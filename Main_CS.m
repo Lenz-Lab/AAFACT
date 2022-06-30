@@ -119,11 +119,14 @@ for m = 1:length(all_files)
 
     list_talus = {'Talonavicular CS','Tibiotalar/Subtalar CS'};
     list_tibia = {'Center of Mass CS','Center of Tibiotalar Facet CS'};
+    list_fibula = {'Center of Mass CS','Center of Talofibular Facet CS'};
 
     if bone_indx == 1
         [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
     elseif bone_indx == 13
         [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
+    elseif bone_indx == 14
+        [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
     else
         bone_coord = [];
     end
@@ -163,7 +166,7 @@ for m = 1:length(all_files)
     coords_final_unit = (R_final*(Temp_Coordinates_Unit_flip') + repmat(T_final,1,length(Temp_Coordinates_Unit_flip')))';
 
     %% Final Plotting
-%     figure()
+    figure()
     plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'k.')
     hold on
 %     plot3(Temp_Nodes_flip(:,1),Temp_Nodes_flip(:,2),Temp_Nodes_flip(:,3),'r.')

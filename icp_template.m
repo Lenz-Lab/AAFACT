@@ -1,4 +1,4 @@
-function [aligned_nodes, flip_out, tib_switch] = icp_template(bone_indx,nodes,bone_coord)
+function [aligned_nodes, flip_out, tibfib_switch] = icp_template(bone_indx,nodes,bone_coord)
 
 if bone_indx == 1 && bone_coord == 1
     TR_template = stlread('Talus_Template.stl');
@@ -50,8 +50,13 @@ elseif bone_indx == 13 && bone_coord == 2
     nodes_template = TR_template.Points;
     con_temp = TR_template.ConnectivityList;
     a = 3;
-elseif bone_indx == 14
+elseif bone_indx == 14 && bone_coord == 1
     TR_template = stlread('Fibula_Template.stl');
+    nodes_template = TR_template.Points;
+    con_temp = TR_template.ConnectivityList;
+    a = 3;
+elseif bone_indx == 14 && bone_coord == 2
+    TR_template = stlread('Fibula_Template_Facet.stl');
     nodes_template = TR_template.Points;
     con_temp = TR_template.ConnectivityList;
     a = 3;
@@ -98,7 +103,7 @@ if bone_indx == 13 || bone_indx == 14
 
         centered_nodes_template = [input_ox input_oy input_oz];
         nodes_template = centered_nodes_template;
-        tib_switch = 2;
+        tibfib_switch = 2;
 
         %         figure()
         %         plot3(centered_nodes_template(:,1),centered_nodes_template(:,2),centered_nodes_template(:,3),'.k')
@@ -108,14 +113,14 @@ if bone_indx == 13 || bone_indx == 14
         %         axis equal
         %         xlabel('X')
     else
-        [R_temp,T_temp] = icp(nodes_template',nodes',200,'Matching','kDtree');
-        nodes = (R_temp*(nodes') + repmat(T_temp,1,length(nodes')))';
-        nodes_template = [nodes_template(nodes_template(:,3)<100,1) nodes_template(nodes_template(:,3)<100,2) nodes_template(nodes_template(:,3)<100,3)];
-        nodes = [nodes(nodes(:,3)<100,1) nodes(nodes(:,3)<100,2) nodes(nodes(:,3)<100,3)];
-        tib_switch = 1;
+%         [R_temp,T_temp] = icp(nodes_template',nodes',200,'Matching','kDtree');
+%         nodes = (R_temp*(nodes') + repmat(T_temp,1,length(nodes')))';
+%         nodes_template = [nodes_template(nodes_template(:,3)<100,1) nodes_template(nodes_template(:,3)<100,2) nodes_template(nodes_template(:,3)<100,3)];
+%         nodes = [nodes(nodes(:,3)<100,1) nodes(nodes(:,3)<100,2) nodes(nodes(:,3)<100,3)];
+        tibfib_switch = 1;
     end
 else
-    tib_switch = 1;
+    tibfib_switch = 1;
 end
 
 
@@ -156,7 +161,7 @@ end
 % plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
 % hold on
 % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'og')
-% % % plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
+% plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
 % % % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
 % % % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
 % % % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)

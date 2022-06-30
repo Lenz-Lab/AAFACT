@@ -1,4 +1,4 @@
-function [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tib_switch)
+function [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tibfib_switch)
 
 %% Align Rough Long Axis Parallel to 2 Axes
 nodes_second_rotation = aligned_nodes;
@@ -35,7 +35,7 @@ elseif bone_indx == 4 % Cuboid
     n = 5;
 elseif bone_indx >= 5 && bone_indx <= 7 % Cuneiforms
     n = 3;
-elseif bone_indx == 13 % Tibia
+elseif bone_indx == 13 || bone_indx == 14 % Tibia or Fibula
     n = 3;
 else
     n = 7;
@@ -84,7 +84,7 @@ av_negative_y_nth_y = mean(negative_y_nth_y);
 av_negative_y_nth_z = mean(negative_y_nth_z);
 
 av_negative_y_nth = [av_negative_y_nth_x,av_negative_y_nth_y,av_negative_y_nth_z];
-
+% 
 % figure()
 % plot3(nodes_second_rotation(:,1),nodes_second_rotation(:,2),nodes_second_rotation(:,3),'k.')
 % hold on
@@ -109,7 +109,7 @@ av_positive_z_nth_y = mean(positive_z_nth_y);
 av_positive_z_nth_z = mean(positive_z_nth_z);
 
 av_positive_z_nth = [av_positive_z_nth_x,av_positive_z_nth_y,av_positive_z_nth_z];
-
+% 
 % figure()
 % plot3(nodes_second_rotation(:,1),nodes_second_rotation(:,2),nodes_second_rotation(:,3),'k.')
 % hold on
@@ -184,7 +184,7 @@ av_positive_x_nth_y = mean(positive_x_nth_y);
 av_positive_x_nth_z = mean(positive_x_nth_z);
 
 av_positive_x_nth = [av_positive_x_nth_x,av_positive_x_nth_y,av_positive_x_nth_z];
-
+% 
 % figure()
 % plot3(nodes_second_rotation(:,1),nodes_second_rotation(:,2),nodes_second_rotation(:,3),'k.')
 % hold on
@@ -208,11 +208,15 @@ elseif bone_indx > 4 && bone_indx < 8
     first_point = av_positive_y_nth;
     second_point = av_negative_y_nth;
     third_point = av_positive_z_nth;
-elseif bone_indx == 13 && tib_switch == 2 % if you only have a portion of the tibia
+elseif bone_indx == 13 && tibfib_switch == 2 % if you only have a portion of the tibia
     first_point = av_positive_y_nth;
     second_point = av_negative_y_nth;
     third_point = av_positive_z_nth;
-elseif bone_indx == 13 && tib_switch == 1 % if you have most of the tibia
+elseif bone_indx == 13 && tibfib_switch == 1 % if you have most of the tibia
+    first_point = av_positive_z_nth;
+    second_point = av_negative_z_nth;
+    third_point = av_positive_y_nth;
+elseif bone_indx == 14 % fibula
     first_point = av_positive_z_nth;
     second_point = av_negative_z_nth;
     third_point = av_positive_y_nth;
@@ -262,12 +266,17 @@ elseif bone_indx > 4 && bone_indx < 8
     SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
     normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
     ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
-elseif bone_indx == 13 && tib_switch == 2
+elseif bone_indx == 13 && tibfib_switch == 2
     AP_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
     SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
     normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
     ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
-elseif bone_indx == 13 && tib_switch == 1
+elseif bone_indx == 13 && tibfib_switch == 1
+    SI_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
+    AP_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
+    normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
+    ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
+elseif bone_indx == 14
     SI_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
     AP_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
     normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
@@ -278,7 +287,7 @@ else
     normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
     ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
 end
-% 
+
 % figure()
 % plot3(nodes_second_rotation(:,1),nodes_second_rotation(:,2),nodes_second_rotation(:,3),'k.')
 % hold on
