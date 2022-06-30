@@ -50,8 +50,13 @@ elseif bone_indx == 13 && bone_coord == 2
     nodes_template = TR_template.Points;
     con_temp = TR_template.ConnectivityList;
     a = 3;
-elseif bone_indx == 14
+elseif bone_indx == 14 && bone_coord == 1
     TR_template = stlread('Fibula_Template.stl');
+    nodes_template = TR_template.Points;
+    con_temp = TR_template.ConnectivityList;
+    a = 3;
+elseif bone_indx == 14 && bone_coord == 2
+    TR_template = stlread('Fibula_Template_Facet.stl');
     nodes_template = TR_template.Points;
     con_temp = TR_template.ConnectivityList;
     a = 3;

@@ -119,7 +119,7 @@ for m = 1:length(all_files)
 
     list_talus = {'Talonavicular CS','Tibiotalar/Subtalar CS'};
     list_tibia = {'Center of Mass CS','Center of Tibiotalar Facet CS'};
-    list_fibula = {'Center of Mass CS','Center of Talofibular Facet CS'}
+    list_fibula = {'Center of Mass CS','Center of Talofibular Facet CS'};
 
     if bone_indx == 1
         [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
