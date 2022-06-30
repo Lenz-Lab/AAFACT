@@ -235,17 +235,17 @@ for i = 1:length(long_axis_points)
     total_distance(i,:) = norm(third_point - long_axis_points(i,:)); % find the distances between the third point and the long axis
 end
 
-figure()
-plot3(nodes_second_rotation(:,1),nodes_second_rotation(:,2),nodes_second_rotation(:,3),'k.')
-hold on
-plot3(first_point(:,1),first_point(:,2),first_point(:,3),'rs')
-plot3(second_point(:,1),second_point(:,2),second_point(:,3),'rs')
-plot3(third_point(:,1),third_point(:,2),third_point(:,3),'rs')
-plot3(0,0,0,'gs')
-xlabel('X')
-ylabel('Y')
-zlabel('Z')
-axis equal
+% figure()
+% plot3(nodes_second_rotation(:,1),nodes_second_rotation(:,2),nodes_second_rotation(:,3),'k.')
+% hold on
+% plot3(first_point(:,1),first_point(:,2),first_point(:,3),'rs')
+% plot3(second_point(:,1),second_point(:,2),second_point(:,3),'rs')
+% plot3(third_point(:,1),third_point(:,2),third_point(:,3),'rs')
+% plot3(0,0,0,'gs')
+% xlabel('X')
+% ylabel('Y')
+% zlabel('Z')
+% axis equal
 
 close_dist = total_distance == min(total_distance); % closest point between third point and the long axis
 origin = [0 0 0];

@@ -80,13 +80,13 @@ if bone_indx == 13 || bone_indx == 14
             end
         end
 
-        figure()
-        plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-        hold on
-        %         plot3(plane(:,1),plane(:,2),plane(:,3),'.r')
-        %         plot3(x,y,z,'.r')
-        axis equal
-        xlabel('X')
+%         figure()
+%         plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
+%         hold on
+%         %         plot3(plane(:,1),plane(:,2),plane(:,3),'.r')
+%         %         plot3(x,y,z,'.r')
+%         axis equal
+%         xlabel('X')
 
         nodes_template = [nodes_template(:,1) nodes_template(:,2) nodes_template(:,3);
             plane(:,1) plane(:,2) plane(:,3)];
@@ -113,10 +113,10 @@ if bone_indx == 13 || bone_indx == 14
         %         axis equal
         %         xlabel('X')
     else
-        [R_temp,T_temp] = icp(nodes_template',nodes',200,'Matching','kDtree');
-        nodes = (R_temp*(nodes') + repmat(T_temp,1,length(nodes')))';
-        nodes_template = [nodes_template(nodes_template(:,3)<100,1) nodes_template(nodes_template(:,3)<100,2) nodes_template(nodes_template(:,3)<100,3)];
-        nodes = [nodes(nodes(:,3)<100,1) nodes(nodes(:,3)<100,2) nodes(nodes(:,3)<100,3)];
+%         [R_temp,T_temp] = icp(nodes_template',nodes',200,'Matching','kDtree');
+%         nodes = (R_temp*(nodes') + repmat(T_temp,1,length(nodes')))';
+%         nodes_template = [nodes_template(nodes_template(:,3)<100,1) nodes_template(nodes_template(:,3)<100,2) nodes_template(nodes_template(:,3)<100,3)];
+%         nodes = [nodes(nodes(:,3)<100,1) nodes(nodes(:,3)<100,2) nodes(nodes(:,3)<100,3)];
         tibfib_switch = 1;
     end
 else
@@ -157,17 +157,17 @@ if multiplier > 1
     aligned_nodes = aligned_nodes/multiplier;
 end
 
-figure()
-plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-hold on
-plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'og')
-% % plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
-% % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
-% % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
-% % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)
-% % plot3(aligned_nodes(superior_point,1),aligned_nodes(superior_point,2),aligned_nodes(superior_point,3),'b.','MarkerSize',100)
-% legend('template','new nodes','anterior','medial','superior')
-xlabel('X')
-ylabel('Y')
-zlabel('Z')
-axis equal
+% figure()
+% plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
+% hold on
+% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'og')
+% plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
+% % % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
+% % % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
+% % % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)
+% % % plot3(aligned_nodes(superior_point,1),aligned_nodes(superior_point,2),aligned_nodes(superior_point,3),'b.','MarkerSize',100)
+% % legend('template','new nodes','anterior','medial','superior')
+% xlabel('X')
+% ylabel('Y')
+% zlabel('Z')
+% axis equal
