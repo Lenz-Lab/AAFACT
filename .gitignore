@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# 3D Objects
+*.stl
+*.vtk
+*.obj
+*.ply
