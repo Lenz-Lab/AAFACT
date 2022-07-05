@@ -4,14 +4,13 @@ Use this code to automatically assign a coordinate system to bone models.
 
 ## Description
 
-An in-depth paragraph about your project and overview of use.
+This code takes a bone model, currently the tibia, fibula, talus, calcaneus, navicular, cuboid and the three cuneiforms, and automatically assigns a coordinate system. The input file type currently supported is ".k", ".stl", ".particles", ".vtk", ".ply" and the output is an .xlsx file with two different coordinate systems. The first is the starting and ending points for all three axes with the origin at the location that the user input the bone. The second is the starting and ending points for all three axes with the origin at (0,0,0).
 
 ## Getting Started
 
 ### Dependencies
 
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-* ex. Windows 10
+* MATLAB R2020A or later
 
 ### Installing
 
@@ -20,11 +19,10 @@ An in-depth paragraph about your project and overview of use.
 
 ### Executing program
 
-* How to run the program
-* Step-by-step bullets
-```
-code blocks for commands
-```
+* Create a new folder in 'C:' drive called 'AutoCoordinateSystem'
+* Execute the matlab script 'MainCS.m'
+* Select an individual bone model or a folder including the bone models
+* If the folder name or the file name does not contains the name of the bone and/or the laterally, you will need to manually select both of those for each bone
 
 ## Help
 
@@ -35,16 +33,10 @@ command to run if program contains helper info
 
 ## Authors
 
-Contributors names and contact info
-
-ex. Amy Lenz  
-ex. [@lenzetal](https://twitter.com/lenzetal)
+* Andrew Peterson ([acpeterson96](https://github.com/acpeterson96), andrew.c.peterson@utah.edu)
 
 ## Version History
 
-* 0.2
-    * Various bug fixes and optimizations
-    * See [commit change]() or See [release history]()
 * 0.1
     * Initial Release
 
