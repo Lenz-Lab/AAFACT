@@ -84,7 +84,7 @@ av_negative_y_nth_y = mean(negative_y_nth_y);
 av_negative_y_nth_z = mean(negative_y_nth_z);
 
 av_negative_y_nth = [av_negative_y_nth_x,av_negative_y_nth_y,av_negative_y_nth_z];
-% 
+
 % figure()
 % plot3(nodes_second_rotation(:,1),nodes_second_rotation(:,2),nodes_second_rotation(:,3),'k.')
 % hold on
