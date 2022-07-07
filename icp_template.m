@@ -2,65 +2,59 @@ function [aligned_nodes, flip_out, tibfib_switch] = icp_template(bone_indx,nodes
 
 if bone_indx == 1 && bone_coord == 1
     TR_template = stlread('Talus_Template.stl');
-    nodes_template = TR_template.Points;
-    con_temp = TR_template.ConnectivityList;
     a = 2;
 elseif bone_indx == 1 && bone_coord == 2
     TR_template = stlread('Talus_Template2.stl');
-    nodes_template = TR_template.Points;
-    con_temp = TR_template.ConnectivityList;
     a = 2;
 elseif bone_indx == 2
     TR_template = stlread('Calcaneus_Template.stl');
-    nodes_template = TR_template.Points;
-    con_temp = TR_template.ConnectivityList;
     a = 2;
 elseif bone_indx == 3
     TR_template = stlread('Navicular_Template.stl');
-    nodes_template = TR_template.Points;
-    con_temp = TR_template.ConnectivityList;
     a = 1;
 elseif bone_indx == 4
     TR_template = stlread('Cuboid_Template.stl');
-    nodes_template = TR_template.Points;
-    con_temp = TR_template.ConnectivityList;
     a = 2;
 elseif bone_indx == 5
     TR_template = stlread('Medial_Cuneiform_Template.stl');
-    nodes_template = TR_template.Points;
-    con_temp = TR_template.ConnectivityList;
     a = 3;
 elseif bone_indx == 6
     TR_template = stlread('Intermediate_Cuneiform_Template.stl');
-    nodes_template = TR_template.Points;
-    con_temp = TR_template.ConnectivityList;
     a = 3;
 elseif bone_indx == 7
     TR_template = stlread('Lateral_Cuneiform_Template.stl');
-    nodes_template = TR_template.Points;
-    con_temp = TR_template.ConnectivityList;
     a = 3;
+elseif bone_indx == 8
+    TR_template = stlread('Metatarsal1_Template.stl');
+    a = 2;
+elseif bone_indx == 9
+    TR_template = stlread('Metatarsal2_Template.stl');
+    a = 2;
+elseif bone_indx == 10
+    TR_template = stlread('Metatarsal3_Template.stl');
+    a = 2;
+elseif bone_indx == 11
+    TR_template = stlread('Metatarsal4_Template.stl');
+    a = 2;
+elseif bone_indx == 12
+    TR_template = stlread('Metatarsal5_Template.stl');
+    a = 2;
 elseif bone_indx == 13 && bone_coord == 1
     TR_template = stlread('Tibia_Template.stl');
-    nodes_template = TR_template.Points;
-    con_temp = TR_template.ConnectivityList;
     a = 3;
 elseif bone_indx == 13 && bone_coord == 2
     TR_template = stlread('Tibia_Template_Facet.stl');
-    nodes_template = TR_template.Points;
-    con_temp = TR_template.ConnectivityList;
     a = 3;
 elseif bone_indx == 14 && bone_coord == 1
     TR_template = stlread('Fibula_Template.stl');
-    nodes_template = TR_template.Points;
-    con_temp = TR_template.ConnectivityList;
     a = 3;
 elseif bone_indx == 14 && bone_coord == 2
     TR_template = stlread('Fibula_Template_Facet.stl');
-    nodes_template = TR_template.Points;
-    con_temp = TR_template.ConnectivityList;
     a = 3;
 end
+
+nodes_template = TR_template.Points;
+con_temp = TR_template.ConnectivityList;
 
 if bone_indx == 13 || bone_indx == 14
     nodes_template_length = (max(nodes_template(:,a)) - min(nodes_template(:,a)));
@@ -80,22 +74,12 @@ if bone_indx == 13 || bone_indx == 14
             end
         end
 
-%         figure()
-%         plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-%         hold on
-%         %         plot3(plane(:,1),plane(:,2),plane(:,3),'.r')
-%         %         plot3(x,y,z,'.r')
-%         axis equal
-%         xlabel('X')
-
         nodes_template = [nodes_template(:,1) nodes_template(:,2) nodes_template(:,3);
             plane(:,1) plane(:,2) plane(:,3)];
 
         cm_x = mean(nodes_template(:,1));
         cm_y = mean(nodes_template(:,2));
         cm_z = mean(nodes_template(:,3));
-
-        % cm = [cm_x cm_y cm_z];
 
         input_ox = nodes_template(:,1) - cm_x;
         input_oy = nodes_template(:,2) - cm_y;
@@ -105,25 +89,12 @@ if bone_indx == 13 || bone_indx == 14
         nodes_template = centered_nodes_template;
         tibfib_switch = 2;
 
-        %         figure()
-        %         plot3(centered_nodes_template(:,1),centered_nodes_template(:,2),centered_nodes_template(:,3),'.k')
-        %         hold on
-        %         %         plot3(plane(:,1),plane(:,2),plane(:,3),'.r')
-        %         %         plot3(x,y,z,'.r')
-        %         axis equal
-        %         xlabel('X')
     else
-%         [R_temp,T_temp] = icp(nodes_template',nodes',200,'Matching','kDtree');
-%         nodes = (R_temp*(nodes') + repmat(T_temp,1,length(nodes')))';
-%         nodes_template = [nodes_template(nodes_template(:,3)<100,1) nodes_template(nodes_template(:,3)<100,2) nodes_template(nodes_template(:,3)<100,3)];
-%         nodes = [nodes(nodes(:,3)<100,1) nodes(nodes(:,3)<100,2) nodes(nodes(:,3)<100,3)];
         tibfib_switch = 1;
     end
 else
     tibfib_switch = 1;
 end
-
-
 
 multiplier = (max(nodes_template(:,a)) - min(nodes_template(:,a)))/(max(nodes(:,a)) - min(nodes(:,a)));
 if multiplier > 1
