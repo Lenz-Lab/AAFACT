@@ -179,7 +179,6 @@ octave-workspace
 .cache/
 
 # 3D Objects
-*.stl
 *.ply
 *.vtk
 *.obj
