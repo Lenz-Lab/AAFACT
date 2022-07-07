@@ -160,7 +160,7 @@ for m = 1:length(all_files)
         Temp_Coords_flip = Temp_Coords_flip.*[1,1,-1]; % Flip back to right if applicable
         Temp_Coordinates_Unit_flip = Temp_Coordinates_Unit_flip.*[1,1,-1]; % Flip back to right if applicable
     end
-    [R_final,T_final] = icp(nodes_original',Temp_Nodes_flip',100,'Matching','kDtree');
+    [R_final,T_final,E] = icp(nodes_original',Temp_Nodes_flip',1000,'Matching','kDtree','WorstRejection',0.1);
     nodes_final = (R_final*(Temp_Nodes_flip') + repmat(T_final,1,length(Temp_Nodes_flip')))';
     coords_final = (R_final*(Temp_Coords_flip') + repmat(T_final,1,length(Temp_Coords_flip')))';
     coords_final_unit = (R_final*(Temp_Coordinates_Unit_flip') + repmat(T_final,1,length(Temp_Coordinates_Unit_flip')))';
@@ -170,7 +170,7 @@ for m = 1:length(all_files)
     plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'k.')
     hold on
 %     plot3(Temp_Nodes_flip(:,1),Temp_Nodes_flip(:,2),Temp_Nodes_flip(:,3),'r.')
-%     plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'g.')
+    plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'g.')
     hold on
     arrow(coords_final(1,:),coords_final(2,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
     arrow(coords_final(3,:),coords_final(4,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
