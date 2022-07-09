@@ -1,5 +1,6 @@
-function [aligned_nodes, flip_out, tibfib_switch] = icp_template(bone_indx,nodes,bone_coord)
+function [aligned_nodes, flip_out, tibfib_switch, Rot, Tra] = icp_template(bone_indx,nodes,bone_coord)
 
+addpath('./Template_Bones')
 if bone_indx == 1 && bone_coord == 1
     TR_template = stlread('Talus_Template.stl');
     a = 2;
@@ -113,32 +114,40 @@ nodesx = temp_nodes*[1 0 0; 0 -1 0; 0 0 -1];
 if exist('ER4','var') && ER4(end,:) < ER3(end,:) && ER4(end,:) < ER2(end,:) && ER4(end,:) < ER1(end,:)
     aligned_nodes = (R4*(nodesx') + repmat(T4,1,length(nodesx')))';
     flip_out = [1 0 0; 0 -1 0; 0 0 -1];
+    Rot = R4;
+    Tra = T4;
 elseif exist('ER3','var') && ER3(end,:) < ER2(end,:) && ER3(end,:) < ER1(end,:)
     aligned_nodes = (R3*(nodesy') + repmat(T3,1,length(nodesy')))';
     flip_out = [-1 0 0; 0 -1 0; 0 0 1];
+    Rot = R3;
+    Tra = T3;
 elseif exist('ER2','var') && ER2(end,:) < ER1(end,:)
     aligned_nodes = (R2*(nodesz') + repmat(T2,1,length(nodesz')))';
     flip_out = [-1 0 0; 0 -1 0; 0 0 1];
+    Rot = R2;
+    Tra = T2;
 else
     aligned_nodes = temp_nodes;
     flip_out = [1 0 0; 0 1 0; 0 0 1];
+    Rot = R1;
+    Tra = T1;
 end
 
 if multiplier > 1
     aligned_nodes = aligned_nodes/multiplier;
 end
 
-figure()
-plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-hold on
-plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'og')
-% plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
-% % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
-% % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
-% % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)
-% % plot3(aligned_nodes(superior_point,1),aligned_nodes(superior_point,2),aligned_nodes(superior_point,3),'b.','MarkerSize',100)
-% legend('template','new nodes','anterior','medial','superior')
-xlabel('X')
-ylabel('Y')
-zlabel('Z')
-axis equal
+% figure()
+% plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
+% hold on
+% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'og')
+% % plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
+% % % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
+% % % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
+% % % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)
+% % % plot3(aligned_nodes(superior_point,1),aligned_nodes(superior_point,2),aligned_nodes(superior_point,3),'b.','MarkerSize',100)
+% % legend('template','new nodes','anterior','medial','superior')
+% xlabel('X')
+% ylabel('Y')
+% zlabel('Z')
+% axis equal
