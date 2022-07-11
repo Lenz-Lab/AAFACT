@@ -1,28 +1,22 @@
 function [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tibfib_switch)
 
-%% Align Rough Long Axis Parallel to 2 Axes
-nodes_second_rotation = aligned_nodes;
-
 %% Multiple CS for Talus
 if bone_indx == 1 && bone_coord == 2
-    nodes_original = nodes_second_rotation;
-    nodes_second_rotation = [aligned_nodes(aligned_nodes(:,2)<10,1) aligned_nodes(aligned_nodes(:,2)<10,2) aligned_nodes(aligned_nodes(:,2)<10,3)];
+    nodes_original = aligned_nodes;
+    aligned_nodes = [aligned_nodes(aligned_nodes(:,2)<10,1) aligned_nodes(aligned_nodes(:,2)<10,2) aligned_nodes(aligned_nodes(:,2)<10,3)];
 end
 
 %% Split up the bone into nth sections in all three planes
-x_min = min(nodes_second_rotation(:,1));
-y_min = min(nodes_second_rotation(:,2));
-z_min = min(nodes_second_rotation(:,3));
-x_max = max(nodes_second_rotation(:,1));
-y_max = max(nodes_second_rotation(:,2));
-z_max = max(nodes_second_rotation(:,3));
+x_min = min(aligned_nodes(:,1));
+y_min = min(aligned_nodes(:,2));
+z_min = min(aligned_nodes(:,3));
+x_max = max(aligned_nodes(:,1));
+y_max = max(aligned_nodes(:,2));
+z_max = max(aligned_nodes(:,3));
 
 range_x = x_max - x_min;
 range_y = y_max - y_min;
 range_z = z_max - z_min;
-
-% list_bone = {'Talus', 'Calcaneus', 'Navicular', 'Cuboid', 'Medial_Cuneiform','Intermediate_Cuneiform',...
-%     'Lateral_Cuneiform','First_Metatarsal','Second_Metatarsal','Third_Metatarsal','Fourth_Metatarsal','Fifth_Metatarsal'};
 
 % Splits bone up in n sections
 if bone_indx == 1 % Talus
@@ -34,6 +28,8 @@ elseif bone_indx == 3 % Navicular
 elseif bone_indx == 4 % Cuboid
     n = 5;
 elseif bone_indx >= 5 && bone_indx <= 7 % Cuneiforms
+    n = 3;
+elseif bone_indx >= 8 && bone_indx <= 12 % Metatarsals
     n = 3;
 elseif bone_indx == 13 || bone_indx == 14 % Tibia or Fibula
     n = 3;
@@ -48,11 +44,11 @@ nth_z = range_z/n;
 %% Positive Y Nth ROI
 positive_y_nth = y_max - nth_y;
 
-positive_y_nth_ROI = nodes_second_rotation(:,2) >= positive_y_nth;
+positive_y_nth_ROI = aligned_nodes(:,2) >= positive_y_nth;
 
-positive_y_nth_x = nonzeros(nodes_second_rotation(:,1).*positive_y_nth_ROI);
-positive_y_nth_y = nonzeros(nodes_second_rotation(:,2).*positive_y_nth_ROI);
-positive_y_nth_z = nonzeros(nodes_second_rotation(:,3).*positive_y_nth_ROI);
+positive_y_nth_x = nonzeros(aligned_nodes(:,1).*positive_y_nth_ROI);
+positive_y_nth_y = nonzeros(aligned_nodes(:,2).*positive_y_nth_ROI);
+positive_y_nth_z = nonzeros(aligned_nodes(:,3).*positive_y_nth_ROI);
 
 av_positive_y_nth_x = mean(positive_y_nth_x);
 av_positive_y_nth_y = mean(positive_y_nth_y);
@@ -73,11 +69,11 @@ av_positive_y_nth = [av_positive_y_nth_x,av_positive_y_nth_y,av_positive_y_nth_z
 %% Negative Y nth ROI
 negative_y_nth = y_min + nth_y;
 
-negative_y_nth_ROI = nodes_second_rotation(:,2) <= negative_y_nth;
+negative_y_nth_ROI = aligned_nodes(:,2) <= negative_y_nth;
 
-negative_y_nth_x = nonzeros(nodes_second_rotation(:,1).*negative_y_nth_ROI);
-negative_y_nth_y = nonzeros(nodes_second_rotation(:,2).*negative_y_nth_ROI);
-negative_y_nth_z = nonzeros(nodes_second_rotation(:,3).*negative_y_nth_ROI);
+negative_y_nth_x = nonzeros(aligned_nodes(:,1).*negative_y_nth_ROI);
+negative_y_nth_y = nonzeros(aligned_nodes(:,2).*negative_y_nth_ROI);
+negative_y_nth_z = nonzeros(aligned_nodes(:,3).*negative_y_nth_ROI);
 
 av_negative_y_nth_x = mean(negative_y_nth_x);
 av_negative_y_nth_y = mean(negative_y_nth_y);
@@ -98,11 +94,11 @@ av_negative_y_nth = [av_negative_y_nth_x,av_negative_y_nth_y,av_negative_y_nth_z
 %% Positive Z nth ROI
 positive_z_nth = z_max - nth_z;
 
-positive_z_nth_ROI = nodes_second_rotation(:,3) >= positive_z_nth;
+positive_z_nth_ROI = aligned_nodes(:,3) >= positive_z_nth;
 
-positive_z_nth_x = nonzeros(nodes_second_rotation(:,1).*positive_z_nth_ROI);
-positive_z_nth_y = nonzeros(nodes_second_rotation(:,2).*positive_z_nth_ROI);
-positive_z_nth_z = nonzeros(nodes_second_rotation(:,3).*positive_z_nth_ROI);
+positive_z_nth_x = nonzeros(aligned_nodes(:,1).*positive_z_nth_ROI);
+positive_z_nth_y = nonzeros(aligned_nodes(:,2).*positive_z_nth_ROI);
+positive_z_nth_z = nonzeros(aligned_nodes(:,3).*positive_z_nth_ROI);
 
 av_positive_z_nth_x = mean(positive_z_nth_x);
 av_positive_z_nth_y = mean(positive_z_nth_y);
@@ -123,11 +119,11 @@ av_positive_z_nth = [av_positive_z_nth_x,av_positive_z_nth_y,av_positive_z_nth_z
 %% Negative Z nth ROI
 negative_z_nth = z_min + nth_z;
 
-negative_z_nth_ROI = nodes_second_rotation(:,3) <= negative_z_nth;
+negative_z_nth_ROI = aligned_nodes(:,3) <= negative_z_nth;
 
-negative_z_nth_x = nonzeros(nodes_second_rotation(:,1).*negative_z_nth_ROI);
-negative_z_nth_y = nonzeros(nodes_second_rotation(:,2).*negative_z_nth_ROI);
-negative_z_nth_z = nonzeros(nodes_second_rotation(:,3).*negative_z_nth_ROI);
+negative_z_nth_x = nonzeros(aligned_nodes(:,1).*negative_z_nth_ROI);
+negative_z_nth_y = nonzeros(aligned_nodes(:,2).*negative_z_nth_ROI);
+negative_z_nth_z = nonzeros(aligned_nodes(:,3).*negative_z_nth_ROI);
 
 av_negative_z_nth_x = mean(negative_z_nth_x);
 av_negative_z_nth_y = mean(negative_z_nth_y);
@@ -139,7 +135,7 @@ av_negative_z_nth = [av_negative_z_nth_x,av_negative_z_nth_y,av_negative_z_nth_z
 % plot3(nodes_second_rotation(:,1),nodes_second_rotation(:,2),nodes_second_rotation(:,3),'k.')
 % hold on
 % plot3(negative_z_nth_x,negative_z_nth_y,negative_z_nth_z,'ys')
-% plot3(av_negative_z_nth_x,av_negative_z_nth_y,av_negative_z_nth_z,'go')
+% plot3(av_negative_z_nth_x,av_negative_z_nth_y,av_negative_z_nth_z,'r.','MarkerSize',50)
 % xlabel('X')
 % ylabel('Y')
 % zlabel('Z')
@@ -148,11 +144,11 @@ av_negative_z_nth = [av_negative_z_nth_x,av_negative_z_nth_y,av_negative_z_nth_z
 %% Negative X nth ROI
 negative_x_nth = x_min + nth_x;
 
-negative_x_nth_ROI = nodes_second_rotation(:,1) <= negative_x_nth;
+negative_x_nth_ROI = aligned_nodes(:,1) <= negative_x_nth;
 
-negative_x_nth_x = nonzeros(nodes_second_rotation(:,1).*negative_x_nth_ROI);
-negative_x_nth_y = nonzeros(nodes_second_rotation(:,2).*negative_x_nth_ROI);
-negative_x_nth_z = nonzeros(nodes_second_rotation(:,3).*negative_x_nth_ROI);
+negative_x_nth_x = nonzeros(aligned_nodes(:,1).*negative_x_nth_ROI);
+negative_x_nth_y = nonzeros(aligned_nodes(:,2).*negative_x_nth_ROI);
+negative_x_nth_z = nonzeros(aligned_nodes(:,3).*negative_x_nth_ROI);
 
 av_negative_x_nth_x = mean(negative_x_nth_x);
 av_negative_x_nth_y = mean(negative_x_nth_y);
@@ -164,7 +160,7 @@ av_negative_x_nth = [av_negative_x_nth_x,av_negative_x_nth_y,av_negative_x_nth_z
 % plot3(nodes_second_rotation(:,1),nodes_second_rotation(:,2),nodes_second_rotation(:,3),'k.')
 % hold on
 % plot3(negative_x_nth_x,negative_x_nth_y,negative_x_nth_z,'ys')
-% plot3(av_negative_x_nth_x,av_negative_x_nth_y,av_negative_x_nth_z,'go')
+% plot3(av_negative_x_nth_x,av_negative_x_nth_y,av_negative_x_nth_z,'r.','MarkerSize',50)
 % xlabel('X')
 % ylabel('Y')
 % zlabel('Z')
@@ -173,23 +169,23 @@ av_negative_x_nth = [av_negative_x_nth_x,av_negative_x_nth_y,av_negative_x_nth_z
 %% Positive X nth ROI
 positive_x_nth = x_max - nth_x;
 
-positive_x_nth_ROI = nodes_second_rotation(:,1) >= positive_x_nth;
+positive_x_nth_ROI = aligned_nodes(:,1) >= positive_x_nth;
 
-positive_x_nth_x = nonzeros(nodes_second_rotation(:,1).*positive_x_nth_ROI);
-positive_x_nth_y = nonzeros(nodes_second_rotation(:,2).*positive_x_nth_ROI);
-positive_x_nth_z = nonzeros(nodes_second_rotation(:,3).*positive_x_nth_ROI);
+positive_x_nth_x = nonzeros(aligned_nodes(:,1).*positive_x_nth_ROI);
+positive_x_nth_y = nonzeros(aligned_nodes(:,2).*positive_x_nth_ROI);
+positive_x_nth_z = nonzeros(aligned_nodes(:,3).*positive_x_nth_ROI);
 
 av_positive_x_nth_x = mean(positive_x_nth_x);
 av_positive_x_nth_y = mean(positive_x_nth_y);
 av_positive_x_nth_z = mean(positive_x_nth_z);
 
 av_positive_x_nth = [av_positive_x_nth_x,av_positive_x_nth_y,av_positive_x_nth_z];
-% 
+
 % figure()
 % plot3(nodes_second_rotation(:,1),nodes_second_rotation(:,2),nodes_second_rotation(:,3),'k.')
 % hold on
 % plot3(positive_x_nth_x,positive_x_nth_y,positive_x_nth_z,'ys')
-% plot3(av_positive_x_nth_x,av_positive_x_nth_y,av_positive_x_nth_z,'go')
+% plot3(av_positive_x_nth_x,av_positive_x_nth_y,av_positive_x_nth_z,'r.','MarkerSize',50)
 % xlabel('X')
 % ylabel('Y')
 % zlabel('Z')
@@ -205,6 +201,10 @@ elseif bone_indx == 1 && bone_coord == 2
     second_point = av_negative_x_nth;
     third_point = av_positive_z_nth;
 elseif bone_indx > 4 && bone_indx < 8
+    first_point = av_positive_y_nth;
+    second_point = av_negative_y_nth;
+    third_point = av_positive_z_nth;
+elseif bone_indx >= 8 && bone_indx <= 12
     first_point = av_positive_y_nth;
     second_point = av_negative_y_nth;
     third_point = av_positive_z_nth;
@@ -266,6 +266,11 @@ elseif bone_indx > 4 && bone_indx < 8
     SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
     normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
     ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
+elseif bone_indx >= 8 && bone_indx <= 12
+    AP_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
+    SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
+    normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
+    ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
 elseif bone_indx == 13 && tibfib_switch == 2
     AP_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
     SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
@@ -289,7 +294,7 @@ else
 end
 
 % figure()
-% plot3(nodes_second_rotation(:,1),nodes_second_rotation(:,2),nodes_second_rotation(:,3),'k.')
+% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
 % hold on
 % plot3(AP_vector_points(:,1),AP_vector_points(:,2),AP_vector_points(:,3),'r')
 % plot3(SI_vector_points(:,1),SI_vector_points(:,2),SI_vector_points(:,3),'g')
@@ -315,5 +320,5 @@ Temp_Coordinates = [AP_vector_points
 if bone_indx == 1 && bone_coord == 2
     Temp_Nodes = nodes_original;
 else
-    Temp_Nodes = nodes_second_rotation;
+    Temp_Nodes = aligned_nodes;
 end

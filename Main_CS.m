@@ -58,7 +58,7 @@ for m = 1:length(all_files)
     % If the folder and the file don't have the bone name, the user must select
     % the bone name
     if exist('bone_indx') == 0
-        [bone_indx,~] = listdlg('PromptString', {'Select which bone you loaded.'}, 'ListString', list_bone,'SelectionMode','single');
+        [bone_indx,~] = listdlg('PromptString', {strcat('Select which bone this file is:'," ",string(FileName))}, 'ListString', list_bone,'SelectionMode','single');
     end
 
     % Looks through the folder name for the bone side
@@ -89,7 +89,7 @@ for m = 1:length(all_files)
     elseif exist('side_folder_indx') && side_folder_indx >= 3
         side_indx = 2;
     else
-        [side_indx,~] = listdlg('PromptString', {'Select which side.'}, 'ListString', list_side,'SelectionMode','single');
+        [side_indx,~] = listdlg('PromptString', {strcat('Select which side this file is:'," ",string(FileName))}, 'ListString', list_side,'SelectionMode','single');
     end
 
     %% Load in file based on file type
@@ -144,7 +144,7 @@ for m = 1:length(all_files)
     % model in a fashion that the superior region is in the positive Z
     % direction, the anterior region is in the positive Y direction, and the
     % medial region is in the positive X direction.
-    [aligned_nodes, flip_out, tib_switch] = icp_template(bone_indx,nodes,bone_coord);
+    [aligned_nodes, flip_out, tib_switch, Rot, Tra] = icp_template(bone_indx,nodes,bone_coord);
 
     %% Performs coordinate system calculation
     [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tib_switch);
@@ -160,16 +160,25 @@ for m = 1:length(all_files)
         Temp_Coords_flip = Temp_Coords_flip.*[1,1,-1]; % Flip back to right if applicable
         Temp_Coordinates_Unit_flip = Temp_Coordinates_Unit_flip.*[1,1,-1]; % Flip back to right if applicable
     end
-    [R_final,T_final] = icp(nodes_original',Temp_Nodes_flip',100,'Matching','kDtree');
-    nodes_final = (R_final*(Temp_Nodes_flip') + repmat(T_final,1,length(Temp_Nodes_flip')))';
-    coords_final = (R_final*(Temp_Coords_flip') + repmat(T_final,1,length(Temp_Coords_flip')))';
-    coords_final_unit = (R_final*(Temp_Coordinates_Unit_flip') + repmat(T_final,1,length(Temp_Coordinates_Unit_flip')))';
+    %     [R_final,T_final,E] = icp(nodes_original',Temp_Nodes_flip',1000,'Matching','kDtree','WorstRejection',0.1);
+    %     nodes_final = (R_final*(Temp_Nodes_flip') + repmat(T_final,1,length(Temp_Nodes_flip')))';
+    %     coords_final = (R_final*(Temp_Coords_flip') + repmat(T_final,1,length(Temp_Coords_flip')))';
+    %     coords_final_unit = (R_final*(Temp_Coordinates_Unit_flip') + repmat(T_final,1,length(Temp_Coordinates_Unit_flip')))';
+
+    nodes_final_temp = (Temp_Nodes_flip' - repmat(Tra,1,length(Temp_Nodes_flip')))';
+    nodes_final = (inv(Rot)*(nodes_final_temp'))';
+
+    coords_final_temp = (Temp_Coords_flip' - repmat(Tra,1,length(Temp_Coords_flip')))';
+    coords_final = (inv(Rot)*(coords_final_temp'))';
+
+    coords_final_unit_temp = (Temp_Coordinates_Unit_flip' - repmat(Tra,1,length(Temp_Coordinates_Unit_flip')))';
+    coords_final_unit = (inv(Rot)*(coords_final_unit_temp'))';
 
     %% Final Plotting
 %     figure()
     plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'k.')
     hold on
-%     plot3(Temp_Nodes_flip(:,1),Temp_Nodes_flip(:,2),Temp_Nodes_flip(:,3),'r.')
+    %     plot3(Temp_Nodes_flip(:,1),Temp_Nodes_flip(:,2),Temp_Nodes_flip(:,3),'r.')
 %     plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'g.')
     hold on
     arrow(coords_final(1,:),coords_final(2,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
