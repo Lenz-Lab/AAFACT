@@ -160,36 +160,6 @@ elseif ER4_0(end) == ER_min
     Tra = T4_0;
 end
 
-
-
-
-% if ER4(end,:) < ER3(end,:) && ER4(end,:) < ER2(end,:) && ER4(end,:) < ER1(end,:) && ER4(end,:) < ER1_0(end,:)
-%     aligned_nodes = (R4*(nodesx') + repmat(T4,1,length(nodesx')))';
-%     flip_out = [1 0 0; 0 -1 0; 0 0 -1];
-%     Rot = R4;
-%     Tra = T4;
-% elseif exist('ER3','var') && ER3(end,:) < ER2(end,:) && ER3(end,:) < ER1(end,:) && ER3(end,:) < ER1_0(end,:)
-%     aligned_nodes = (R3*(nodesy') + repmat(T3,1,length(nodesy')))';
-%     flip_out = [-1 0 0; 0 -1 0; 0 0 1];
-%     Rot = R3;
-%     Tra = T3;
-% elseif exist('ER2','var') && ER2(end,:) < ER1(end,:) && ER2(end,:) < ER1_0(end,:)
-%     aligned_nodes = (R2*(nodesz') + repmat(T2,1,length(nodesz')))';
-%     flip_out = [-1 0 0; 0 -1 0; 0 0 1];
-%     Rot = R2;
-%     Tra = T2;
-% elseif exist('ER1','var') && ER2(end,:) < ER1(end,:) && ER1(end,:) < ER1_0(end,:)
-%     aligned_nodes = temp_nodes;
-%     flip_out = [1 0 0; 0 1 0; 0 0 1];
-%     Rot = R1;
-%     Tra = T1;
-% else
-%     aligned_nodes = temp_nodes_0;
-%     flip_out = [1 0 0; 0 1 0; 0 0 1];
-%     Rot = R1_0;
-%     Tra = T1_0;
-% end
-
 if multiplier > 1
     aligned_nodes = aligned_nodes/multiplier;
 end
