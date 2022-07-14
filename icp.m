@@ -581,7 +581,8 @@ poly = double(poly);
 pts = double(pts);
 
 %Calculating freeboundary points:
-TR = TriRep(poly, pts(1,:)', pts(2,:)', pts(3,:)');
+% TR = triangulation(poly, pts(1,:)', pts(2,:)', pts(3,:)');
+TR = delaunayTriangulation(pts(1,:)', pts(2,:)', pts(3,:)');
 FF = freeBoundary(TR);
 
 %Output
