@@ -104,34 +104,91 @@ end
 
 [R1,T1,ER1] = icp(nodes_template',nodes',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
 temp_nodes = (R1*(nodes') + repmat(T1,1,length(nodes')))';
+[R1_0,T1_0,ER1_0] = icp(nodes_template',nodes',200,'Matching','kDtree','WorstRejection',0.1);
+temp_nodes_0 = (R1_0*(nodes') + repmat(T1_0,1,length(nodes')))';
 nodesz = temp_nodes*[-1 0 0; 0 -1 0; 0 0 1];
 [R2,T2,ER2] = icp(nodes_template',nodesz',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+[R2_0,T2_0,ER2_0] = icp(nodes_template',nodesz',200,'Matching','kDtree','WorstRejection',0.1);
 nodesy = temp_nodes*[-1 0 0; 0 1 0; 0 0 -1];
 [R3,T3,ER3] = icp(nodes_template',nodesy',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+[R3_0,T3_0,ER3_0] = icp(nodes_template',nodesy',200,'Matching','kDtree','WorstRejection',0.1);
 nodesx = temp_nodes*[1 0 0; 0 -1 0; 0 0 -1];
 [R4,T4,ER4] = icp(nodes_template',nodesx',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+[R4_0,T4_0,ER4_0] = icp(nodes_template',nodesx',200,'Matching','kDtree','WorstRejection',0.1);
 
-if exist('ER4','var') && ER4(end,:) < ER3(end,:) && ER4(end,:) < ER2(end,:) && ER4(end,:) < ER1(end,:)
-    aligned_nodes = (R4*(nodesx') + repmat(T4,1,length(nodesx')))';
-    flip_out = [1 0 0; 0 -1 0; 0 0 -1];
-    Rot = R4;
-    Tra = T4;
-elseif exist('ER3','var') && ER3(end,:) < ER2(end,:) && ER3(end,:) < ER1(end,:)
-    aligned_nodes = (R3*(nodesy') + repmat(T3,1,length(nodesy')))';
-    flip_out = [-1 0 0; 0 -1 0; 0 0 1];
-    Rot = R3;
-    Tra = T3;
-elseif exist('ER2','var') && ER2(end,:) < ER1(end,:)
-    aligned_nodes = (R2*(nodesz') + repmat(T2,1,length(nodesz')))';
-    flip_out = [-1 0 0; 0 -1 0; 0 0 1];
-    Rot = R2;
-    Tra = T2;
-else
+ER_min = min([ER1(end),ER1_0(end),ER2(end),ER2_0(end),ER3(end),ER3_0(end),ER4(end),ER4_0(end)]);
+
+if ER1(end) == ER_min
     aligned_nodes = temp_nodes;
     flip_out = [1 0 0; 0 1 0; 0 0 1];
     Rot = R1;
     Tra = T1;
+elseif ER1_0(end) == ER_min
+    aligned_nodes = temp_nodes_0;
+    flip_out = [1 0 0; 0 1 0; 0 0 1];
+    Rot = R1_0;
+    Tra = T1_0;
+elseif ER2(end) == ER_min
+    aligned_nodes = (R2*(nodesz') + repmat(T2,1,length(nodesz')))';
+    flip_out = [-1 0 0; 0 -1 0; 0 0 1];
+    Rot = R2;
+    Tra = T2;
+elseif ER2_0(end) == ER_min
+    aligned_nodes = (R2_0*(nodesz') + repmat(T2_0,1,length(nodesz')))';
+    flip_out = [-1 0 0; 0 -1 0; 0 0 1];
+    Rot = R2_0;
+    Tra = T2_0;
+elseif ER3(end) == ER_min
+    aligned_nodes = (R3*(nodesy') + repmat(T3,1,length(nodesy')))';
+    flip_out = [-1 0 0; 0 -1 0; 0 0 1];
+    Rot = R3;
+    Tra = T3;
+elseif ER3_0(end) == ER_min
+    aligned_nodes = (R3_0*(nodesy') + repmat(T3_0,1,length(nodesy')))';
+    flip_out = [-1 0 0; 0 -1 0; 0 0 1];
+    Rot = R3_0;
+    Tra = T3_0;
+elseif ER4(end) == ER_min
+    aligned_nodes = (R4*(nodesx') + repmat(T4,1,length(nodesx')))';
+    flip_out = [1 0 0; 0 -1 0; 0 0 -1];
+    Rot = R4;
+    Tra = T4;
+elseif ER4_0(end) == ER_min
+    aligned_nodes = (R4_0*(nodesx') + repmat(T4_0,1,length(nodesx')))';
+    flip_out = [1 0 0; 0 -1 0; 0 0 -1];
+    Rot = R4_0;
+    Tra = T4_0;
 end
+
+
+
+
+% if ER4(end,:) < ER3(end,:) && ER4(end,:) < ER2(end,:) && ER4(end,:) < ER1(end,:) && ER4(end,:) < ER1_0(end,:)
+%     aligned_nodes = (R4*(nodesx') + repmat(T4,1,length(nodesx')))';
+%     flip_out = [1 0 0; 0 -1 0; 0 0 -1];
+%     Rot = R4;
+%     Tra = T4;
+% elseif exist('ER3','var') && ER3(end,:) < ER2(end,:) && ER3(end,:) < ER1(end,:) && ER3(end,:) < ER1_0(end,:)
+%     aligned_nodes = (R3*(nodesy') + repmat(T3,1,length(nodesy')))';
+%     flip_out = [-1 0 0; 0 -1 0; 0 0 1];
+%     Rot = R3;
+%     Tra = T3;
+% elseif exist('ER2','var') && ER2(end,:) < ER1(end,:) && ER2(end,:) < ER1_0(end,:)
+%     aligned_nodes = (R2*(nodesz') + repmat(T2,1,length(nodesz')))';
+%     flip_out = [-1 0 0; 0 -1 0; 0 0 1];
+%     Rot = R2;
+%     Tra = T2;
+% elseif exist('ER1','var') && ER2(end,:) < ER1(end,:) && ER1(end,:) < ER1_0(end,:)
+%     aligned_nodes = temp_nodes;
+%     flip_out = [1 0 0; 0 1 0; 0 0 1];
+%     Rot = R1;
+%     Tra = T1;
+% else
+%     aligned_nodes = temp_nodes_0;
+%     flip_out = [1 0 0; 0 1 0; 0 0 1];
+%     Rot = R1_0;
+%     Tra = T1_0;
+% end
 
 if multiplier > 1
     aligned_nodes = aligned_nodes/multiplier;
