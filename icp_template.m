@@ -1,6 +1,6 @@
 function [aligned_nodes, flip_out, tibfib_switch, Rot, Tra] = icp_template(bone_indx,nodes,bone_coord)
 
-addpath('./Template_Bones')
+addpath('Template_Bones')
 if bone_indx == 1 && bone_coord == 1
     TR_template = stlread('Talus_Template.stl');
     a = 2;

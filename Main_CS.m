@@ -1,5 +1,6 @@
 %% Main Script for Coordinate System Toolbox
 clear, clc, close all
+addpath('Template_Bones')
 
 % Determine the files in the folder selected
 FolderPathName = uigetdir('*.*', 'Select folder with your bones');
@@ -33,6 +34,7 @@ for m = 1:length(all_files)
     % Extract the name and file extension from the file
     FileName = char(all_files(m));
     [~,name,ext] = fileparts(FileName);
+    disp(FileName)
     
     % Looks through the folder name for the bone name
     for n = 1:length(list_bone)
@@ -175,7 +177,7 @@ for m = 1:length(all_files)
     coords_final_unit = (inv(Rot)*(coords_final_unit_temp'))';
 
     %% Final Plotting
-%     figure()
+    figure()
     plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'k.')
     hold on
     %     plot3(Temp_Nodes_flip(:,1),Temp_Nodes_flip(:,2),Temp_Nodes_flip(:,3),'r.')
