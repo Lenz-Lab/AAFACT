@@ -20,7 +20,6 @@ This code takes a bone model, currently the tibia, fibula, talus, calcaneus, nav
 ### Executing program
 
 * Create a new folder in 'C:' drive called 'AutoCoordinateSystem'
-* Copy all the .stl files from (L:\Lab_Members\Andrew_Peterson\Coordinate_System\Coordinate_System_Templates) into the new folder you just created
 * Execute the matlab script 'MainCS.m'
 * Select an individual bone model or a folder including the bone models
 * If the folder name or the file name does not contains the name of the bone and/or the laterally, you will need to manually select both of those for each bone
