@@ -122,9 +122,10 @@ for m = 1:length(all_files)
     list_talus = {'Talonavicular CS','Tibiotalar/Subtalar CS'};
     list_tibia = {'Center of Mass CS','Center of Tibiotalar Facet CS'};
     list_fibula = {'Center of Mass CS','Center of Talofibular Facet CS'};
+    list_yesno = {'Yes','No'};
 
     if bone_indx == 1
-        [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');git 
+        [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
     elseif bone_indx == 13
         [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
     elseif bone_indx == 14
@@ -132,6 +133,8 @@ for m = 1:length(all_files)
     else
         bone_coord = [];
     end
+
+    [manual_indx,~] = listdlg('PromptString', [{'Would you like the bone automatically oriented?'} {"} {"}], 'ListString', list_yesno,'SelectionMode','single');
 
     %% Plot Original
 %     figure()
@@ -146,7 +149,7 @@ for m = 1:length(all_files)
     % model in a fashion that the superior region is in the positive Z
     % direction, the anterior region is in the positive Y direction, and the
     % medial region is in the positive X direction.
-    [aligned_nodes, flip_out, tib_switch, Rot, Tra] = icp_template(bone_indx,nodes,bone_coord);
+    [aligned_nodes, flip_out, tib_switch, Rot, Tra] = icp_template(bone_indx,nodes,bone_coord,manual_indx);
 
     %% Performs coordinate system calculation
     [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tib_switch);
