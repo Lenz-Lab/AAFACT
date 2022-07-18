@@ -105,9 +105,9 @@ if multiplier > 1
     nodes = nodes*multiplier;
 end
 
-[R1,T1,ER1] = icp(nodes_template',nodes',1000,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+[R1,T1,ER1] = icp(nodes_template',nodes',1000,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp,'Extrapolation',logical(1));
 temp_nodes = (R1*(nodes') + repmat(T1,1,length(nodes')))';
-[R1_0,T1_0,ER1_0] = icp(nodes_template',nodes',1000,'Matching','kDtree','WorstRejection',0.1);
+[R1_0,T1_0,ER1_0] = icp(nodes_template',nodes',1000,'Matching','kDtree','WorstRejection',0.1);%,'Extrapolation',logical(1));
 temp_nodes_0 = (R1_0*(nodes') + repmat(T1_0,1,length(nodes')))';
 nodesz = temp_nodes*[-1 0 0; 0 -1 0; 0 0 1];
 [R2,T2,ER2] = icp(nodes_template',nodesz',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
@@ -174,17 +174,17 @@ if multiplier > 1
     aligned_nodes = aligned_nodes/multiplier;
 end
 
-figure()
-plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-hold on
-plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'og')
-% plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
-% % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
-% % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
-% % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)
-% % plot3(aligned_nodes(superior_point,1),aligned_nodes(superior_point,2),aligned_nodes(superior_point,3),'b.','MarkerSize',100)
-% legend('template','new nodes','anterior','medial','superior')
-xlabel('X')
-ylabel('Y')
-zlabel('Z')
-axis equal
+% figure()
+% plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
+% hold on
+% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'og')
+% % plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
+% % % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
+% % % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
+% % % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)
+% % % plot3(aligned_nodes(superior_point,1),aligned_nodes(superior_point,2),aligned_nodes(superior_point,3),'b.','MarkerSize',100)
+% % legend('template','new nodes','anterior','medial','superior')
+% xlabel('X')
+% ylabel('Y')
+% zlabel('Z')
+% axis equal
