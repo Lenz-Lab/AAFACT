@@ -190,13 +190,13 @@ elseif manual_indx == 2
     Z_Vector = [0 0 1]';
 
     temp_nodes_red = [temp_nodes((temp_nodes(:,1) > 0),:)]; % Should be medial
+    temp_nodes_blue = [temp_nodes((temp_nodes(:,2) > 0),:)]; % Should be anterior
 
 
     figure()
     plot3(temp_nodes(:,1),temp_nodes(:,2),temp_nodes(:,3),'.k')
     hold on
     plot3(temp_nodes_red(:,1),temp_nodes_red(:,2),temp_nodes_red(:,3),'or')
-    plot3(maxx(1),maxx(2),maxx(3),'g*')
     xlabel('X')
     ylabel('Y')
     zlabel('Z')
@@ -204,6 +204,18 @@ elseif manual_indx == 2
 
     list_simlap = {'Superior','Inferior','Medial','Lateral','Anterior','Posterior'};
     [red_indx,~] = listdlg('PromptString', [{'What general region is red?'}], 'ListString', list_simlap,'SelectionMode','single');
+
+    figure()
+    plot3(temp_nodes(:,1),temp_nodes(:,2),temp_nodes(:,3),'.k')
+    hold on
+    plot3(temp_nodes_blue(:,1),temp_nodes_blue(:,2),temp_nodes_blue(:,3),'ob')
+    xlabel('X')
+    ylabel('Y')
+    zlabel('Z')
+    axis equal
+
+    list_simlap = {'Superior','Inferior','Medial','Lateral','Anterior','Posterior'};
+    [blue_indx,~] = listdlg('PromptString', [{'What general region is blue?'}], 'ListString', list_simlap,'SelectionMode','single');
 
     if red_indx == 6
         maxx = [temp_nodes(find(max(temp_nodes(:,1)) == temp_nodes(:,1)),:)]
@@ -239,6 +251,7 @@ elseif manual_indx == 2
     axis equal
 
     [blue_indx,~] = listdlg('PromptString', [{'What general region is blue?'}], 'ListString', list_simlap,'SelectionMode','single');
+    end
 
 
 
