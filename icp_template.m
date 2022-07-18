@@ -1,11 +1,14 @@
-function [aligned_nodes, flip_out, tibfib_switch, Rot, Tra] = icp_template(bone_indx,nodes,bone_coord)
+function [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr] = icp_template(bone_indx,nodes,bone_coord)
 
 addpath('Template_Bones')
 if bone_indx == 1 && bone_coord == 1
     TR_template = stlread('Talus_Template.stl');
     a = 2;
 elseif bone_indx == 1 && bone_coord == 2
-    TR_template = stlread('Talus_Template2.stl');
+    TR_template2 = stlread('Talus_Template2.stl');
+    TR_template = stlread('Talus_Template.stl');
+    nodes_template2 = TR_template2.Points;
+    con_template2 = TR_template2.ConnectivityList;
     a = 2;
 elseif bone_indx == 2
     TR_template = stlread('Calcaneus_Template.stl');
@@ -102,9 +105,9 @@ if multiplier > 1
     nodes = nodes*multiplier;
 end
 
-[R1,T1,ER1] = icp(nodes_template',nodes',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+[R1,T1,ER1] = icp(nodes_template',nodes',1000,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
 temp_nodes = (R1*(nodes') + repmat(T1,1,length(nodes')))';
-[R1_0,T1_0,ER1_0] = icp(nodes_template',nodes',200,'Matching','kDtree','WorstRejection',0.1);
+[R1_0,T1_0,ER1_0] = icp(nodes_template',nodes',1000,'Matching','kDtree','WorstRejection',0.1);
 temp_nodes_0 = (R1_0*(nodes') + repmat(T1_0,1,length(nodes')))';
 nodesz = temp_nodes*[-1 0 0; 0 -1 0; 0 0 1];
 [R2,T2,ER2] = icp(nodes_template',nodesz',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
@@ -158,6 +161,13 @@ elseif ER4_0(end) == ER_min
     flip_out = [1 0 0; 0 -1 0; 0 0 -1];
     Rot = R4_0;
     Tra = T4_0;
+end
+
+if bone_indx == 1 && bone_coord == 2
+    [Rr,Tr,ERr] = icp(nodes_template2',nodes_template',25,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    aligned_nodes = (Rr*(aligned_nodes'))';
+else
+    Rr = [];
 end
 
 if multiplier > 1
