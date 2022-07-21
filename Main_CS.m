@@ -237,6 +237,8 @@ for m = 1:length(all_files)
 
 end
 
+if length(all_files) == 1
 accurate_answer = questdlg('Is the coordinate system accurately assigned to the model?',...
     'Coordiante System','Yes','No','Yes');
 manual_orientation(accurate_answer)
+end
