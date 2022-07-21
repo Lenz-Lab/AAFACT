@@ -134,8 +134,6 @@ for m = 1:length(all_files)
         bone_coord = [];
     end
 
-    [manual_indx,~] = listdlg('PromptString', [{'Would you like the bone automatically oriented?'} {"} {"}], 'ListString', list_yesno,'SelectionMode','single');
-
     %% Plot Original
 %     figure()
 %     plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
@@ -239,3 +237,6 @@ for m = 1:length(all_files)
 
 end
 
+accurate_answer = questdlg('Is the coordinate system accurately assigned to the model?',...
+    'Coordiante System','Yes','No','Yes');
+manual_orientation(accurate_answer)

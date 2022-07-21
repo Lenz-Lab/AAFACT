@@ -1,4 +1,4 @@
-function [aligned_nodes, flip_out, tibfib_switch, Rot, Tra] = icp_template(bone_indx,nodes,bone_coord,manual_indx)
+function [aligned_nodes, flip_out, tibfib_switch, Rot, Tra] = icp_template(bone_indx,nodes,bone_coord)
 
 addpath('Template_Bones')
 if bone_indx == 1 && bone_coord == 1
@@ -97,8 +97,6 @@ else
     tibfib_switch = 1;
 end
 
-
-if manual_indx == 1
     multiplier = (max(nodes_template(:,a)) - min(nodes_template(:,a)))/(max(nodes(:,a)) - min(nodes(:,a)));
     if multiplier > 1
         nodes = nodes*multiplier;
@@ -180,80 +178,3 @@ if manual_indx == 1
     % ylabel('Y')
     % zlabel('Z')
     % axis equal
-
-elseif manual_indx == 2
-    [R1,T1,ER1] = icp(nodes_template',nodes',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    temp_nodes = (R1*(nodes') + repmat(T1,1,length(nodes')))';
-    Origin = [0;0;0];
-    X_Vector = [1 0 0]';
-    Y_Vector = [0 1 0]';
-    Z_Vector = [0 0 1]';
-
-    temp_nodes_red = [temp_nodes((temp_nodes(:,1) > 0),:)]; % Should be medial
-    temp_nodes_blue = [temp_nodes((temp_nodes(:,2) > 0),:)]; % Should be anterior
-
-
-    figure()
-    plot3(temp_nodes(:,1),temp_nodes(:,2),temp_nodes(:,3),'.k')
-    hold on
-    plot3(temp_nodes_red(:,1),temp_nodes_red(:,2),temp_nodes_red(:,3),'or')
-    xlabel('X')
-    ylabel('Y')
-    zlabel('Z')
-    axis equal
-
-    list_simlap = {'Superior','Inferior','Medial','Lateral','Anterior','Posterior'};
-    [red_indx,~] = listdlg('PromptString', [{'What general region is red?'}], 'ListString', list_simlap,'SelectionMode','single');
-
-    figure()
-    plot3(temp_nodes(:,1),temp_nodes(:,2),temp_nodes(:,3),'.k')
-    hold on
-    plot3(temp_nodes_blue(:,1),temp_nodes_blue(:,2),temp_nodes_blue(:,3),'ob')
-    xlabel('X')
-    ylabel('Y')
-    zlabel('Z')
-    axis equal
-
-    list_simlap = {'Superior','Inferior','Medial','Lateral','Anterior','Posterior'};
-    [blue_indx,~] = listdlg('PromptString', [{'What general region is blue?'}], 'ListString', list_simlap,'SelectionMode','single');
-
-    if red_indx == 6
-        maxx = [temp_nodes(find(max(temp_nodes(:,1)) == temp_nodes(:,1)),:)]
-        temp_yangle = acosd(dot(maxx,-Y_Vector) / norm(maxx)*norm(-Y_Vector));
-        roy = roty(temp_yangle);
-
-        tempp_nodes = (roy*(temp_nodes'))'
-
-
-
-%         figure()
-% %     quiver3(Origin(1),Origin(2),Origin(3),Y_Vector(1),Y_Vector(2),Y_Vector(3),'k')
-%     hold on
-%     quiver3(Origin(1),Origin(2),Origin(3),X_Vector(1),X_Vector(2),X_Vector(3),'k')
-% %     quiver3(Origin(1),Origin(2),Origin(3),Z_Vector(1),Z_Vector(2),Z_Vector(3),'k')
-% %     quiver3(Origin(1),Origin(2),Origin(3),AP_Vector(1),AP_Vector(2),AP_Vector(3),'r')
-%     quiver3(Origin(1),Origin(2),Origin(3),maxx(1),maxx(2),maxx(3),'r')
-% %     quiver3(Origin(1),Origin(2),Origin(3),SI_Vector(1),SI_Vector(2),SI_Vector(3),'r')
-%     xlabel('X')
-%     ylabel('Y')
-%     zlabel('Z')
-%     axis equal
-
-
-            temp_nodes_blue = [tempp_nodes((tempp_nodes(:,3) > 0),:)]; % Should be superior
-    figure()
-    plot3(tempp_nodes(:,1),tempp_nodes(:,2),tempp_nodes(:,3),'.k')
-    hold on
-    plot3(temp_nodes_blue(:,1),temp_nodes_blue(:,2),temp_nodes_blue(:,3),'ob')
-    xlabel('X')
-    ylabel('Y')
-    zlabel('Z')
-    axis equal
-
-    [blue_indx,~] = listdlg('PromptString', [{'What general region is blue?'}], 'ListString', list_simlap,'SelectionMode','single');
-    end
-
-
-
-
-end
