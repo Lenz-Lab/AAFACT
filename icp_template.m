@@ -267,17 +267,17 @@ if multiplier > 1
     aligned_nodes = aligned_nodes/multiplier;
 end
 
-figure()
-plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-hold on
-plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
-% plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
-% % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
-% % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
-% % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)
-% % plot3(aligned_nodes(superior_point,1),aligned_nodes(superior_point,2),aligned_nodes(superior_point,3),'b.','MarkerSize',100)
-% legend('template','new nodes','anterior','medial','superior')
-xlabel('X')
-ylabel('Y')
-zlabel('Z')
-axis equal
+% figure()
+% plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
+% hold on
+% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
+% % plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
+% % % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
+% % % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
+% % % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)
+% % % plot3(aligned_nodes(superior_point,1),aligned_nodes(superior_point,2),aligned_nodes(superior_point,3),'b.','MarkerSize',100)
+% % legend('template','new nodes','anterior','medial','superior')
+% xlabel('X')
+% ylabel('Y')
+% zlabel('Z')
+% axis equal
