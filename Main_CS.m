@@ -149,10 +149,10 @@ for m = 1:length(all_files)
     % model in a fashion that the superior region is in the positive Z
     % direction, the anterior region is in the positive Y direction, and the
     % medial region is in the positive X direction.
-    [aligned_nodes, flip_out, tib_switch, Rot, Tra, Rr] = icp_template(bone_indx,nodes,bone_coord);
+    [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr] = icp_template(bone_indx,nodes,bone_coord);
 
     %% Performs coordinate system calculation
-    [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tib_switch);
+    [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tibfib_switch);
     Temp_Coordinates_Unit = Temp_Coordinates/50; % makes it a unit vector...
     % - multiplying it by 50 in the previous function is simply for coordinate system visualization
 
@@ -191,7 +191,6 @@ for m = 1:length(all_files)
         coords_final_unit_temp = (Temp_Coordinates_Unit_flip' - repmat(Tra,1,length(Temp_Coordinates_Unit_flip')))';
         coords_final_unit = (inv(Rot)*(coords_final_unit_temp'))';
     end
-
 
     %% Final Plotting
     figure()

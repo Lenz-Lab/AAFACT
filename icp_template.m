@@ -94,12 +94,16 @@ if bone_indx == 13 || bone_indx == 14
         nodes_template = centered_nodes_template;
         end
 
-        tibfib_switch = 2;
+        if nodes_template_length/5 > max_nodes_length
+            tibfib_switch = 2;
+        else
+            tibfib_switch = 1;
+        end
     else
-        tibfib_switch = 1;
+        tibfib_switch = 1; % over 1/5 tibia/fibula is available
     end
 else
-    tibfib_switch = 1;
+    tibfib_switch = 1; % over 1/5 tibia/fibula is available
 end
 
 multiplier = (max(nodes_template(:,a)) - min(nodes_template(:,a)))/(max(nodes(:,a)) - min(nodes(:,a)));
@@ -269,17 +273,17 @@ if multiplier > 1
     aligned_nodes = aligned_nodes/multiplier;
 end
 
-% figure()
-% plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-% hold on
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
-% % plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
-% % % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
-% % % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
-% % % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)
-% % % plot3(aligned_nodes(superior_point,1),aligned_nodes(superior_point,2),aligned_nodes(superior_point,3),'b.','MarkerSize',100)
-% % legend('template','new nodes','anterior','medial','superior')
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
+figure()
+plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
+hold on
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
+% plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
+% % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
+% % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
+% % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)
+% % plot3(aligned_nodes(superior_point,1),aligned_nodes(superior_point,2),aligned_nodes(superior_point,3),'b.','MarkerSize',100)
+% legend('template','new nodes','anterior','medial','superior')
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
