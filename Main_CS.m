@@ -127,7 +127,8 @@ for m = 1:length(all_files)
     if bone_indx == 1
         [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
     elseif bone_indx == 13
-        [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
+%         [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
+    bone_coord = 2;
     elseif bone_indx == 14
         [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
     else
@@ -147,10 +148,10 @@ for m = 1:length(all_files)
     % model in a fashion that the superior region is in the positive Z
     % direction, the anterior region is in the positive Y direction, and the
     % medial region is in the positive X direction.
-    [aligned_nodes, flip_out, tib_switch, Rot, Tra] = icp_template(bone_indx,nodes,bone_coord,manual_indx);
+    [aligned_nodes, flip_out, tibfib_switch, Rot, Tra] = icp_template(bone_indx,nodes,bone_coord);
 
     %% Performs coordinate system calculation
-    [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tib_switch);
+    [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tibfib_switch);
     Temp_Coordinates_Unit = Temp_Coordinates/50; % makes it a unit vector...
     % - multiplying it by 50 in the previous function is simply for coordinate system visualization
 
@@ -237,8 +238,9 @@ for m = 1:length(all_files)
 
 end
 
+%% Manual Orientation
 if length(all_files) == 1
 accurate_answer = questdlg('Is the coordinate system accurately assigned to the model?',...
     'Coordiante System','Yes','No','Yes');
-manual_orientation(accurate_answer)
+manual_orientation(accurate_answer,aligned_nodes,bone_indx,bone_coord,side_indx)
 end

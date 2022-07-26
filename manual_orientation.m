@@ -1,4 +1,4 @@
-function manual_orientation(accurate_answer)
+function manual_orientation(accurate_answer,aligned_nodes,bone_indx,bone_coord,side_indx)
 
 switch accurate_answer
     case 'No'
@@ -70,6 +70,7 @@ switch accurate_answer
         delete(Fig)
         switch med1_selection
             case 'Medial'
+                aligned_nodes_new = aligned_nodes_ant;
             case 'Lateral'
                 aligned_nodes_new = (roty(180)*aligned_nodes_ant')';
             case 'Superior'
