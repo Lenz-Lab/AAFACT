@@ -242,5 +242,5 @@ end
 if length(all_files) == 1
 accurate_answer = questdlg('Is the coordinate system accurately assigned to the model?',...
     'Coordiante System','Yes','No','Yes');
-manual_orientation(accurate_answer,aligned_nodes,bone_indx,bone_coord,side_indx)
+manual_orientation(accurate_answer,aligned_nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName)
 end

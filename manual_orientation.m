@@ -1,4 +1,4 @@
-function manual_orientation(accurate_answer,aligned_nodes,bone_indx,bone_coord,side_indx)
+function manual_orientation(accurate_answer,aligned_nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName)
 
 switch accurate_answer
     case 'No'
