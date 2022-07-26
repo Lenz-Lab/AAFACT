@@ -81,6 +81,7 @@ if bone_indx == 13 || bone_indx == 14
         nodes_template = [nodes_template(:,1) nodes_template(:,2) nodes_template(:,3);
             plane(:,1) plane(:,2) plane(:,3)];
 
+        if bone_coord == 1
         cm_x = mean(nodes_template(:,1));
         cm_y = mean(nodes_template(:,2));
         cm_z = mean(nodes_template(:,3));
@@ -91,8 +92,9 @@ if bone_indx == 13 || bone_indx == 14
 
         centered_nodes_template = [input_ox input_oy input_oz];
         nodes_template = centered_nodes_template;
-        tibfib_switch = 2;
+        end
 
+        tibfib_switch = 2;
     else
         tibfib_switch = 1;
     end
