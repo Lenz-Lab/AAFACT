@@ -122,6 +122,7 @@ for m = 1:length(all_files)
     list_talus = {'Talonavicular CS','Tibiotalar/Subtalar CS'};
     list_tibia = {'Center of Mass CS','Center of Tibiotalar Facet CS'};
     list_fibula = {'Center of Mass CS','Center of Talofibular Facet CS'};
+    list_yesno = {'Yes','No'};
 
     if bone_indx == 1
         % [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
@@ -251,4 +252,10 @@ for m = 1:length(all_files)
     writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
 end
 
+%% Manual Orientation
+if length(all_files) == 1
+accurate_answer = questdlg('Is the coordinate system accurately assigned to the model?',...
+    'Coordiante System','Yes','No','Yes');
+manual_orientation(accurate_answer,aligned_nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName)
+end
 
