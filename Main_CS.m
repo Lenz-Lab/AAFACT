@@ -125,12 +125,14 @@ for m = 1:length(all_files)
     list_yesno = {'Yes','No'};
 
     if bone_indx == 1
-        [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
+        % [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
+        bone_coord = 2;
     elseif bone_indx == 13
 %         [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
-    bone_coord = 2;
+        bone_coord = 2;
     elseif bone_indx == 14
-        [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
+%         [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
+    bone_coord = 2;
     else
         bone_coord = [];
     end
@@ -148,7 +150,7 @@ for m = 1:length(all_files)
     % model in a fashion that the superior region is in the positive Z
     % direction, the anterior region is in the positive Y direction, and the
     % medial region is in the positive X direction.
-    [aligned_nodes, flip_out, tibfib_switch, Rot, Tra] = icp_template(bone_indx,nodes,bone_coord);
+    [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr] = icp_template(bone_indx,nodes,bone_coord);
 
     %% Performs coordinate system calculation
     [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tibfib_switch);
@@ -168,28 +170,41 @@ for m = 1:length(all_files)
     %     nodes_final = (R_final*(Temp_Nodes_flip') + repmat(T_final,1,length(Temp_Nodes_flip')))';
     %     coords_final = (R_final*(Temp_Coords_flip') + repmat(T_final,1,length(Temp_Coords_flip')))';
     %     coords_final_unit = (R_final*(Temp_Coordinates_Unit_flip') + repmat(T_final,1,length(Temp_Coordinates_Unit_flip')))';
+    if isempty(Rr) == 0
+        nodes_final_tempp = (inv(Rr)*(Temp_Nodes_flip'))';
+        nodes_final_temp = (nodes_final_tempp' - repmat(Tra,1,length(nodes_final_tempp')))';
+        nodes_final = (inv(Rot)*(nodes_final_temp'))';
 
-    nodes_final_temp = (Temp_Nodes_flip' - repmat(Tra,1,length(Temp_Nodes_flip')))';
-    nodes_final = (inv(Rot)*(nodes_final_temp'))';
+        coords_final_tempp = (inv(Rr)*(Temp_Coords_flip'))';
+        coords_final_temp = (coords_final_tempp' - repmat(Tra,1,length(coords_final_tempp')))';
+        coords_final = (inv(Rot)*(coords_final_temp'))';
 
-    coords_final_temp = (Temp_Coords_flip' - repmat(Tra,1,length(Temp_Coords_flip')))';
-    coords_final = (inv(Rot)*(coords_final_temp'))';
+        coords_final_unit_tempp = (inv(Rr)*(Temp_Coordinates_Unit_flip'))';
+        coords_final_unit_temp = (coords_final_unit_tempp' - repmat(Tra,1,length(coords_final_unit_tempp')))';
+        coords_final_unit = (inv(Rot)*(coords_final_unit_temp'))';
+    else
+        nodes_final_temp = (Temp_Nodes_flip' - repmat(Tra,1,length(Temp_Nodes_flip')))';
+        nodes_final = (inv(Rot)*(nodes_final_temp'))';
 
-    coords_final_unit_temp = (Temp_Coordinates_Unit_flip' - repmat(Tra,1,length(Temp_Coordinates_Unit_flip')))';
-    coords_final_unit = (inv(Rot)*(coords_final_unit_temp'))';
+        coords_final_temp = (Temp_Coords_flip' - repmat(Tra,1,length(Temp_Coords_flip')))';
+        coords_final = (inv(Rot)*(coords_final_temp'))';
+
+        coords_final_unit_temp = (Temp_Coordinates_Unit_flip' - repmat(Tra,1,length(Temp_Coordinates_Unit_flip')))';
+        coords_final_unit = (inv(Rot)*(coords_final_unit_temp'))';
+    end
 
     %% Final Plotting
     figure()
     plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'k.')
     hold on
-    %     plot3(Temp_Nodes_flip(:,1),Temp_Nodes_flip(:,2),Temp_Nodes_flip(:,3),'r.')
-%     plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'g.')
+    % plot3(Temp_Nodes_flip(:,1),Temp_Nodes_flip(:,2),Temp_Nodes_flip(:,3),'r.')
+    % plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'g.')
     hold on
     arrow(coords_final(1,:),coords_final(2,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
     arrow(coords_final(3,:),coords_final(4,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
     arrow(coords_final(5,:),coords_final(6,:),'FaceColor','b','EdgeColor','b','LineWidth',5,'Length',10)
     legend(' Nodal Points',' AP Axis',' SI Axis',' ML Axis')
-    title('Coordinate System of Users Bone in Original Orientation')
+    title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
     text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','r');
     text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','g');
     text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','b');
@@ -235,7 +250,6 @@ for m = 1:length(all_files)
     writematrix(Temp_Coordinates_Unit(2,:),xlfilename,'Sheet',name,'Range','B12');
     writematrix(Temp_Coordinates_Unit(4,:),xlfilename,'Sheet',name,'Range','B13');
     writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
-
 end
 
 %% Manual Orientation
@@ -244,3 +258,4 @@ accurate_answer = questdlg('Is the coordinate system accurately assigned to the 
     'Coordiante System','Yes','No','Yes');
 manual_orientation(accurate_answer,aligned_nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName)
 end
+
