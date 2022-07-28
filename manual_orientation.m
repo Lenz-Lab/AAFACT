@@ -81,10 +81,10 @@ switch accurate_answer
 
         nodes_new = aligned_nodes_new;
 
-        [aligned_nodes, flip_out, tib_switch, Rot, Tra, Rr] = icp_template(bone_indx,nodes_new,bone_coord);
+        [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr] = icp_template(bone_indx,nodes_new,bone_coord);
 
             %% Performs coordinate system calculation
-    [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tib_switch);
+    [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tibfib_switch);
     Temp_Coordinates_Unit = Temp_Coordinates/50; % makes it a unit vector...
     % - multiplying it by 50 in the previous function is simply for coordinate system visualization
 
