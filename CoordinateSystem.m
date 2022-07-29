@@ -6,6 +6,12 @@ if bone_indx == 1 && bone_coord == 2
     aligned_nodes = [aligned_nodes(aligned_nodes(:,2)<10,1) aligned_nodes(aligned_nodes(:,2)<10,2) aligned_nodes(aligned_nodes(:,2)<10,3)];
 end
 
+%% Tibial Realignment for Medial Malleolus
+if bone_indx == 13 && bone_coord == 2
+    nodes_original = aligned_nodes;
+    aligned_nodes = [aligned_nodes(aligned_nodes(:,3)>0,1) aligned_nodes(aligned_nodes(:,3)>0,2) aligned_nodes(aligned_nodes(:,3)>0,3)];
+end
+
 %% Split up the bone into nth sections in all three planes
 x_min = min(aligned_nodes(:,1));
 y_min = min(aligned_nodes(:,2));
@@ -208,14 +214,15 @@ elseif bone_indx >= 8 && bone_indx <= 12
     first_point = av_positive_y_nth;
     second_point = av_negative_y_nth;
     third_point = av_positive_z_nth;
-elseif bone_indx == 13 && tibfib_switch == 2 % if you only have a portion of the tibia
-    first_point = av_positive_y_nth;
-    second_point = av_negative_y_nth;
-    third_point = av_positive_z_nth;
-elseif bone_indx == 13 && tibfib_switch == 1 % if you have most of the tibia
+% elseif bone_indx == 13 && tibfib_switch == 2 % if you only have a portion of the tibia
+%     first_point = av_positive_y_nth;
+%     second_point = av_negative_y_nth;
+%     third_point = av_positive_z_nth;
+elseif bone_indx == 13% && tibfib_switch == 1 % if you have most of the tibia
     first_point = av_positive_z_nth;
     second_point = av_negative_z_nth;
-    third_point = av_positive_y_nth;
+%     third_point = av_positive_y_nth;
+third_point = av_negative_x_nth;
 elseif bone_indx == 14 % fibula
     first_point = av_positive_z_nth;
     second_point = av_negative_z_nth;
@@ -272,16 +279,16 @@ elseif bone_indx >= 8 && bone_indx <= 12
     SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
     normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
     ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
-elseif bone_indx == 13 && tibfib_switch == 2
-    AP_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
-    normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
-    ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
-elseif bone_indx == 13 && tibfib_switch == 1
+% elseif bone_indx == 13 && tibfib_switch == 2
+%     AP_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
+%     SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
+%     normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
+%     ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
+elseif bone_indx == 13% && tibfib_switch == 1
     SI_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    AP_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
-    normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
-    ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
+    ML_vector_points = -[origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
+    normal_vector = cross(ML_vector_points(2,:), SI_vector_points(2,:));
+    AP_vector_points = -[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
 elseif bone_indx == 14
     SI_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
     AP_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
@@ -294,24 +301,24 @@ else
     ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
 end
 
-% figure()
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
-% hold on
-% plot3(AP_vector_points(:,1),AP_vector_points(:,2),AP_vector_points(:,3),'r')
-% plot3(SI_vector_points(:,1),SI_vector_points(:,2),SI_vector_points(:,3),'g')
-% plot3(ML_vector_points(:,1),ML_vector_points(:,2),ML_vector_points(:,3),'b')
-% plot3(0,0,0,'ys')
-% plot3(first_point(:,1),first_point(:,2),first_point(:,3),'rs')
-% plot3(second_point(:,1),second_point(:,2),second_point(:,3),'rs')
-% plot3(third_point(:,1),third_point(:,2),third_point(:,3),'rs')
-% legend('Nodal Points','AP Axis','SI Axis','ML Axis')
-% text(AP_vector_points(2,1),AP_vector_points(2,2),AP_vector_points(2,3),'Anterior','HorizontalAlignment','left','FontSize',10,'Color','r');
-% text(SI_vector_points(2,1),SI_vector_points(2,2),SI_vector_points(2,3),'Superior','HorizontalAlignment','left','FontSize',10,'Color','g');
-% text(ML_vector_points(2,1),ML_vector_points(2,2),ML_vector_points(2,3),'Medial','HorizontalAlignment','left','FontSize',10,'Color','b');
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
+figure()
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
+hold on
+plot3(AP_vector_points(:,1),AP_vector_points(:,2),AP_vector_points(:,3),'r')
+plot3(SI_vector_points(:,1),SI_vector_points(:,2),SI_vector_points(:,3),'g')
+plot3(ML_vector_points(:,1),ML_vector_points(:,2),ML_vector_points(:,3),'b')
+plot3(0,0,0,'ys')
+plot3(first_point(:,1),first_point(:,2),first_point(:,3),'rs')
+plot3(second_point(:,1),second_point(:,2),second_point(:,3),'rs')
+plot3(third_point(:,1),third_point(:,2),third_point(:,3),'rs')
+legend('Nodal Points','AP Axis','SI Axis','ML Axis')
+text(AP_vector_points(2,1),AP_vector_points(2,2),AP_vector_points(2,3),'Anterior','HorizontalAlignment','left','FontSize',10,'Color','r');
+text(SI_vector_points(2,1),SI_vector_points(2,2),SI_vector_points(2,3),'Superior','HorizontalAlignment','left','FontSize',10,'Color','g');
+text(ML_vector_points(2,1),ML_vector_points(2,2),ML_vector_points(2,3),'Medial','HorizontalAlignment','left','FontSize',10,'Color','b');
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
 
 %% Output Axes and Rotation Index
 Temp_Coordinates = [AP_vector_points([1,2],:)
