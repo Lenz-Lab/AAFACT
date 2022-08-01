@@ -1,4 +1,4 @@
-function [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr, cm] = icp_template(bone_indx,nodes,bone_coord)
+function [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr, cm_nodes] = icp_template(bone_indx,nodes,bone_coord)
 
 addpath('Template_Bones')
 if bone_indx == 1 && bone_coord == 1
@@ -60,6 +60,11 @@ end
 nodes_template = TR_template.Points;
 con_temp = TR_template.ConnectivityList;
 
+figure()
+plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
+axis equal
+
+
 if bone_indx == 13 || bone_indx == 14
     nodes_template_length = (max(nodes_template(:,a)) - min(nodes_template(:,a)));
     max_nodes_length = max([(max(nodes(:,1)) - min(nodes(:,1))) (max(nodes(:,2)) - min(nodes(:,2))) (max(nodes(:,3)) - min(nodes(:,3)))]);
@@ -118,18 +123,20 @@ if bone_indx >= 8 && bone_indx <= 12
         nodes_template = [nodes_template(:,1) nodes_template(:,2) nodes_template(:,3);
             plane(:,1) plane(:,2) plane(:,3)];
 
-%         figure()
-%         plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-%         hold on
-%         plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
-%         axis equal
+        figure()
+        plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
+        hold on
+        plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
+        axis equal
     end
 end
 
-[nodes,cm] = center(nodes);
+[nodes,cm_nodes] = center(nodes);
+% cm_nodes = [0,0,0];
 
 multiplier = (max(nodes_template(:,a)) - min(nodes_template(:,a)))/(max(nodes(:,a)) - min(nodes(:,a)));
 tibfib_multiplier = (max(nodes_template(:,1)) - min(nodes_template(:,1)))/(max(nodes(:,1)) - min(nodes(:,1)));
+
 if multiplier > 1
     nodes = nodes*multiplier;
 elseif tibfib_multiplier > 1 && bone_indx >= 13
