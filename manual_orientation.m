@@ -126,10 +126,10 @@ switch accurate_answer
 
     %% Final Plotting
     figure()
-    plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'k.')
+%     plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'k.')
     hold on
     % plot3(Temp_Nodes_flip(:,1),Temp_Nodes_flip(:,2),Temp_Nodes_flip(:,3),'r.')
-    % plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'g.')
+    plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'g.')
     hold on
     arrow(coords_final(1,:),coords_final(2,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
     arrow(coords_final(3,:),coords_final(4,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
