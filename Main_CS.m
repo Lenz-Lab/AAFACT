@@ -59,7 +59,7 @@ for m = 1:length(all_files)
     % If the folder and the file don't have the bone name, the user must select
     % the bone name
     if exist('bone_indx') == 0
-        [bone_indx,~] = listdlg('PromptString', {strcat('Select which bone this file is:'," ",string(FileName))}, 'ListString', list_bone,'SelectionMode','single');
+        [bone_indx,~] = listdlg('PromptString', [{strcat('Select which bone this file is:'," ",string(FileName))} {''}], 'ListString', list_bone,'SelectionMode','single');
     end
 
     % Looks through the folder name for the bone side
@@ -90,7 +90,7 @@ for m = 1:length(all_files)
     elseif exist('side_folder_indx') && side_folder_indx >= 3
         side_indx = 2;
     else
-        [side_indx,~] = listdlg('PromptString', {strcat('Select which side this file is:'," ",string(FileName))}, 'ListString', list_side,'SelectionMode','single');
+        [side_indx,~] = listdlg('PromptString', [{strcat('Select which side this file is:'," ",string(FileName))} {''}], 'ListString', list_side,'SelectionMode','single');
     end
 
     %% Load in file based on file type
@@ -124,11 +124,11 @@ for m = 1:length(all_files)
     list_yesno = {'Yes','No'};
 
     if bone_indx == 1
-        %         [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
-        bone_coord = 2;
+                [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
+%         bone_coord = 2;
     elseif bone_indx == 13
-%         [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
-                bone_coord = 2;
+        [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
+%                 bone_coord = 2;
     elseif bone_indx == 14
         [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
         %     bone_coord = 2;
@@ -137,21 +137,22 @@ for m = 1:length(all_files)
     end
 
     %% Plot Original
-        figure()
-        plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
-        hold on
-        plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'ro')
-        xlabel('X')
-        ylabel('Y')
-        zlabel('Z')
-        axis equal
+%         figure()
+%         plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
+%         hold on
+%         plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'ro')
+%         xlabel('X')
+%         ylabel('Y')
+%         zlabel('Z')
+%         axis equal
 
     %% ICP to Template
     % Align users model to the prealigned template model. This orients the
     % model in a fashion that the superior region is in the positive Z
     % direction, the anterior region is in the positive Y direction, and the
     % medial region is in the positive X direction.
-    [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr, cm_nodes] = icp_template(bone_indx,nodes,bone_coord);
+    [nodes,cm_nodes] = center(nodes);
+    [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr] = icp_template(bone_indx,nodes,bone_coord);
 
     %% Performs coordinate system calculation
     [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tibfib_switch);
@@ -261,9 +262,8 @@ for m = 1:length(all_files)
 end
 
 %% Manual Orientation
-if length(all_files) == 1 || any(isnan(coords_final_unit(:,:)))
+if length(all_files) == 1 || all(any(isnan(coords_final_unit(:,:))))
     accurate_answer = questdlg('Is the coordinate system accurately assigned to the model?',...
         'Coordiante System','Yes','No','Yes');
-    manual_orientation(accurate_answer,aligned_nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName)
+    manual_orientation(accurate_answer,nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original)
 end
-
