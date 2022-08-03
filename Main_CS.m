@@ -241,6 +241,12 @@ for m = 1:length(all_files)
         "ML Axis"];
     D = ["X" "Y" "Z"];
 
+    if bone_indx == 1 && bone_coord == 1
+        name = strcat('TN_',name);
+    elseif bone_indx == 1 && bone_coord == 2
+        name = strcat('TTST_',name);
+    end
+    
     if length(name) > 31
         name = name(1:31);
     end
@@ -261,9 +267,10 @@ for m = 1:length(all_files)
     writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
 end
 
-%% Manual Orientation
+%% Better Starting Point
+
 if length(all_files) == 1 || all(any(isnan(coords_final_unit(:,:))))
     accurate_answer = questdlg('Is the coordinate system accurately assigned to the model?',...
         'Coordiante System','Yes','No','Yes');
-    manual_orientation(accurate_answer,nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original)
+    better_starting_point(accurate_answer,nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original)
 end
