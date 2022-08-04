@@ -152,11 +152,17 @@ av_negative_z_nth = [av_negative_z_nth_x,av_negative_z_nth_y,av_negative_z_nth_z
 %% Negative X nth ROI
 negative_x_nth = x_min + nth_x;
 
-negative_x_nth_ROI = aligned_nodes(:,1) <= negative_x_nth;
+if bone_indx == 13
+    aligned_nodes_temp = [aligned_nodes(aligned_nodes(:,3)<30,1) aligned_nodes(aligned_nodes(:,3)<30,2) aligned_nodes(aligned_nodes(:,3)<30,3)];
+else 
+    aligned_nodes_temp = aligned_nodes;
+end
 
-negative_x_nth_x = nonzeros(aligned_nodes(:,1).*negative_x_nth_ROI);
-negative_x_nth_y = nonzeros(aligned_nodes(:,2).*negative_x_nth_ROI);
-negative_x_nth_z = nonzeros(aligned_nodes(:,3).*negative_x_nth_ROI);
+negative_x_nth_ROI = aligned_nodes_temp(:,1) <= negative_x_nth;
+
+negative_x_nth_x = nonzeros(aligned_nodes_temp(:,1).*negative_x_nth_ROI);
+negative_x_nth_y = nonzeros(aligned_nodes_temp(:,2).*negative_x_nth_ROI);
+negative_x_nth_z = nonzeros(aligned_nodes_temp(:,3).*negative_x_nth_ROI);
 
 av_negative_x_nth_x = mean(negative_x_nth_x);
 av_negative_x_nth_y = mean(negative_x_nth_y);
@@ -165,7 +171,7 @@ av_negative_x_nth_z = mean(negative_x_nth_z);
 av_negative_x_nth = [av_negative_x_nth_x,av_negative_x_nth_y,av_negative_x_nth_z];
 
 % figure()
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
+% plot3(aligned_nodes_temp(:,1),aligned_nodes_temp(:,2),aligned_nodes_temp(:,3),'k.')
 % hold on
 % plot3(negative_x_nth_x,negative_x_nth_y,negative_x_nth_z,'ys')
 % plot3(av_negative_x_nth_x,av_negative_x_nth_y,av_negative_x_nth_z,'r.','MarkerSize',50)
@@ -177,11 +183,11 @@ av_negative_x_nth = [av_negative_x_nth_x,av_negative_x_nth_y,av_negative_x_nth_z
 %% Positive X nth ROI
 positive_x_nth = x_max - nth_x;
 
-positive_x_nth_ROI = aligned_nodes(:,1) >= positive_x_nth;
+positive_x_nth_ROI = aligned_nodes_temp(:,1) >= positive_x_nth;
 
-positive_x_nth_x = nonzeros(aligned_nodes(:,1).*positive_x_nth_ROI);
-positive_x_nth_y = nonzeros(aligned_nodes(:,2).*positive_x_nth_ROI);
-positive_x_nth_z = nonzeros(aligned_nodes(:,3).*positive_x_nth_ROI);
+positive_x_nth_x = nonzeros(aligned_nodes_temp(:,1).*positive_x_nth_ROI);
+positive_x_nth_y = nonzeros(aligned_nodes_temp(:,2).*positive_x_nth_ROI);
+positive_x_nth_z = nonzeros(aligned_nodes_temp(:,3).*positive_x_nth_ROI);
 
 av_positive_x_nth_x = mean(positive_x_nth_x);
 av_positive_x_nth_y = mean(positive_x_nth_y);
@@ -190,7 +196,7 @@ av_positive_x_nth_z = mean(positive_x_nth_z);
 av_positive_x_nth = [av_positive_x_nth_x,av_positive_x_nth_y,av_positive_x_nth_z];
 
 % figure()
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
+% plot3(aligned_nodes_temp(:,1),aligned_nodes_temp(:,2),aligned_nodes_temp(:,3),'k.')
 % hold on
 % plot3(positive_x_nth_x,positive_x_nth_y,positive_x_nth_z,'ys')
 % plot3(av_positive_x_nth_x,av_positive_x_nth_y,av_positive_x_nth_z,'r.','MarkerSize',50)
@@ -198,6 +204,31 @@ av_positive_x_nth = [av_positive_x_nth_x,av_positive_x_nth_y,av_positive_x_nth_z
 % ylabel('Y')
 % zlabel('Z')
 % axis equal
+
+%% MDTA and TT Calculation
+if bone_indx == 13
+    temp_SI = [0 0 0; (av_positive_z_nth_x - av_negative_z_nth_x),(av_positive_z_nth_y - av_negative_z_nth_y),(av_positive_z_nth_z - av_negative_z_nth_z)];
+    temp_ML = [0 0 0; (av_positive_x_nth_x - av_negative_x_nth_x),(av_positive_x_nth_y - av_negative_x_nth_y),(av_positive_x_nth_z - av_negative_x_nth_z)];
+
+%     temp_SI_2D = [0 0 0; (av_positive_z_nth_x - av_negative_z_nth_x),0,(av_positive_z_nth_z - av_negative_z_nth_z)];
+%     temp_ML_2D = [0 0 0; (av_positive_x_nth_x - av_negative_x_nth_x),0,(av_positive_x_nth_z - av_negative_x_nth_z)];
+
+
+    MDTA = acosd(dot(temp_SI(2,:),temp_ML(2,:))/(norm(temp_SI(2,:))*norm(temp_ML(2,:))))
+%     MDTA_2D = acosd(dot(temp_SI_2D(2,:),temp_ML_2D(2,:))/(norm(temp_SI_2D(2,:))*norm(temp_ML_2D(2,:))))
+
+    figure()
+    plot3(nodes_aligned_original(:,1),nodes_aligned_original(:,2),nodes_aligned_original(:,3),'.k')
+    hold on
+    plot3(temp_SI(:,1),temp_SI(:,2),temp_SI(:,3),'r-')
+    plot3(temp_ML(:,1),temp_ML(:,2),temp_ML(:,3),'b-')
+%     plot3(temp_SI_2D(:,1),temp_SI_2D(:,2),temp_SI_2D(:,3),'r-')
+%     plot3(temp_ML_2D(:,1),temp_ML_2D(:,2),temp_ML_2D(:,3),'b-')
+    xlabel('x')
+    ylabel('y')
+    zlabel('z')
+    axis equal
+end
 
 %% Raw Axis Calculation
 if bone_indx == 3 % Navicular
