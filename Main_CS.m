@@ -124,10 +124,12 @@ list_side = {'Right','Left'};
 
     nodes_original_tibia = nodes_tib;
     nodes_original_talus = nodes_tal;
+    nodes_original_tibtal = [nodes_original_tibia(:,1), nodes_original_tibia(:,2), nodes_original_tibia(:,3);
+        nodes_original_talus(:,1), nodes_original_talus(:,2), nodes_original_talus(:,3)];
 
     if side_indx == 1
-        nodes_tib = nodes_tib.*[1,1,-1]; % Flip all rights to left
-        nodes_tal = nodes_tal.*[1,1,-1];
+        nodes_original_tibtal = nodes_original_tibtal.*[1,1,-1]; % Flip all rights to left
+%         nodes_tal = nodes_original_tibtal.*[1,1,-1];
     end
 
     list_talus = {'Talonavicular CS','Tibiotalar/Subtalar CS'};
@@ -160,9 +162,12 @@ list_side = {'Right','Left'};
 %         axis equal
 
         figure()
-        plot3(nodes_original_tibia(:,1),nodes_original_tibia(:,2),nodes_original_tibia(:,3),'k.')
+        plot3(aligned_nodes_tibtal(:,1),aligned_nodes_tibtal(:,2),aligned_nodes_tibtal(:,3),'k.')
         hold on
-        plot3(nodes_original_talus(:,1),nodes_original_talus(:,2),nodes_original_talus(:,3),'.k')
+%         plot3(nodes_original_talus(:,1),nodes_original_talus(:,2),nodes_original_talus(:,3),'.g')
+        %         plot3(nodes_original_tibtal(:,1),nodes_original_tibtal(:,2),nodes_original_tibtal(:,3),'ro')
+%         plot3(aligned_nodes_talus(:,1),aligned_nodes_talus(:,2),aligned_nodes_talus(:,3),'.k')
+        plot3(aligned_nodes_tib(:,1),aligned_nodes_tib(:,2),aligned_nodes_tib(:,3),'.g')
         xlabel('X')
         ylabel('Y')
         zlabel('Z')
@@ -173,13 +178,24 @@ list_side = {'Right','Left'};
     % model in a fashion that the superior region is in the positive Z
     % direction, the anterior region is in the positive Y direction, and the
     % medial region is in the positive X direction.
-    [nodes_tib,cm_nodes] = center(nodes_tib);
-    [nodes_tal,cm_nodes] = center(nodes_tal);
-    [aligned_nodes_tibia, flip_out, tibfib_switch, Rot, Tra, Rr] = icp_template(13,nodes_tib,bone_coord);
-    [aligned_nodes_talus, flip_out, tibfib_switch, Rot, Tra, Rr] = icp_template(1,nodes_tal,bone_coord);
+%     [nodes_tib,cm_nodes_tib] = center(nodes_tib);
+%     [nodes_tal,cm_nodes] = center(nodes_tal);
+    [aligned_nodes_tibtal, flip_out, tibfib_switch, Rot, Tra, Rr] = icp_template(150,nodes_original_tibtal,bone_coord);
+    aligned_nodes_tib_temp = nodes_tib*flip_out;
+    aligned_nodes_tib = (Rot*(aligned_nodes_tib_temp') + repmat(Tra,1,length(aligned_nodes_tib_temp')))';
+
+    aligned_ndoes_tal_temp = nodes_tal*flip_out;
+    aligned_nodes_tal = (Rot*(aligned_ndoes_tal_temp') + repmat(Tra,1,length(aligned_ndoes_tal_temp')))';
+
+
+
+%     [aligned_nodes_talus, flip_out, tibfib_switch, Rot, Tra, Rr] = icp_template(1,nodes_tal,bone_coord);
+
+%% ICP Talus
+
 
     %% MDTA && TT
-    [MDTA, TT, TLSA] = MDTATT(aligned_nodes_tibia,aligned_nodes_talus);
+    [MDTA, TT, TLSA] = MDTATT(aligned_nodes_tib,aligned_nodes_tal);
 
     %% Performs coordinate system calculation
 %     [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tibfib_switch);

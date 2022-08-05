@@ -55,6 +55,9 @@ elseif bone_indx == 14 && bone_coord == 1
 elseif bone_indx == 14 && bone_coord == 2
     TR_template = stlread('Fibula_Template_Facet.stl');
     a = 3;
+elseif bone_indx == 150
+    TR_template = stlread('TibiaTalus_Template.stl');
+    a = 3;
 end
 
 nodes_template = TR_template.Points;
@@ -173,9 +176,9 @@ nodesx270 = nodes*rotx(270);
 [Rx270,Tx270,ERx270] = icp(nodes_template',nodesx270',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
 [Rx270_wr,Tx270_wr,ERx270_wr] = icp(nodes_template',nodesx270',200,'Matching','kDtree','WorstRejection',0.1);
 
-ER_all = [ER1(end),ER1_0(end),ERz90(end),ERz90_wr(end),ERz180(end),ERz180_wr(end),ERz270(end),ERz270_wr(end),...
-    ERy90(end),ERy90_wr(end),ERy180(end),ERy180_wr(end),ERy270(end),ERy270_wr(end),...
-    ERx90(end),ERx90_wr(end),ERx180(end),ERx180_wr(end),ERx270(end),ERx270_wr(end)];
+ ER_all = [ER1(end),ER1_0(end),ERz90(end),ERz90_wr(end),ERz180(end),ERz180_wr(end),ERz270(end),ERz270_wr(end),...
+     ERy90(end),ERy90_wr(end),ERy180(end),ERy180_wr(end),ERy270(end),ERy270_wr(end),...
+     ERx90(end),ERx90_wr(end),ERx180(end),ERx180_wr(end),ERx270(end),ERx270_wr(end)];
 
 format long g
 ER_min = min(ER_all);
