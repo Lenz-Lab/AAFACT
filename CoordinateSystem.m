@@ -2,8 +2,16 @@ function [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_in
 
 %% Multiple CS for Talus
 if bone_indx == 1 && bone_coord == 2
-    nodes_original = aligned_nodes;
+    nodes_aligned_original = aligned_nodes;
     aligned_nodes = [aligned_nodes(aligned_nodes(:,2)<10,1) aligned_nodes(aligned_nodes(:,2)<10,2) aligned_nodes(aligned_nodes(:,2)<10,3)];
+end
+
+%% Tibial Realignment for Medial Malleolus
+cutting_plane = min(aligned_nodes(:,3)) + 14; % Temporarily removes the tibial plafond
+
+if bone_indx == 13
+    nodes_aligned_original = aligned_nodes;
+    aligned_nodes = [aligned_nodes(aligned_nodes(:,3)>cutting_plane,1) aligned_nodes(aligned_nodes(:,3)>cutting_plane,2) aligned_nodes(aligned_nodes(:,3)>cutting_plane,3)];
 end
 
 %% Split up the bone into nth sections in all three planes
@@ -105,7 +113,7 @@ av_positive_z_nth_y = mean(positive_z_nth_y);
 av_positive_z_nth_z = mean(positive_z_nth_z);
 
 av_positive_z_nth = [av_positive_z_nth_x,av_positive_z_nth_y,av_positive_z_nth_z];
-% 
+
 % figure()
 % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
 % hold on
@@ -192,35 +200,31 @@ av_positive_x_nth = [av_positive_x_nth_x,av_positive_x_nth_y,av_positive_x_nth_z
 % axis equal
 
 %% Raw Axis Calculation
-if bone_indx == 3
+if bone_indx == 3 % Navicular
     first_point = av_positive_x_nth;
     second_point = av_negative_x_nth;
     third_point = av_positive_z_nth;
-elseif bone_indx == 1 && bone_coord == 2
+elseif bone_indx == 1 && bone_coord == 2 % Talus
     first_point = av_positive_x_nth;
     second_point = av_negative_x_nth;
     third_point = av_positive_z_nth;
-elseif bone_indx > 4 && bone_indx < 8
+elseif bone_indx > 4 && bone_indx < 8 % Cuneiforms
     first_point = av_positive_y_nth;
     second_point = av_negative_y_nth;
     third_point = av_positive_z_nth;
-elseif bone_indx >= 8 && bone_indx <= 12
+elseif bone_indx >= 8 && bone_indx <= 12 % Metatarsals
     first_point = av_positive_y_nth;
     second_point = av_negative_y_nth;
     third_point = av_positive_z_nth;
-elseif bone_indx == 13 && tibfib_switch == 2 % if you only have a portion of the tibia
-    first_point = av_positive_y_nth;
-    second_point = av_negative_y_nth;
-    third_point = av_positive_z_nth;
-elseif bone_indx == 13 && tibfib_switch == 1 % if you have most of the tibia
+elseif bone_indx == 13 % tibia
     first_point = av_positive_z_nth;
     second_point = av_negative_z_nth;
-    third_point = av_positive_y_nth;
+    third_point = av_negative_x_nth;
 elseif bone_indx == 14 % fibula
     first_point = av_positive_z_nth;
     second_point = av_negative_z_nth;
     third_point = av_positive_y_nth;
-else
+else % Calcaneus, Cuboid
     first_point = av_positive_y_nth;
     second_point = av_negative_y_nth;
     third_point = av_positive_z_nth;
@@ -235,22 +239,22 @@ for i = 1:length(long_axis_points)
     total_distance(i,:) = norm(third_point - long_axis_points(i,:)); % find the distances between the third point and the long axis
 end
 
+close_dist = (total_distance == min(total_distance)); % closest point between third point and the long axis
+origin = [0 0 0];
+temp_origin = long_axis_points(close_dist,:); % 90 degree intersecting point between long axis and third point
+
 % figure()
-% % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
+% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
 % hold on
 % plot3(first_point(:,1),first_point(:,2),first_point(:,3),'ys')
 % plot3(second_point(:,1),second_point(:,2),second_point(:,3),'rs')
 % plot3(third_point(:,1),third_point(:,2),third_point(:,3),'bs')
-% plot3(temp_origin(:,1),temp_origin(:,2),temp_origin(:,3),'.k')
+% plot3(temp_origin(:,1),temp_origin(:,2),temp_origin(:,3),'og')
 % plot3(0,0,0,'gs')
 % xlabel('X')
 % ylabel('Y')
 % zlabel('Z')
 % axis equal
-
-close_dist = (total_distance == min(total_distance)); % closest point between third point and the long axis
-origin = [0 0 0];
-temp_origin = long_axis_points(close_dist,:); % 90 degree intersecting point between long axis and third point
 
 if bone_indx == 3
     ML_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
@@ -272,16 +276,11 @@ elseif bone_indx >= 8 && bone_indx <= 12
     SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
     normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
     ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
-elseif bone_indx == 13 && tibfib_switch == 2
-    AP_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
-    normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
-    ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
-elseif bone_indx == 13 && tibfib_switch == 1
+elseif bone_indx == 13
     SI_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    AP_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
-    normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
-    ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
+    ML_vector_points = -[origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
+    normal_vector = cross(ML_vector_points(2,:), SI_vector_points(2,:));
+    AP_vector_points = -[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
 elseif bone_indx == 14
     SI_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
     AP_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
@@ -319,7 +318,7 @@ Temp_Coordinates = [AP_vector_points([1,2],:)
     ML_vector_points([1,2],:)];
 
 if bone_indx == 1 && bone_coord == 2
-    Temp_Nodes = nodes_original;
+    Temp_Nodes = nodes_aligned_original;
 else
     Temp_Nodes = aligned_nodes;
 end
