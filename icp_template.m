@@ -1,4 +1,4 @@
-function [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr] = icp_template(bone_indx,nodes,bone_coord)
+function [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr] = icp_template(bone_indx,nodes,bone_coord,better_start)
 
 addpath('Template_Bones')
 if bone_indx == 1 && bone_coord == 1
@@ -118,11 +118,11 @@ if bone_indx >= 8 && bone_indx <= 12
         nodes_template = [nodes_template(:,1) nodes_template(:,2) nodes_template(:,3);
             plane(:,1) plane(:,2) plane(:,3)];
 
-%         figure()
-%         plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-%         hold on
-%         plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
-%         axis equal
+        %         figure()
+        %         plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
+        %         hold on
+        %         plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
+        %         axis equal
     end
 end
 
@@ -140,47 +140,51 @@ end
 [R1_0,T1_0,ER1_0] = icp(nodes_template',nodes',200,'Matching','kDtree','WorstRejection',0.1);
 % temp_nodes_0 = (R1_0*(temp_nodes') + repmat(T1_0,1,length(temp_nodes')))';
 
-nodesz90 = nodes*rotz(90);
-nodesz180 = nodes*rotz(180);
-nodesz270 = nodes*rotz(270);
+if better_start == 1
+    nodesz90 = nodes*rotz(90);
+    nodesz180 = nodes*rotz(180);
+    nodesz270 = nodes*rotz(270);
 
-[Rz90,Tz90,ERz90] = icp(nodes_template',nodesz90',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-[Rz90_wr,Tz90_wr,ERz90_wr] = icp(nodes_template',nodesz90',200,'Matching','kDtree','WorstRejection',0.1);
-[Rz180,Tz180,ERz180] = icp(nodes_template',nodesz180',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-[Rz180_wr,Tz180_wr,ERz180_wr] = icp(nodes_template',nodesz180',200,'Matching','kDtree','WorstRejection',0.1);
-[Rz270,Tz270,ERz270] = icp(nodes_template',nodesz270',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-[Rz270_wr,Tz270_wr,ERz270_wr] = icp(nodes_template',nodesz270',200,'Matching','kDtree','WorstRejection',0.1);
+    [Rz90,Tz90,ERz90] = icp(nodes_template',nodesz90',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rz90_wr,Tz90_wr,ERz90_wr] = icp(nodes_template',nodesz90',200,'Matching','kDtree','WorstRejection',0.1);
+    [Rz180,Tz180,ERz180] = icp(nodes_template',nodesz180',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rz180_wr,Tz180_wr,ERz180_wr] = icp(nodes_template',nodesz180',200,'Matching','kDtree','WorstRejection',0.1);
+    [Rz270,Tz270,ERz270] = icp(nodes_template',nodesz270',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rz270_wr,Tz270_wr,ERz270_wr] = icp(nodes_template',nodesz270',200,'Matching','kDtree','WorstRejection',0.1);
 
-nodesy90 = nodes*roty(90);
-nodesy180 = nodes*roty(180);
-nodesy270 = nodes*roty(270);
+    nodesy90 = nodes*roty(90);
+    nodesy180 = nodes*roty(180);
+    nodesy270 = nodes*roty(270);
 
-[Ry90,Ty90,ERy90] = icp(nodes_template',nodesy90',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-[Ry90_wr,Ty90_wr,ERy90_wr] = icp(nodes_template',nodesy90',200,'Matching','kDtree','WorstRejection',0.1);
-[Ry180,Ty180,ERy180] = icp(nodes_template',nodesy180',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-[Ry180_wr,Ty180_wr,ERy180_wr] = icp(nodes_template',nodesy180',200,'Matching','kDtree','WorstRejection',0.1);
-[Ry270,Ty270,ERy270] = icp(nodes_template',nodesy270',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-[Ry270_wr,Ty270_wr,ERy270_wr] = icp(nodes_template',nodesy270',200,'Matching','kDtree','WorstRejection',0.1);
+    [Ry90,Ty90,ERy90] = icp(nodes_template',nodesy90',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Ry90_wr,Ty90_wr,ERy90_wr] = icp(nodes_template',nodesy90',200,'Matching','kDtree','WorstRejection',0.1);
+    [Ry180,Ty180,ERy180] = icp(nodes_template',nodesy180',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Ry180_wr,Ty180_wr,ERy180_wr] = icp(nodes_template',nodesy180',200,'Matching','kDtree','WorstRejection',0.1);
+    [Ry270,Ty270,ERy270] = icp(nodes_template',nodesy270',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Ry270_wr,Ty270_wr,ERy270_wr] = icp(nodes_template',nodesy270',200,'Matching','kDtree','WorstRejection',0.1);
 
-nodesx90 = nodes*rotx(90);
-nodesx180 = nodes*rotx(180);
-nodesx270 = nodes*rotx(270);
+    nodesx90 = nodes*rotx(90);
+    nodesx180 = nodes*rotx(180);
+    nodesx270 = nodes*rotx(270);
 
-[Rx90,Tx90,ERx90] = icp(nodes_template',nodesx90',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-[Rx90_wr,Tx90_wr,ERx90_wr] = icp(nodes_template',nodesx90',200,'Matching','kDtree','WorstRejection',0.1);
-[Rx180,Tx180,ERx180] = icp(nodes_template',nodesx180',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-[Rx180_wr,Tx180_wr,ERx180_wr] = icp(nodes_template',nodesx180',200,'Matching','kDtree','WorstRejection',0.1);
-[Rx270,Tx270,ERx270] = icp(nodes_template',nodesx270',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-[Rx270_wr,Tx270_wr,ERx270_wr] = icp(nodes_template',nodesx270',200,'Matching','kDtree','WorstRejection',0.1);
+    [Rx90,Tx90,ERx90] = icp(nodes_template',nodesx90',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx90_wr,Tx90_wr,ERx90_wr] = icp(nodes_template',nodesx90',200,'Matching','kDtree','WorstRejection',0.1);
+    [Rx180,Tx180,ERx180] = icp(nodes_template',nodesx180',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx180_wr,Tx180_wr,ERx180_wr] = icp(nodes_template',nodesx180',200,'Matching','kDtree','WorstRejection',0.1);
+    [Rx270,Tx270,ERx270] = icp(nodes_template',nodesx270',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx270_wr,Tx270_wr,ERx270_wr] = icp(nodes_template',nodesx270',200,'Matching','kDtree','WorstRejection',0.1);
 
-ER_all = [ER1(end),ER1_0(end),ERz90(end),ERz90_wr(end),ERz180(end),ERz180_wr(end),ERz270(end),ERz270_wr(end),...
-    ERy90(end),ERy90_wr(end),ERy180(end),ERy180_wr(end),ERy270(end),ERy270_wr(end),...
-    ERx90(end),ERx90_wr(end),ERx180(end),ERx180_wr(end),ERx270(end),ERx270_wr(end)];
+    ER_all = [ER1(end),ER1_0(end),ERz90(end),ERz90_wr(end),ERz180(end),ERz180_wr(end),ERz270(end),ERz270_wr(end),...
+        ERy90(end),ERy90_wr(end),ERy180(end),ERy180_wr(end),ERy270(end),ERy270_wr(end),...
+        ERx90(end),ERx90_wr(end),ERx180(end),ERx180_wr(end),ERx270(end),ERx270_wr(end)];
+else
+    ER_all = [ER1(end),ER1_0(end)];
+end
 
 format long g
 ER_min = min(ER_all);
 % ER_count = numel(find(ER_all == ER_min))
-% 
+%
 % if ER_count ~= 1
 
 
@@ -285,6 +289,8 @@ elseif ERx270_wr(end) == ER_min
     Rot = Rx270_wr;
     Tra = Tx270_wr;
 end
+
+
 
 if bone_indx == 1 && bone_coord == 2
     [Rr,Tr,ERr] = icp(nodes_template2',nodes_template',25,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);

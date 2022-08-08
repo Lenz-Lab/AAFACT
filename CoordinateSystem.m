@@ -63,7 +63,7 @@ av_positive_y_nth_y = mean(positive_y_nth_y);
 av_positive_y_nth_z = mean(positive_y_nth_z);
 
 av_positive_y_nth = [av_positive_y_nth_x,av_positive_y_nth_y,av_positive_y_nth_z];
-
+% 
 % figure()
 % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
 % hold on
@@ -243,18 +243,18 @@ close_dist = (total_distance == min(total_distance)); % closest point between th
 origin = [0 0 0];
 temp_origin = long_axis_points(close_dist,:); % 90 degree intersecting point between long axis and third point
 
-% figure()
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
-% hold on
-% plot3(first_point(:,1),first_point(:,2),first_point(:,3),'ys')
-% plot3(second_point(:,1),second_point(:,2),second_point(:,3),'rs')
-% plot3(third_point(:,1),third_point(:,2),third_point(:,3),'bs')
-% plot3(temp_origin(:,1),temp_origin(:,2),temp_origin(:,3),'og')
-% plot3(0,0,0,'gs')
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
+figure()
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
+hold on
+plot3(first_point(:,1),first_point(:,2),first_point(:,3),'ys')
+plot3(second_point(:,1),second_point(:,2),second_point(:,3),'rs')
+plot3(third_point(:,1),third_point(:,2),third_point(:,3),'bs')
+plot3(temp_origin(:,1),temp_origin(:,2),temp_origin(:,3),'og')
+plot3(0,0,0,'gs')
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
 
 if bone_indx == 3
     ML_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
@@ -293,24 +293,24 @@ else
     ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
 end
 
-% figure()
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
-% hold on
-% plot3(AP_vector_points(:,1),AP_vector_points(:,2),AP_vector_points(:,3),'r')
-% plot3(SI_vector_points(:,1),SI_vector_points(:,2),SI_vector_points(:,3),'g')
-% plot3(ML_vector_points(:,1),ML_vector_points(:,2),ML_vector_points(:,3),'b')
-% plot3(0,0,0,'ys')
-% plot3(first_point(:,1),first_point(:,2),first_point(:,3),'rs')
-% plot3(second_point(:,1),second_point(:,2),second_point(:,3),'rs')
-% plot3(third_point(:,1),third_point(:,2),third_point(:,3),'rs')
-% legend('Nodal Points','AP Axis','SI Axis','ML Axis')
-% text(AP_vector_points(2,1),AP_vector_points(2,2),AP_vector_points(2,3),'Anterior','HorizontalAlignment','left','FontSize',10,'Color','r');
-% text(SI_vector_points(2,1),SI_vector_points(2,2),SI_vector_points(2,3),'Superior','HorizontalAlignment','left','FontSize',10,'Color','g');
-% text(ML_vector_points(2,1),ML_vector_points(2,2),ML_vector_points(2,3),'Medial','HorizontalAlignment','left','FontSize',10,'Color','b');
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
+figure()
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
+hold on
+plot3(AP_vector_points(:,1),AP_vector_points(:,2),AP_vector_points(:,3),'r')
+plot3(SI_vector_points(:,1),SI_vector_points(:,2),SI_vector_points(:,3),'g')
+plot3(ML_vector_points(:,1),ML_vector_points(:,2),ML_vector_points(:,3),'b')
+plot3(0,0,0,'ys')
+plot3(first_point(:,1),first_point(:,2),first_point(:,3),'rs')
+plot3(second_point(:,1),second_point(:,2),second_point(:,3),'rs')
+plot3(third_point(:,1),third_point(:,2),third_point(:,3),'rs')
+legend('Nodal Points','AP Axis','SI Axis','ML Axis')
+text(AP_vector_points(2,1),AP_vector_points(2,2),AP_vector_points(2,3),'Anterior','HorizontalAlignment','left','FontSize',10,'Color','r');
+text(SI_vector_points(2,1),SI_vector_points(2,2),SI_vector_points(2,3),'Superior','HorizontalAlignment','left','FontSize',10,'Color','g');
+text(ML_vector_points(2,1),ML_vector_points(2,2),ML_vector_points(2,3),'Medial','HorizontalAlignment','left','FontSize',10,'Color','b');
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
 
 %% Output Axes and Rotation Index
 Temp_Coordinates = [AP_vector_points([1,2],:)
