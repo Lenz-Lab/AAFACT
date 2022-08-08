@@ -139,8 +139,13 @@ for m = 1:length(all_files)
         %         [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
         bone_coord = 2;
     elseif bone_indx == 14
+<<<<<<< HEAD
         %         [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
         bone_coord = 2;
+=======
+%         [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
+            bone_coord = 2;
+>>>>>>> 9fcdb6632ce18a2e25271350ea582e4e03e1cb19
     else
         bone_coord = [];
     end

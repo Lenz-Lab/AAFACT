@@ -1,6 +1,5 @@
 function [output,cm] = center(input)
 
-% input = nav_01.Points;
 % This function accepts nodal inputs and outputs the bone centered at
 % (0,0,0)
 
@@ -15,4 +14,3 @@ input_oy = input(:,2) - cm_y;
 input_oz = input(:,3) - cm_z;
 
 output = [input_ox input_oy input_oz];
-% end
