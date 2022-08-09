@@ -136,29 +136,24 @@ for m = 1:length(all_files)
         [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
         %         bone_coord = 2;
     elseif bone_indx == 13
-        %         [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
-        bone_coord = 2;
+                [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
+%         bone_coord = 2;
     elseif bone_indx == 14
-<<<<<<< HEAD
-        %         [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
-        bone_coord = 2;
-=======
-%         [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
-            bone_coord = 2;
->>>>>>> 9fcdb6632ce18a2e25271350ea582e4e03e1cb19
+        [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
+%             bone_coord = 2;
     else
         bone_coord = [];
     end
 
     %% Plot Original
-            figure()
-            plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
-            hold on
-%             plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'ro')
-            xlabel('X')
-            ylabel('Y')
-            zlabel('Z')
-            axis equal
+%             figure()
+%             plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
+%             hold on
+% %             plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'ro')
+%             xlabel('X')
+%             ylabel('Y')
+%             zlabel('Z')
+%             axis equal
 
     %% ICP to Template
     % Align users model to the prealigned template model. This orients the
