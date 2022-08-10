@@ -211,13 +211,27 @@ for m = 1:length(all_files)
         coords_final_unit = coords_final_unit.*[1,1,-1]; % Flip back to right if applicable
     end
 
+    %% Transformation Matrix
+    Temp_Coordinates_Unit_temp = [Temp_Coordinates_Unit(2,:)', Temp_Coordinates_Unit(4,:)', Temp_Coordinates_Unit(6,:)'];
+    coord_final_unit_temp = [coords_final_unit(2,:)', coords_final_unit(4,:)', coords_final_unit(6,:)'];
+
+    Rotation_Matrix = coord_final_unit_temp*inv(Temp_Coordinates_Unit_temp);
+
+    Transformation_Matrix(1:3,1:3) = Rotation_Matrix;
+    Transformation_Matrix(1:3,4) = coords_final_unit(1,:);
+    Transformation_Matrix(4,1:4) = [0 0 0 1];
+
     %% Final Plotting
     figure()
     plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
     hold on
+        plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
     %     plot3(nodes_final_temp(:,1),nodes_final_temp(:,2),nodes_final_temp(:,3),'y.')
     %     plot3(Temp_Nodes_flip(:,1),Temp_Nodes_flip(:,2),Temp_Nodes_flip(:,3),'r.')
     %     plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'k.')
+        arrow(Temp_Coordinates(1,:),Temp_Coordinates(2,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
+    arrow(Temp_Coordinates(3,:),Temp_Coordinates(4,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
+    arrow(Temp_Coordinates(5,:),Temp_Coordinates(6,:),'FaceColor','b','EdgeColor','b','LineWidth',5,'Length',10)
     hold on
     arrow(coords_final(1,:),coords_final(2,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
     arrow(coords_final(3,:),coords_final(4,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
@@ -248,7 +262,9 @@ for m = 1:length(all_files)
         "Origin"
         "AP Axis"
         "SI Axis"
-        "ML Axis"];
+        "ML Axis"
+        ""
+"Transformation Matrix"];
     D = ["X" "Y" "Z"];
 
     if bone_indx == 1 && bone_coord == 1
@@ -275,6 +291,7 @@ for m = 1:length(all_files)
     writematrix(Temp_Coordinates_Unit(2,:),xlfilename,'Sheet',name,'Range','B12');
     writematrix(Temp_Coordinates_Unit(4,:),xlfilename,'Sheet',name,'Range','B13');
     writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
+    writematrix(Transformation_Matrix(:,:),xlfilename,'Sheet',name,'Range','B16');
 end
 
 %% Better Starting Point
