@@ -21,6 +21,9 @@ all_files = list_files(files_indx)'; % stores all files selected
 
 % Lists for detemining bone and side
 list_bone = {'Talus', 'Calcaneus', 'Navicular', 'Cuboid', 'Medial_Cuneiform','Intermediate_Cuneiform',...
+    'Lateral_Cuneiform','Metatarsal1','Metatarsal2','Metatarsal3','Metatarsal4','Metatarsal5',...
+    'Tibia','Fibula'};
+list_bone2 = {'Talus', 'Calcaneus', 'Navicular', 'Cuboid', 'Medial_Cuneiform','Intermediate_Cuneiform',...
     'Lateral_Cuneiform','First_Metatarsal','Second_Metatarsal','Third_Metatarsal','Fourth_Metatarsal','Fifth_Metatarsal',...
     'Tibia','Fibula'};
 list_side_folder = {'Right','_R','Left','_L'};
@@ -39,7 +42,10 @@ for m = 1:length(all_files)
     for n = 1:length(list_bone)
         if any(string(extract(FolderName,list_bone(n))) == string(list_bone(n))) ||...
                 any(string(extract(FolderName,lower(list_bone(n)))) == lower(string(list_bone(n)))) ||...
-                any(string(extract(FolderName,upper(list_bone(n)))) == upper(string(list_bone(n))))
+                any(string(extract(FolderName,upper(list_bone(n)))) == upper(string(list_bone(n)))) ||...
+                any(string(extract(FolderName,list_bone2(n))) == string(list_bone2(n))) ||...
+                any(string(extract(FolderName,lower(list_bone2(n)))) == lower(string(list_bone2(n)))) ||...
+                any(string(extract(FolderName,upper(list_bone2(n)))) == upper(string(list_bone2(n))))
             bone_indx = n;
         end
     end
@@ -50,7 +56,10 @@ for m = 1:length(all_files)
         for n = 1:length(list_bone)
             if any(string(extract(FileName,list_bone(n))) == string(list_bone(n))) ||...
                     any(string(extract(FileName,lower(list_bone(n)))) == lower(string(list_bone(n)))) ||...
-                    any(string(extract(FileName,upper(list_bone(n)))) == upper(string(list_bone(n))))
+                    any(string(extract(FileName,upper(list_bone(n)))) == upper(string(list_bone(n)))) ||...
+                    any(string(extract(FileName,list_bone2(n))) == string(list_bone2(n))) ||...
+                    any(string(extract(FileName,lower(list_bone2(n)))) == lower(string(list_bone2(n)))) ||...
+                    any(string(extract(FileName,upper(list_bone2(n)))) == upper(string(list_bone2(n))))
                 bone_indx = n;
             end
         end
@@ -124,11 +133,11 @@ for m = 1:length(all_files)
     list_yesno = {'Yes','No'};
 
     if bone_indx == 1
-                [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
-%         bone_coord = 2;
+        [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
+        %         bone_coord = 2;
     elseif bone_indx == 13
-        [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
-%                 bone_coord = 2;
+                [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
+%         bone_coord = 2;
     elseif bone_indx == 14
         [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
 %             bone_coord = 2;
@@ -137,14 +146,14 @@ for m = 1:length(all_files)
     end
 
     %% Plot Original
-%         figure()
-%         plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
-%         hold on
-%         plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'ro')
-%         xlabel('X')
-%         ylabel('Y')
-%         zlabel('Z')
-%         axis equal
+%             figure()
+%             plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
+%             hold on
+% %             plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'ro')
+%             xlabel('X')
+%             ylabel('Y')
+%             zlabel('Z')
+%             axis equal
 
     %% ICP to Template
     % Align users model to the prealigned template model. This orients the
@@ -152,7 +161,8 @@ for m = 1:length(all_files)
     % direction, the anterior region is in the positive Y direction, and the
     % medial region is in the positive X direction.
     [nodes,cm_nodes] = center(nodes);
-    [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr] = icp_template(bone_indx,nodes,bone_coord);
+    better_start = 1;
+    [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr] = icp_template(bone_indx,nodes,bone_coord,better_start);
 
     %% Performs coordinate system calculation
     [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tibfib_switch);
@@ -203,11 +213,11 @@ for m = 1:length(all_files)
 
     %% Final Plotting
     figure()
-            plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
+    plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
     hold on
     %     plot3(nodes_final_temp(:,1),nodes_final_temp(:,2),nodes_final_temp(:,3),'y.')
     %     plot3(Temp_Nodes_flip(:,1),Temp_Nodes_flip(:,2),Temp_Nodes_flip(:,3),'r.')
-%     plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'k.')
+    %     plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'k.')
     hold on
     arrow(coords_final(1,:),coords_final(2,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
     arrow(coords_final(3,:),coords_final(4,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
@@ -246,7 +256,7 @@ for m = 1:length(all_files)
     elseif bone_indx == 1 && bone_coord == 2
         name = strcat('TTST_',name);
     end
-    
+
     if length(name) > 31
         name = name(1:31);
     end
