@@ -118,7 +118,7 @@ for m = 1:length(all_files)
         nodes = nodes.*[1,1,-1]; % Flip all rights to left
     end
 
-    list_talus = {'Talonavicular CS','Tibiotalar/Subtalar CS'};
+    list_talus = {'Talonavicular CS','Tibiotalar CS'};
     list_tibia = {'Center of Mass CS','Center of Tibiotalar Facet CS'};
     list_fibula = {'Center of Mass CS','Center of Talofibular Facet CS'};
     list_yesno = {'Yes','No'};
@@ -130,8 +130,8 @@ for m = 1:length(all_files)
         [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
 %                 bone_coord = 2;
     elseif bone_indx == 14
-%         [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
-            bone_coord = 2;
+        [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
+%             bone_coord = 2;
     else
         bone_coord = [];
     end
