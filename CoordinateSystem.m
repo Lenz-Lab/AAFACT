@@ -223,7 +223,7 @@ elseif bone_indx == 13 % tibia
 elseif bone_indx == 14 % fibula
     first_point = av_positive_z_nth;
     second_point = av_negative_z_nth;
-    third_point = av_positive_y_nth;
+    third_point = av_positive_x_nth;
 else % Calcaneus, Cuboid
     first_point = av_positive_y_nth;
     second_point = av_negative_y_nth;
@@ -283,9 +283,9 @@ elseif bone_indx == 13
     AP_vector_points = -[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
 elseif bone_indx == 14
     SI_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    AP_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
-    normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
-    ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
+    ML_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
+    normal_vector = cross(ML_vector_points(2,:), SI_vector_points(2,:));
+    AP_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
 else
     AP_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
     SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
