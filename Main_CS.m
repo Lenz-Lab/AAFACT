@@ -136,7 +136,7 @@ for m = 1:length(all_files)
         [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
         % bone_coord = 2;
     elseif bone_indx == 13
-                [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
+        [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
         % bone_coord = 2;
     elseif bone_indx == 14
         [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
@@ -146,14 +146,14 @@ for m = 1:length(all_files)
     end
 
     %% Plot Original
-%             figure()
-%             plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
-%             hold on
-% %             plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'ro')
-%             xlabel('X')
-%             ylabel('Y')
-%             zlabel('Z')
-%             axis equal
+    %             figure()
+    %             plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
+    %             hold on
+    % %             plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'ro')
+    %             xlabel('X')
+    %             ylabel('Y')
+    %             zlabel('Z')
+    %             axis equal
 
     %% ICP to Template
     % Align users model to the prealigned template model. This orients the
@@ -162,7 +162,7 @@ for m = 1:length(all_files)
     % medial region is in the positive X direction.
     [nodes,cm_nodes] = center(nodes);
     better_start = 1;
-    [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr] = icp_template(bone_indx,nodes,bone_coord,better_start);
+    [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr, Ttw] = icp_template(bone_indx,nodes,bone_coord,better_start);
 
     %% Performs coordinate system calculation
     [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tibfib_switch);
@@ -172,38 +172,50 @@ for m = 1:length(all_files)
     %% Reorient and Translate to Original Input Origin and Orientation
     if isempty(Rr) == 0
         nodes_final_temptr = (inv(Rr)*(Temp_Nodes'))';
-        nodes_final_tempt = (nodes_final_temptr' - repmat(Tra,1,length(nodes_final_temptr')))';
-        nodes_final_temp = (inv(Rot)*(nodes_final_tempt'))';
-        nodes_final_tem = ((nodes_final_temp)*inv(flip_out));
-        nodes_final = [nodes_final_tem(:,1) + cm_nodes(1), nodes_final_tem(:,2) + cm_nodes(2), nodes_final_tem(:,3) + cm_nodes(3)];
-
         coords_final_temptr = (inv(Rr)*(Temp_Coordinates'))';
-        coords_final_tempt = (coords_final_temptr' - repmat(Tra,1,length(coords_final_temptr')))';
-        coords_final_temp = (inv(Rot)*(coords_final_tempt'))';
-        coords_final_tem = ((coords_final_temp)*inv(flip_out));
-        coords_final = [coords_final_tem(:,1) + cm_nodes(1), coords_final_tem(:,2) + cm_nodes(2), coords_final_tem(:,3) + cm_nodes(3)];
-
         coords_final_unit_temptr = (inv(Rr)*(Temp_Coordinates_Unit'))';
-        coords_final_unit_tempt = (coords_final_unit_temptr' - repmat(Tra,1,length(coords_final_unit_temptr')))';
-        coords_final_unit_temp = (inv(Rot)*(coords_final_unit_tempt'))';
-        coords_final_unit_tem = ((coords_final_unit_temp)*inv(flip_out));
-        coords_final_unit = [coords_final_unit_tem(:,1) + cm_nodes(1), coords_final_unit_tem(:,2) + cm_nodes(2), coords_final_unit_tem(:,3) + cm_nodes(3)];
+    elseif isempty(Ttw) == 0
+        nodes_final_temptr = (Temp_Nodes' - repmat(Ttw,1,length(Temp_Nodes')))';
+        coords_final_temptr = (Temp_Coordinates' - repmat(Ttw,1,length(Temp_Coordinates')))';
+        coords_final_unit_temptr = (Temp_Coordinates_Unit' - repmat(Ttw,1,length(Temp_Coordinates_Unit')))';
     else
-        nodes_final_tempt = (Temp_Nodes' - repmat(Tra,1,length(Temp_Nodes')))';
-        nodes_final_temp = (inv(Rot)*(nodes_final_tempt'))';
-        nodes_final_tem = ((nodes_final_temp)*inv(flip_out));
-        nodes_final = [nodes_final_tem(:,1) + cm_nodes(1), nodes_final_tem(:,2) + cm_nodes(2), nodes_final_tem(:,3) + cm_nodes(3)];
-
-        coords_final_tempt = (Temp_Coordinates' - repmat(Tra,1,length(Temp_Coordinates')))';
-        coords_final_temp = (inv(Rot)*(coords_final_tempt'))';
-        coords_final_tem = ((coords_final_temp)*inv(flip_out));
-        coords_final = [coords_final_tem(:,1) + cm_nodes(1), coords_final_tem(:,2) + cm_nodes(2), coords_final_tem(:,3) + cm_nodes(3)];
-
-        coords_final_unit_tempt = (Temp_Coordinates_Unit' - repmat(Tra,1,length(Temp_Coordinates_Unit')))';
-        coords_final_unit_temp = (inv(Rot)*(coords_final_unit_tempt'))';
-        coords_final_unit_tem = ((coords_final_unit_temp)*inv(flip_out));
-        coords_final_unit = [coords_final_unit_tem(:,1) + cm_nodes(1), coords_final_unit_tem(:,2) + cm_nodes(2), coords_final_unit_tem(:,3) + cm_nodes(3)];
+        nodes_final_temptr = Temp_Nodes;
+        coords_final_temptr = Temp_Coordinates;
+        coords_final_unit_temptr = Temp_Coordinates_Unit;
     end
+
+    nodes_final_tempt = (nodes_final_temptr' - repmat(Tra,1,length(nodes_final_temptr')))';
+    nodes_final_temp = (inv(Rot)*(nodes_final_tempt'))';
+    nodes_final_tem = ((nodes_final_temp)*inv(flip_out));
+    nodes_final = [nodes_final_tem(:,1) + cm_nodes(1), nodes_final_tem(:,2) + cm_nodes(2), nodes_final_tem(:,3) + cm_nodes(3)];
+
+
+    coords_final_tempt = (coords_final_temptr' - repmat(Tra,1,length(coords_final_temptr')))';
+    coords_final_temp = (inv(Rot)*(coords_final_tempt'))';
+    coords_final_tem = ((coords_final_temp)*inv(flip_out));
+    coords_final = [coords_final_tem(:,1) + cm_nodes(1), coords_final_tem(:,2) + cm_nodes(2), coords_final_tem(:,3) + cm_nodes(3)];
+
+    coords_final_unit_tempt = (coords_final_unit_temptr' - repmat(Tra,1,length(coords_final_unit_temptr')))';
+    coords_final_unit_temp = (inv(Rot)*(coords_final_unit_tempt'))';
+    coords_final_unit_tem = ((coords_final_unit_temp)*inv(flip_out));
+    coords_final_unit = [coords_final_unit_tem(:,1) + cm_nodes(1), coords_final_unit_tem(:,2) + cm_nodes(2), coords_final_unit_tem(:,3) + cm_nodes(3)];
+  
+    %     else
+    %         nodes_final_tempt = (Temp_Nodes' - repmat(Tra,1,length(Temp_Nodes')))';
+    %         nodes_final_temp = (inv(Rot)*(nodes_final_tempt'))';
+    %         nodes_final_tem = ((nodes_final_temp)*inv(flip_out));
+    %         nodes_final = [nodes_final_tem(:,1) + cm_nodes(1), nodes_final_tem(:,2) + cm_nodes(2), nodes_final_tem(:,3) + cm_nodes(3)];
+    %
+    %         coords_final_tempt = (Temp_Coordinates' - repmat(Tra,1,length(Temp_Coordinates')))';
+    %         coords_final_temp = (inv(Rot)*(coords_final_tempt'))';
+    %         coords_final_tem = ((coords_final_temp)*inv(flip_out));
+    %         coords_final = [coords_final_tem(:,1) + cm_nodes(1), coords_final_tem(:,2) + cm_nodes(2), coords_final_tem(:,3) + cm_nodes(3)];
+    %
+    %         coords_final_unit_tempt = (Temp_Coordinates_Unit' - repmat(Tra,1,length(Temp_Coordinates_Unit')))';
+    %         coords_final_unit_temp = (inv(Rot)*(coords_final_unit_tempt'))';
+    %         coords_final_unit_tem = ((coords_final_unit_temp)*inv(flip_out));
+    %         coords_final_unit = [coords_final_unit_tem(:,1) + cm_nodes(1), coords_final_unit_tem(:,2) + cm_nodes(2), coords_final_unit_tem(:,3) + cm_nodes(3)];
+    %     end
 
     if side_indx == 1
         nodes_final = nodes_final.*[1,1,-1]; % Flip back to right if applicable
