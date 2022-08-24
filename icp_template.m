@@ -117,12 +117,6 @@ if bone_indx >= 8 && bone_indx <= 12
 
         nodes_template = [nodes_template(:,1) nodes_template(:,2) nodes_template(:,3);
             plane(:,1) plane(:,2) plane(:,3)];
-
-        %         figure()
-        %         plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-        %         hold on
-        %         plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
-        %         axis equal
     end
 end
 
@@ -183,10 +177,6 @@ end
 
 format long g
 ER_min = min(ER_all);
-% ER_count = numel(find(ER_all == ER_min))
-%
-% if ER_count ~= 1
-
 
 if ER1(end) == ER_min
     aligned_nodes = (R1*(nodes') + repmat(T1,1,length(nodes')))';
