@@ -62,13 +62,16 @@ con_temp = TR_template.ConnectivityList;
 
 if bone_indx == 13 || bone_indx == 14
     nodes_template_length = (max(nodes_template(:,a)) - min(nodes_template(:,a)));
-    max_nodes_length = max([(max(nodes(:,1)) - min(nodes(:,1))) (max(nodes(:,2)) - min(nodes(:,2))) (max(nodes(:,3)) - min(nodes(:,3)))]);
+    max_nodes_x = (max(nodes(:,1)) - min(nodes(:,1)));
+    max_nodes_y = (max(nodes(:,2)) - min(nodes(:,2)));
+    max_nodes_z = (max(nodes(:,3)) - min(nodes(:,3)));
+    max_nodes_length = max([max_nodes_x  max_nodes_y max_nodes_z]);
     if nodes_template_length/2 > max_nodes_length
         temp = find(nodes_template(:,3) < (min(nodes_template(:,a)) + max_nodes_length));
         nodes_template = [nodes_template(temp,1) nodes_template(temp,2) nodes_template(temp,3)];
         x = [-20:4:10]';
         y = [-10:4:20]';
-        [x y] = meshgrid(x,y);
+        [x, y] = meshgrid(x,y);
         z = (min(nodes_template(:,a)) + max_nodes_length) .* ones(length(x(:,1)),1);
         k = 1;
         for n = 1:length(z)
@@ -91,6 +94,50 @@ if bone_indx == 13 || bone_indx == 14
             tibfib_switch = 1;
         end
     else
+%         if max_nodes_x == max_nodes_length
+%         elseif max_nodes_y == max_nodes_length
+%         elseif max_nodes_z == max_nodes_length
+%             temp = find(nodes(:,3) < 0);
+%             nodes_test = [nodes(temp,1) nodes(temp,2) nodes(temp,3)];
+%             x = [-20:4:20]';
+%             y = [-20:4:20]';
+%             [x, y] = meshgrid(x,y);
+%             z = (max(nodes_test(:,3))) .* ones(length(x(:,1)),1);
+%             k = 1;
+%             for n = 1:length(z)
+%                 for m = 1:length(z)
+%                     plane(k,:) = [x(m,n) y(m,n) z(1)];
+%                     k = k + 1;
+%                 end
+%             end
+% 
+%             nodes_test = [nodes_test(:,1) nodes_test(:,2) nodes_test(:,3);
+%                 plane(:,1) plane(:,2) plane(:,3)];
+% 
+%             clear temp x y z plane
+% 
+%             temp = find(nodes_template(:,3) < (min(nodes_template(:,a)) + max_nodes_length));
+%             nodes_template = [nodes_template(temp,1) nodes_template(temp,2) nodes_template(temp,3)];
+%             x = [-20:4:10]';
+%             y = [-10:4:20]';
+%             [x, y] = meshgrid(x,y);
+%             z = (min(nodes_template(:,a)) + max_nodes_length) .* ones(length(x(:,1)),1);
+%             k = 1;
+%             for n = 1:length(z)
+%                 for m = 1:length(z)
+%                     plane(k,:) = [x(m,n) y(m,n) z(1)];
+%                     k = k + 1;
+%                 end
+%             end
+% 
+%             nodes_template = [nodes_template(:,1) nodes_template(:,2) nodes_template(:,3);
+%                 plane(:,1) plane(:,2) plane(:,3)];
+% 
+%             if bone_coord == 1
+%                 nodes_template = center(nodes_template);
+%             end
+%         end
+
         tibfib_switch = 1; % over 1/5 tibia/fibula is available
     end
 else
@@ -121,12 +168,13 @@ if bone_indx >= 8 && bone_indx <= 12
 end
 
 multiplier = (max(nodes_template(:,a)) - min(nodes_template(:,a)))/(max(nodes(:,a)) - min(nodes(:,a)));
-tibfib_multiplier = (max(nodes_template(:,1)) - min(nodes_template(:,1)))/(max(nodes(:,1)) - min(nodes(:,1)));
+parttib_multiplier = (max(nodes_template(:,1)) - min(nodes_template(:,1)))/(max(nodes(:,1)) - min(nodes(:,1)));
+
 
 if multiplier > 1
     nodes = nodes*multiplier;
-elseif tibfib_multiplier > 1 && bone_indx >= 13
-    nodes = nodes*tibfib_multiplier;
+elseif parttib_multiplier > 1 && tibfib_switch == 2 && bone_indx >= 13
+    nodes = nodes*parttib_multiplier;
 end
 
 [R1,T1,ER1] = icp(nodes_template',nodes',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
@@ -280,8 +328,6 @@ elseif ERx270_wr(end) == ER_min
     Tra = Tx270_wr;
 end
 
-
-
 if bone_indx == 1 && bone_coord == 2
     [Rr,Tr,ERr] = icp(nodes_template2',nodes_template',25,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
     aligned_nodes = (Rr*(aligned_nodes'))';
@@ -291,24 +337,24 @@ end
 
 if multiplier > 1
     aligned_nodes = aligned_nodes/multiplier;
-elseif tibfib_multiplier > 1 && bone_indx >= 13
-    aligned_nodes = aligned_nodes/tibfib_multiplier;
+elseif parttib_multiplier > 1 && tibfib_switch == 2 && bone_indx >= 13
+    aligned_nodes = aligned_nodes/parttib_multiplier;
 end
 
-figure()
-if bone_indx == 1 && bone_coord == 2
-    plot3(nodes_template2(:,1),nodes_template2(:,2),nodes_template2(:,3),'.k')
-else
-    plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-end
-hold on
-plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
-% plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
-% % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
-% % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)
-% % plot3(aligned_nodes(superior_point,1),aligned_nodes(superior_point,2),aligned_nodes(superior_point,3),'b.','MarkerSize',100)
-% legend('template','new nodes','anterior','medial','superior')
-xlabel('X')
-ylabel('Y')
-zlabel('Z')
-axis equal
+% figure()
+% if bone_indx == 1 && bone_coord == 2
+%     plot3(nodes_template2(:,1),nodes_template2(:,2),nodes_template2(:,3),'.k')
+% else
+%     plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
+% end
+% hold on
+% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
+% % plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
+% % % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
+% % % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)
+% % % plot3(aligned_nodes(superior_point,1),aligned_nodes(superior_point,2),aligned_nodes(superior_point,3),'b.','MarkerSize',100)
+% % legend('template','new nodes','anterior','medial','superior')
+% xlabel('X')
+% ylabel('Y')
+% zlabel('Z')
+% axis equal
