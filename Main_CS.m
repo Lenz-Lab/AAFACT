@@ -162,7 +162,7 @@ for m = 1:length(all_files)
     % medial region is in the positive X direction.
     [nodes,cm_nodes] = center(nodes);
     better_start = 1;
-    [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr, Ttw] = icp_template(bone_indx,nodes,bone_coord,better_start);
+    [aligned_nodes, flip_out, flip_tib, tibfib_switch, Rot, Tra, Rr, Rtw, Ttw] = icp_template(bone_indx,nodes,bone_coord,better_start);
 
     %% Performs coordinate system calculation
     [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tibfib_switch);
@@ -175,9 +175,17 @@ for m = 1:length(all_files)
         coords_final_temptr = (inv(Rr)*(Temp_Coordinates'))';
         coords_final_unit_temptr = (inv(Rr)*(Temp_Coordinates_Unit'))';
     elseif isempty(Ttw) == 0
-        nodes_final_temptr = (Temp_Nodes' - repmat(Ttw,1,length(Temp_Nodes')))';
-        coords_final_temptr = (Temp_Coordinates' - repmat(Ttw,1,length(Temp_Coordinates')))';
-        coords_final_unit_temptr = (Temp_Coordinates_Unit' - repmat(Ttw,1,length(Temp_Coordinates_Unit')))';
+        nodes_final_temptemp = (Temp_Nodes' - repmat(Ttw,1,length(Temp_Nodes')))';
+        nodes_final_temptem = (inv(Rtw)*(nodes_final_temptemp'))';
+        nodes_final_temptr = ((nodes_final_temptem)*inv(flip_tib));
+
+        coords_final_temptemp = (Temp_Coordinates' - repmat(Ttw,1,length(Temp_Coordinates')))';
+        coords_final_temptem = (inv(Rtw)*(coords_final_temptemp'))';
+        coords_final_temptr = ((coords_final_temptem)*inv(flip_tib));
+
+        coords_final_unit_temptemp = (Temp_Coordinates_Unit' - repmat(Ttw,1,length(Temp_Coordinates_Unit')))';
+        coords_final_unit_temptem = (inv(Rtw)*(coords_final_unit_temptemp'))';
+        coords_final_unit_temptr = ((coords_final_unit_temptem)*inv(flip_tib));
     else
         nodes_final_temptr = Temp_Nodes;
         coords_final_temptr = Temp_Coordinates;
@@ -188,7 +196,6 @@ for m = 1:length(all_files)
     nodes_final_temp = (inv(Rot)*(nodes_final_tempt'))';
     nodes_final_tem = ((nodes_final_temp)*inv(flip_out));
     nodes_final = [nodes_final_tem(:,1) + cm_nodes(1), nodes_final_tem(:,2) + cm_nodes(2), nodes_final_tem(:,3) + cm_nodes(3)];
-
 
     coords_final_tempt = (coords_final_temptr' - repmat(Tra,1,length(coords_final_temptr')))';
     coords_final_temp = (inv(Rot)*(coords_final_tempt'))';

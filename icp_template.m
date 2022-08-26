@@ -1,4 +1,4 @@
-function [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr, Ttw] = icp_template(bone_indx,nodes,bone_coord,better_start)
+function [aligned_nodes, flip_out, flip_tib, tibfib_switch, Rot, Tra, Rr, Rtw, Ttw] = icp_template(bone_indx,nodes,bone_coord,better_start)
 
 addpath('Template_Bones')
 if bone_indx == 1 && bone_coord == 1
@@ -312,14 +312,48 @@ if tibfib_switch == 1 && bone_indx == 13
         end
     end
 
-    nodes_test = [nodes_test(:,1) nodes_test(:,2) nodes_test(:,3);
+    nodes_test1 = [nodes_test(:,1) nodes_test(:,2) nodes_test(:,3);
         plane(:,1) plane(:,2) plane(:,3)];
 
-    [Rtw,Ttw] = icp(nodes_template',nodes_test',200,'Matching','kDtree','WorstRejection',0.1);
-% aligned_nodes = (Rtw*(aligned_nodes') + repmat(Ttw,1,length(aligned_nodes')))';
-aligned_nodes = ((aligned_nodes') + repmat(Ttw,1,length(aligned_nodes')))';
+    nodes_test2 = nodes_test1*rotz(90);
+    nodes_test3 = nodes_test1*rotz(180);
+    nodes_test4 = nodes_test1*rotz(270);
+
+    [Rtw1,Ttw1,Etw1] = icp(nodes_template',nodes_test1',200,'Matching','kDtree','WorstRejection',0.1);
+    [Rtw2,Ttw2,Etw2] = icp(nodes_template',nodes_test2',200,'Matching','kDtree','WorstRejection',0.1);
+    [Rtw3,Ttw3,Etw3] = icp(nodes_template',nodes_test3',200,'Matching','kDtree','WorstRejection',0.1);
+    [Rtw4,Ttw4,Etw4] = icp(nodes_template',nodes_test4',200,'Matching','kDtree','WorstRejection',0.1);
+
+    Etw = min([Etw1(end),Etw2(end),Etw3(end),Etw4(end)]);
+
+    if Etw == Etw1(end)
+        flip_tib = [1 0 0; 0 1 0; 0 0 1];
+        aligned_nodes = (Rtw1*(aligned_nodes') + repmat(Ttw1,1,length(aligned_nodes')))';
+        Rtw = Rtw1;
+        Ttw = Ttw1;
+    elseif Etw == Etw2(end)
+        flip_tib = rotz(90);
+        aligned_nodes = aligned_nodes*rotz(90);
+        aligned_nodes = (Rtw2*(aligned_nodes') + repmat(Ttw2,1,length(aligned_nodes')))';
+        Rtw = Rtw2;
+        Ttw = Ttw2;
+    elseif Etw == Etw3(end)
+        flip_tib = rotz(180);
+        aligned_nodes = aligned_nodes*rotz(180);
+        aligned_nodes = (Rtw3*(aligned_nodes') + repmat(Ttw3,1,length(aligned_nodes')))';
+        Rtw = Rtw3;
+        Ttw = Ttw3;
+    elseif Etw == Etw4(end)
+        flip_tib = rotz(270);
+        aligned_nodes = aligned_nodes*rotz(270);
+        aligned_nodes = (Rtw4*(aligned_nodes') + repmat(Ttw4,1,length(aligned_nodes')))';
+        Rtw = Rtw4;
+        Ttw = Ttw4;
+    end
 else
+    Rtw = [];
     Ttw = [];
+    flip_tib = [];
 end
 
 % figure()
@@ -330,6 +364,7 @@ end
 % end
 % hold on
 % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
+% % plot3(aligned_nodes_test(:,1),aligned_nodes_test(:,2),aligned_nodes_test(:,3),'.r')
 % % plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
 % % % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
 % % % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)
