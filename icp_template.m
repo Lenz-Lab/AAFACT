@@ -5,10 +5,13 @@ if bone_indx == 1 && bone_coord == 1
     TR_template = stlread('Talus_Template.stl');
     a = 2;
 elseif bone_indx == 1 && bone_coord == 2
-    TR_template2 = stlread('Talus_Template2.stl');
+    TR_template2 = stlread('Talus_Template_TT.stl');
     TR_template = stlread('Talus_Template.stl');
     nodes_template2 = TR_template2.Points;
     con_template2 = TR_template2.ConnectivityList;
+    a = 2;
+elseif bone_indx == 1 && bone_coord == 3
+    TR_template = stlread('Talus_Template_ST.stl');
     a = 2;
 elseif bone_indx == 2
     TR_template = stlread('Calcaneus_Template.stl');
@@ -322,20 +325,20 @@ else
     Ttw = [];
 end
 
-% figure()
-% if bone_indx == 1 && bone_coord == 2
-%     plot3(nodes_template2(:,1),nodes_template2(:,2),nodes_template2(:,3),'.k')
-% else
-%     plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-% end
-% hold on
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
-% % plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
-% % % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
-% % % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)
-% % % plot3(aligned_nodes(superior_point,1),aligned_nodes(superior_point,2),aligned_nodes(superior_point,3),'b.','MarkerSize',100)
-% % legend('template','new nodes','anterior','medial','superior')
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
+figure()
+if bone_indx == 1 && bone_coord == 2
+    plot3(nodes_template2(:,1),nodes_template2(:,2),nodes_template2(:,3),'.k')
+else
+    plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
+end
+hold on
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
+% plot3(nodes(:,1),nodes(:,2),nodes(:,3),'.r')
+% % plot3(aligned_nodes(anterior_point,1),aligned_nodes(anterior_point,2),aligned_nodes(anterior_point,3),'r.','MarkerSize',100)
+% % plot3(aligned_nodes(medial_point,1),aligned_nodes(medial_point,2),aligned_nodes(medial_point,3),'g.','MarkerSize',100)
+% % plot3(aligned_nodes(superior_point,1),aligned_nodes(superior_point,2),aligned_nodes(superior_point,3),'b.','MarkerSize',100)
+% legend('template','new nodes','anterior','medial','superior')
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
