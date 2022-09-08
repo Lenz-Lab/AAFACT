@@ -1,5 +1,5 @@
 %% Main Script for Coordinate System Toolbox
-clear, clc, close all
+% clear, clc, close all
 
 % Determine the files in the folder selected
 FolderPathName = uigetdir('*.*', 'Select folder with your bones');
@@ -128,12 +128,16 @@ for m = 1:length(all_files)
     end
 
     list_talus = {'Talonavicular CS','Tibiotalar CS','Subtalar CS'};
+    list_calcaneus = {'Calcaneocuboid CS','Subtalar CS'};
     list_tibia = {'Center of Mass CS','Center of Tibiotalar Facet CS'};
     list_fibula = {'Center of Mass CS','Center of Talofibular Facet CS'};
     list_yesno = {'Yes','No'};
 
     if bone_indx == 1
         [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
+        % bone_coord = 2;
+    elseif bone_indx == 2
+        [bone_coord,~] = listdlg('PromptString', {'Select which calcaneal CS.'}, 'ListString', list_calcaneus,'SelectionMode','single');
         % bone_coord = 2;
     elseif bone_indx == 13
         [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
@@ -199,7 +203,7 @@ for m = 1:length(all_files)
     coords_final_unit_temp = (inv(Rot)*(coords_final_unit_tempt'))';
     coords_final_unit_tem = ((coords_final_unit_temp)*inv(flip_out));
     coords_final_unit = [coords_final_unit_tem(:,1) + cm_nodes(1), coords_final_unit_tem(:,2) + cm_nodes(2), coords_final_unit_tem(:,3) + cm_nodes(3)];
-  
+
     %     else
     %         nodes_final_tempt = (Temp_Nodes' - repmat(Tra,1,length(Temp_Nodes')))';
     %         nodes_final_temp = (inv(Rot)*(nodes_final_tempt'))';

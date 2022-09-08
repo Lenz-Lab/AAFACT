@@ -63,7 +63,7 @@ av_positive_y_nth_y = mean(positive_y_nth_y);
 av_positive_y_nth_z = mean(positive_y_nth_z);
 
 av_positive_y_nth = [av_positive_y_nth_x,av_positive_y_nth_y,av_positive_y_nth_z];
-% 
+
 % figure()
 % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
 % hold on
@@ -204,6 +204,10 @@ if bone_indx == 1 && bone_coord >= 2 % Talus
     first_point = av_positive_x_nth;
     second_point = av_negative_x_nth;
     third_point = av_positive_z_nth;
+elseif bone_indx == 2 && bone_coord == 2
+        first_point = av_positive_x_nth;
+    second_point = av_negative_x_nth;
+    third_point = av_positive_y_nth;
 elseif bone_indx == 3 % Navicular
     first_point = av_positive_x_nth;
     second_point = av_negative_x_nth;
@@ -261,6 +265,11 @@ if bone_indx == 1 && bone_coord >= 2
     SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
     normal_vector = cross(ML_vector_points(2,:), SI_vector_points(2,:));
     AP_vector_points = -[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
+elseif bone_indx == 2 && bone_coord == 2
+    ML_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
+    AP_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
+    normal_vector = cross(ML_vector_points(2,:), AP_vector_points(2,:));
+    SI_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
 elseif bone_indx == 3
     ML_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
     SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
