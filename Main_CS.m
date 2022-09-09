@@ -1,5 +1,5 @@
 %% Main Script for Coordinate System Toolbox
-% clear, clc, close all
+clear, clc, close all
 
 % Determine the files in the folder selected
 FolderPathName = uigetdir('*.*', 'Select folder with your bones');
