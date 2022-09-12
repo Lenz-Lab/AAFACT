@@ -1,6 +1,19 @@
 %% Main Script for Coordinate System Toolbox
 clear, clc, close all
 
+% This main code only requires the users bone model input. Select the
+% folder where the file is and then select the bone model(s) you wish the
+% apply a coordinate system to. 
+
+% Currently, this code works for all bones from the tibia and fibula
+% through the metatarsals. It also has an option for multiple coordinate
+% systems for the talus, tibia and fibula.
+
+% While it's not neccessary, naming your file with the laterality (_L_ or
+% _Left_ etc.) and the name of the bone (_Calcaneus) will speed up the
+% process. I recommend a file name similar to this for ease: 
+% group_#_bone_laterality.stl (ex. ABC_01_Tibia_Right.stl)
+
 % Determine the files in the folder selected
 FolderPathName = uigetdir('*.*', 'Select folder with your bones');
 addpath(FolderPathName)
@@ -104,7 +117,7 @@ for m = 1:length(all_files)
 
     %% Load in file based on file type
     if ext == ".k"
-        nodes = LoadKFile(FileName);
+        nodes = LoadDataFile(FileName);
     elseif ext == ".stl"
         TR = stlread(FileName);
         nodes = TR.Points;
@@ -112,7 +125,7 @@ for m = 1:length(all_files)
     elseif ext == ".particles"
         nodes = load(FileName);
     elseif ext == ".vtk"
-        nodes = LoadVTKFile(FileName);
+        nodes = LoadDataFile(FileName);
     elseif ext == ".ply"
         ptCloud = pcread(FileName);
         nodes = ptCloud.Location;
@@ -127,6 +140,7 @@ for m = 1:length(all_files)
         nodes = nodes.*[1,1,-1]; % Flip all rights to left
     end
 
+    % List of different coordinate systems to choose from
     list_talus = {'Talonavicular CS','Tibiotalar CS'};
     list_tibia = {'Center of Mass CS','Center of Tibiotalar Facet CS'};
     list_fibula = {'Center of Mass CS','Center of Talofibular Facet CS'};
@@ -134,13 +148,10 @@ for m = 1:length(all_files)
 
     if bone_indx == 1
         [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
-        % bone_coord = 2;
     elseif bone_indx == 13
         [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
-        % bone_coord = 2;
     elseif bone_indx == 14
         [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
-        % bone_coord = 2;
     else
         bone_coord = [];
     end
@@ -149,7 +160,6 @@ for m = 1:length(all_files)
     %             figure()
     %             plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
     %             hold on
-    % %             plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'ro')
     %             xlabel('X')
     %             ylabel('Y')
     %             zlabel('Z')
@@ -162,81 +172,17 @@ for m = 1:length(all_files)
     % medial region is in the positive X direction.
     [nodes,cm_nodes] = center(nodes);
     better_start = 1;
-    [aligned_nodes, flip_out, flip_tib, tibfib_switch, Rot, Tra, Rr, Rtw, Ttw] = icp_template(bone_indx,nodes,bone_coord,better_start);
+    [aligned_nodes, RTs] = icp_template(bone_indx, nodes, bone_coord, better_start);
 
     %% Performs coordinate system calculation
-    [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tibfib_switch);
-    Temp_Coordinates_Unit = Temp_Coordinates/50; % makes it a unit vector...
-    % - multiplying it by 50 in the previous function is simply for coordinate system visualization
+    [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord);
 
     %% Reorient and Translate to Original Input Origin and Orientation
-    if isempty(Rr) == 0
-        nodes_final_temptr = (inv(Rr)*(Temp_Nodes'))';
-        coords_final_temptr = (inv(Rr)*(Temp_Coordinates'))';
-        coords_final_unit_temptr = (inv(Rr)*(Temp_Coordinates_Unit'))';
-    elseif isempty(Ttw) == 0
-        nodes_final_temptemp = (Temp_Nodes' - repmat(Ttw,1,length(Temp_Nodes')))';
-        nodes_final_temptem = (inv(Rtw)*(nodes_final_temptemp'))';
-        nodes_final_temptr = ((nodes_final_temptem)*inv(flip_tib));
-
-        coords_final_temptemp = (Temp_Coordinates' - repmat(Ttw,1,length(Temp_Coordinates')))';
-        coords_final_temptem = (inv(Rtw)*(coords_final_temptemp'))';
-        coords_final_temptr = ((coords_final_temptem)*inv(flip_tib));
-
-        coords_final_unit_temptemp = (Temp_Coordinates_Unit' - repmat(Ttw,1,length(Temp_Coordinates_Unit')))';
-        coords_final_unit_temptem = (inv(Rtw)*(coords_final_unit_temptemp'))';
-        coords_final_unit_temptr = ((coords_final_unit_temptem)*inv(flip_tib));
-    else
-        nodes_final_temptr = Temp_Nodes;
-        coords_final_temptr = Temp_Coordinates;
-        coords_final_unit_temptr = Temp_Coordinates_Unit;
-    end
-
-    nodes_final_tempt = (nodes_final_temptr' - repmat(Tra,1,length(nodes_final_temptr')))';
-    nodes_final_temp = (inv(Rot)*(nodes_final_tempt'))';
-    nodes_final_tem = ((nodes_final_temp)*inv(flip_out));
-    nodes_final = [nodes_final_tem(:,1) + cm_nodes(1), nodes_final_tem(:,2) + cm_nodes(2), nodes_final_tem(:,3) + cm_nodes(3)];
-
-    coords_final_tempt = (coords_final_temptr' - repmat(Tra,1,length(coords_final_temptr')))';
-    coords_final_temp = (inv(Rot)*(coords_final_tempt'))';
-    coords_final_tem = ((coords_final_temp)*inv(flip_out));
-    coords_final = [coords_final_tem(:,1) + cm_nodes(1), coords_final_tem(:,2) + cm_nodes(2), coords_final_tem(:,3) + cm_nodes(3)];
-
-    coords_final_unit_tempt = (coords_final_unit_temptr' - repmat(Tra,1,length(coords_final_unit_temptr')))';
-    coords_final_unit_temp = (inv(Rot)*(coords_final_unit_tempt'))';
-    coords_final_unit_tem = ((coords_final_unit_temp)*inv(flip_out));
-    coords_final_unit = [coords_final_unit_tem(:,1) + cm_nodes(1), coords_final_unit_tem(:,2) + cm_nodes(2), coords_final_unit_tem(:,3) + cm_nodes(3)];
-  
-    %     else
-    %         nodes_final_tempt = (Temp_Nodes' - repmat(Tra,1,length(Temp_Nodes')))';
-    %         nodes_final_temp = (inv(Rot)*(nodes_final_tempt'))';
-    %         nodes_final_tem = ((nodes_final_temp)*inv(flip_out));
-    %         nodes_final = [nodes_final_tem(:,1) + cm_nodes(1), nodes_final_tem(:,2) + cm_nodes(2), nodes_final_tem(:,3) + cm_nodes(3)];
-    %
-    %         coords_final_tempt = (Temp_Coordinates' - repmat(Tra,1,length(Temp_Coordinates')))';
-    %         coords_final_temp = (inv(Rot)*(coords_final_tempt'))';
-    %         coords_final_tem = ((coords_final_temp)*inv(flip_out));
-    %         coords_final = [coords_final_tem(:,1) + cm_nodes(1), coords_final_tem(:,2) + cm_nodes(2), coords_final_tem(:,3) + cm_nodes(3)];
-    %
-    %         coords_final_unit_tempt = (Temp_Coordinates_Unit' - repmat(Tra,1,length(Temp_Coordinates_Unit')))';
-    %         coords_final_unit_temp = (inv(Rot)*(coords_final_unit_tempt'))';
-    %         coords_final_unit_tem = ((coords_final_unit_temp)*inv(flip_out));
-    %         coords_final_unit = [coords_final_unit_tem(:,1) + cm_nodes(1), coords_final_unit_tem(:,2) + cm_nodes(2), coords_final_unit_tem(:,3) + cm_nodes(3)];
-    %     end
-
-    if side_indx == 1
-        nodes_final = nodes_final.*[1,1,-1]; % Flip back to right if applicable
-        coords_final = coords_final.*[1,1,-1]; % Flip back to right if applicable
-        coords_final_unit = coords_final_unit.*[1,1,-1]; % Flip back to right if applicable
-    end
+    [nodes_final, coords_final, coords_final_unit] = reorient(Temp_Nodes, Temp_Coordinates, Temp_Coordinates_Unit, cm_nodes, side_indx, RTs);
 
     %% Final Plotting
     figure()
     plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
-    hold on
-    %     plot3(nodes_final_temp(:,1),nodes_final_temp(:,2),nodes_final_temp(:,3),'y.')
-    %     plot3(Temp_Nodes_flip(:,1),Temp_Nodes_flip(:,2),Temp_Nodes_flip(:,3),'r.')
-    %     plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'k.')
     hold on
     arrow(coords_final(1,:),coords_final(2,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
     arrow(coords_final(3,:),coords_final(4,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
@@ -297,7 +243,6 @@ for m = 1:length(all_files)
 end
 
 %% Better Starting Point
-
 if length(all_files) == 1 || all(any(isnan(coords_final_unit(:,:))))
     accurate_answer = questdlg('Is the coordinate system accurately assigned to the model?',...
         'Coordiante System','Yes','No','Yes');

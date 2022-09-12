@@ -1,4 +1,6 @@
 function better_starting_point(accurate_answer,nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original)
+% This function allows the user to choose a better starting point for their
+% bone model if the icp alignment isn't working. This is only ran if you 
 
 switch accurate_answer
     case 'No'
@@ -88,71 +90,20 @@ switch accurate_answer
                 R_red = roty(90);
                 nodes_new = (R_red*nodes_ant')';
         end
-        
+
         close all
         better_start = 2;
-        [aligned_nodes, flip_out, tibfib_switch, Rot, Tra, Rr] = icp_template(bone_indx,nodes_new,bone_coord,better_start);
+        [aligned_nodes, RTs] = icp_template(bone_indx, nodes, bone_coord, better_start);
 
         %% Performs coordinate system calculation
-        [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tibfib_switch);
-        Temp_Coordinates_Unit = Temp_Coordinates/50; % makes it a unit vector...
-        % - multiplying it by 50 in the previous function is simply for coordinate system visualization
+        [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord);
 
         %% Reorient and Translate to Original Input Origin and Orientation
-        if isempty(Rr) == 0
-            nodes_final_temptr = (inv(Rr)*(Temp_Nodes'))';
-            nodes_final_tempt = (nodes_final_temptr' - repmat(Tra,1,length(nodes_final_temptr')))';
-            nodes_final_temp = (inv(Rot)*(nodes_final_tempt'))';
-            nodes_final_tem = ((nodes_final_temp)*inv(flip_out));
-            nodes_final = [nodes_final_tem(:,1) + cm_nodes(1), nodes_final_tem(:,2) + cm_nodes(2), nodes_final_tem(:,3) + cm_nodes(3)];
-
-            coords_final_temptr = (inv(Rr)*(Temp_Coordinates'))';
-            coords_final_tempt = (coords_final_temptr' - repmat(Tra,1,length(coords_final_temptr')))';
-            coords_final_temp = (inv(Rot)*(coords_final_tempt'))';
-            coords_final_tem = ((coords_final_temp)*inv(flip_out));
-            coords_final = [coords_final_tem(:,1) + cm_nodes(1), coords_final_tem(:,2) + cm_nodes(2), coords_final_tem(:,3) + cm_nodes(3)];
-
-            coords_final_unit_temptr = (inv(Rr)*(Temp_Coordinates_Unit'))';
-            coords_final_unit_tempt = (coords_final_unit_temptr' - repmat(Tra,1,length(coords_final_unit_temptr')))';
-            coords_final_unit_temp = (inv(Rot)*(coords_final_unit_tempt'))';
-            coords_final_unit_tem = ((coords_final_unit_temp)*inv(flip_out));
-            coords_final_unit = [coords_final_unit_tem(:,1) + cm_nodes(1), coords_final_unit_tem(:,2) + cm_nodes(2), coords_final_unit_tem(:,3) + cm_nodes(3)];
-        else
-            nodes_final_tempt = (Temp_Nodes' - repmat(Tra,1,length(Temp_Nodes')))';
-            nodes_final_temp = (inv(Rot)*(nodes_final_tempt'))';
-            nodes_final_tem = ((nodes_final_temp)*inv(flip_out));
-            nodes_final_te = (inv(R_red)*(nodes_final_tem'))';
-            nodes_final_t = (inv(R_yellow)*(nodes_final_te'))';
-            nodes_final = [nodes_final_t(:,1) + cm_nodes(1), nodes_final_t(:,2) + cm_nodes(2), nodes_final_t(:,3) + cm_nodes(3)];
-
-            coords_final_tempt = (Temp_Coordinates' - repmat(Tra,1,length(Temp_Coordinates')))';
-            coords_final_temp = (inv(Rot)*(coords_final_tempt'))';
-            coords_final_tem = ((coords_final_temp)*inv(flip_out));
-            coords_final_te = (inv(R_red)*(coords_final_tem'))';
-            coords_final_t = (inv(R_yellow)*(coords_final_te'))';
-            coords_final = [coords_final_t(:,1) + cm_nodes(1), coords_final_t(:,2) + cm_nodes(2), coords_final_t(:,3) + cm_nodes(3)];
-
-            coords_final_unit_tempt = (Temp_Coordinates_Unit' - repmat(Tra,1,length(Temp_Coordinates_Unit')))';
-            coords_final_unit_temp = (inv(Rot)*(coords_final_unit_tempt'))';
-            coords_final_unit_tem = ((coords_final_unit_temp)*inv(flip_out));
-            coords_final_unit_te = (inv(R_red)*(coords_final_unit_tem'))';
-            coords_final_unit_t = (inv(R_yellow)*(coords_final_unit_te'))';
-            coords_final_unit = [coords_final_unit_t(:,1) + cm_nodes(1), coords_final_unit_t(:,2) + cm_nodes(2), coords_final_unit_t(:,3) + cm_nodes(3)];
-        end
-
-        if side_indx == 1
-            nodes_final = nodes_final.*[1,1,-1]; % Flip back to right if applicable
-            coords_final = coords_final.*[1,1,-1]; % Flip back to right if applicable
-            coords_final_unit = coords_final_unit.*[1,1,-1]; % Flip back to right if applicable
-        end
+        [nodes_final, coords_final, coords_final_unit] = reorient(Temp_Nodes, Temp_Coordinates, Temp_Coordinates_Unit, cm_nodes, side_indx, RTs);
 
         %% Final Plotting
         figure()
         plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
-        hold on
-        %     plot3(nodes_final_temp(:,1),nodes_final_temp(:,2),nodes_final_temp(:,3),'y.')
-        %     plot3(Temp_Nodes_flip(:,1),Temp_Nodes_flip(:,2),Temp_Nodes_flip(:,3),'r.')
-        %     plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'k.')
         hold on
         arrow(coords_final(1,:),coords_final(2,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
         arrow(coords_final(3,:),coords_final(4,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
@@ -185,6 +136,12 @@ switch accurate_answer
             "SI Axis"
             "ML Axis"];
         D = ["X" "Y" "Z"];
+
+        if bone_indx == 1 && bone_coord == 1
+            name = strcat('TN_',name);
+        elseif bone_indx == 1 && bone_coord == 2
+            name = strcat('TTST_',name);
+        end
 
         if length(name) > 31
             name = name(1:31);

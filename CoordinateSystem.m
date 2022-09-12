@@ -1,4 +1,6 @@
-function [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,tibfib_switch)
+function [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord)
+% This function produces the coordinate system for the users bone in the
+% temporarily aligned orientation.
 
 %% Multiple CS for Talus
 if bone_indx == 1 && bone_coord == 2
@@ -41,8 +43,6 @@ elseif bone_indx >= 8 && bone_indx <= 12 % Metatarsals
     n = 3;
 elseif bone_indx == 13 || bone_indx == 14 % Tibia or Fibula
     n = 3;
-else
-    n = 7;
 end
 
 nth_x = range_x/n;
@@ -63,7 +63,7 @@ av_positive_y_nth_y = mean(positive_y_nth_y);
 av_positive_y_nth_z = mean(positive_y_nth_z);
 
 av_positive_y_nth = [av_positive_y_nth_x,av_positive_y_nth_y,av_positive_y_nth_z];
-% 
+
 % figure()
 % plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
 % hold on
@@ -200,31 +200,16 @@ av_positive_x_nth = [av_positive_x_nth_x,av_positive_x_nth_y,av_positive_x_nth_z
 % axis equal
 
 %% Raw Axis Calculation
-if bone_indx == 3 % Navicular
+
+if (bone_indx == 1 && bone_coord == 2) || bone_indx == 3 % TT Talus, Navicular
     first_point = av_positive_x_nth;
     second_point = av_negative_x_nth;
     third_point = av_positive_z_nth;
-elseif bone_indx == 1 && bone_coord == 2 % Talus
-    first_point = av_positive_x_nth;
-    second_point = av_negative_x_nth;
-    third_point = av_positive_z_nth;
-elseif bone_indx > 4 && bone_indx < 8 % Cuneiforms
-    first_point = av_positive_y_nth;
-    second_point = av_negative_y_nth;
-    third_point = av_positive_z_nth;
-elseif bone_indx >= 8 && bone_indx <= 12 % Metatarsals
-    first_point = av_positive_y_nth;
-    second_point = av_negative_y_nth;
-    third_point = av_positive_z_nth;
-elseif bone_indx == 13 % tibia
+elseif bone_indx >= 13 % Tibia, Fibula
     first_point = av_positive_z_nth;
     second_point = av_negative_z_nth;
     third_point = av_negative_x_nth;
-elseif bone_indx == 14 % fibula
-    first_point = av_positive_z_nth;
-    second_point = av_negative_z_nth;
-    third_point = av_positive_x_nth;
-else % Calcaneus, Cuboid
+else % Cuneiforms, Metatarsals, Calcaneus, Cuboid, TN Talus
     first_point = av_positive_y_nth;
     second_point = av_negative_y_nth;
     third_point = av_positive_z_nth;
@@ -243,50 +228,17 @@ close_dist = (total_distance == min(total_distance)); % closest point between th
 origin = [0 0 0];
 temp_origin = long_axis_points(close_dist,:); % 90 degree intersecting point between long axis and third point
 
-% figure()
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
-% hold on
-% plot3(first_point(:,1),first_point(:,2),first_point(:,3),'ys')
-% plot3(second_point(:,1),second_point(:,2),second_point(:,3),'rs')
-% plot3(third_point(:,1),third_point(:,2),third_point(:,3),'bs')
-% plot3(temp_origin(:,1),temp_origin(:,2),temp_origin(:,3),'og')
-% plot3(0,0,0,'gs')
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
-
-if bone_indx == 3
+if (bone_indx == 1 && bone_coord == 2) || bone_indx == 3 % TT Talus, Navicular
     ML_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
     SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
     normal_vector = cross(ML_vector_points(2,:), SI_vector_points(2,:));
     AP_vector_points = -[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
-elseif bone_indx == 1 && bone_coord == 2
-    ML_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
-    normal_vector = cross(ML_vector_points(2,:), SI_vector_points(2,:));
-    AP_vector_points = -[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
-elseif bone_indx > 4 && bone_indx < 8
-    AP_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
-    normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
-    ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
-elseif bone_indx >= 8 && bone_indx <= 12
-    AP_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
-    normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
-    ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
-elseif bone_indx == 13
+elseif bone_indx == 13 || bone_indx == 14 % Tibia, Fibula
     SI_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
     ML_vector_points = -[origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
     normal_vector = cross(ML_vector_points(2,:), SI_vector_points(2,:));
     AP_vector_points = -[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
-elseif bone_indx == 14
-    SI_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    ML_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
-    normal_vector = cross(ML_vector_points(2,:), SI_vector_points(2,:));
-    AP_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
-else
+else % Cuneiforms, Metatarsals, Calcaneus, Cuboid, TN Talus
     AP_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
     SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
     normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
@@ -316,6 +268,8 @@ end
 Temp_Coordinates = [AP_vector_points([1,2],:)
     SI_vector_points([1,2],:)
     ML_vector_points([1,2],:)];
+
+Temp_Coordinates_Unit = Temp_Coordinates/50; % makes it a unit vector
 
 if bone_indx == 1 && bone_coord == 2
     Temp_Nodes = nodes_aligned_original;
