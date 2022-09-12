@@ -228,7 +228,7 @@ for m = 1:length(all_files)
     end
 
     %% Final Plotting
-    figure()
+%     figure()
     plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
     hold on
     %     plot3(nodes_final_temp(:,1),nodes_final_temp(:,2),nodes_final_temp(:,3),'y.')
