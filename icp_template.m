@@ -16,6 +16,9 @@ elseif bone_indx == 1 && bone_coord == 3
 elseif bone_indx == 2
     TR_template = stlread('Calcaneus_Template.stl');
     a = 2;
+elseif bone_indx == 2 && bone_coord == 2
+    TR_template = stlread('Calcaneus_Template_ST.stl');
+    a = 2;
 elseif bone_indx == 3
     TR_template = stlread('Navicular_Template.stl');
     a = 1;
