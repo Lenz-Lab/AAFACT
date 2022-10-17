@@ -20,6 +20,18 @@ elseif isempty(RTs.sT_tibia) == 0
     coords_final_unit_i6 = (Temp_Coordinates_Unit' - repmat(RTs.sT_tibia,1,length(Temp_Coordinates_Unit')))';
     coords_final_unit_i5 = (inv(RTs.sR_tibia)*(coords_final_unit_i6'))';
     coords_final_unit_i4 = ((coords_final_unit_i5)*inv(RTs.sflip));
+elseif isempty(RTs.sT_fibula) == 0
+    nodes_final_i6 = (Temp_Nodes' - repmat(RTs.sT_fibula,1,length(Temp_Nodes')))';
+    nodes_final_i5 = (inv(RTs.sR_fibula)*(nodes_final_i6'))';
+    nodes_final_i4 = ((nodes_final_i5)*inv(RTs.sflip));
+
+    coords_final_i6 = (Temp_Coordinates' - repmat(RTs.sT_fibula,1,length(Temp_Coordinates')))';
+    coords_final_i5 = (inv(RTs.sR_fibula)*(coords_final_i6'))';
+    coords_final_i4 = ((coords_final_i5)*inv(RTs.sflip));
+
+    coords_final_unit_i6 = (Temp_Coordinates_Unit' - repmat(RTs.sT_fibula,1,length(Temp_Coordinates_Unit')))';
+    coords_final_unit_i5 = (inv(RTs.sR_fibula)*(coords_final_unit_i6'))';
+    coords_final_unit_i4 = ((coords_final_unit_i5)*inv(RTs.sflip));
 else
     nodes_final_i4 = Temp_Nodes;
     coords_final_i4 = Temp_Coordinates;

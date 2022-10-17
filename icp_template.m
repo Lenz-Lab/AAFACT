@@ -322,7 +322,7 @@ end
 
 % The ensures the tibial coordinate system is at the center of the tibial
 % plafond
-if tibfib_switch == 1 && bone_indx == 13
+if (tibfib_switch == 1 && bone_indx == 13) || (tibfib_switch == 1 && bone_indx == 14)
     temp = find(aligned_nodes(:,3) < 150);
     nodes_test = [aligned_nodes(temp,1) aligned_nodes(temp,2) aligned_nodes(temp,3)];
     x = [-20:4:20]';
@@ -381,25 +381,38 @@ else
     sflip = [];
 end
 
+if bone_indx == 14
+    sR_fibula = sR_tibia;
+    sT_fibula = sT_tibia;
+    sR_tibia= [];
+    sT_tibia= [];
+else
+    sR_fibula = [];
+    sT_fibula = [];
+end
+
+
 %% Combine all rotation and translation matricies
 RTs.iflip = iflip; % initial flip flip_out
 RTs.sflip = sflip; % secondary flip (for tibia) tib_flip
 RTs.iR = iR; % initial rotation Rot
-RTs.iT= iT; %initial translation Tra
+RTs.iT = iT; %initial translation Tra
 RTs.sR_talus = sR_talus; % secondary rotation (for talus) Rr
-RTs.sR_tibia= sR_tibia; % secondary rotation (for tibia) Rtw
+RTs.sR_tibia = sR_tibia; % secondary rotation (for tibia) Rtw
 RTs.sT_tibia = sT_tibia; % secondary translation (for tibia) Ttw
+RTs.sR_fibula = sR_fibula; % secondary rotation (for fibula) Rtw
+RTs.sT_fibula = sT_fibula; % secondary translation (for fibula) Ttw
 
 %% Visualize proper alignment
-% figure()
-% if bone_indx == 1 && bone_coord == 2
-%     plot3(nodes_template2(:,1),nodes_template2(:,2),nodes_template2(:,3),'.k')
-% else
-%     plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-% end
-% hold on
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
+figure()
+if bone_indx == 1 && bone_coord == 2
+    plot3(nodes_template2(:,1),nodes_template2(:,2),nodes_template2(:,3),'.k')
+else
+    plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
+end
+hold on
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
