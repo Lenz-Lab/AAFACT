@@ -219,7 +219,7 @@ for m = 1:length(all_files)
     if bone_indx == 1 && bone_coord == 1
         name = strcat('TN_',name);
     elseif bone_indx == 1 && bone_coord == 2
-        name = strcat('TTST_',name);
+        name = strcat('TT_',name);
     end
 
     if length(name) > 31
