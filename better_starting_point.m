@@ -1,6 +1,6 @@
 function better_starting_point(accurate_answer,nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original)
 % This function allows the user to choose a better starting point for their
-% bone model if the icp alignment isn't working. This is only ran if you 
+% bone model if the icp alignment isn't working. This is only ran if you
 
 switch accurate_answer
     case 'No'
@@ -105,14 +105,18 @@ switch accurate_answer
         figure()
         plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
         hold on
-        arrow(coords_final(1,:),coords_final(2,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
-        arrow(coords_final(3,:),coords_final(4,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
-        arrow(coords_final(5,:),coords_final(6,:),'FaceColor','b','EdgeColor','b','LineWidth',5,'Length',10)
+        arrow(coords_final(1,:),coords_final(2,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
+        arrow(coords_final(3,:),coords_final(4,:),'FaceColor','b','EdgeColor','b','LineWidth',5,'Length',10)
+        arrow(coords_final(5,:),coords_final(6,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
         legend(' Nodal Points',' AP Axis',' SI Axis',' ML Axis')
         title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
-        text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','r');
-        text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','g');
-        text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','b');
+        text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
+        text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','b');
+        if side_indx == 1
+            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Lateral','HorizontalAlignment','left','FontSize',15,'Color','r');
+        elseif side_indx == 2
+            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
+        end
         xlabel('X')
         ylabel('Y')
         zlabel('Z')

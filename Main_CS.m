@@ -3,7 +3,7 @@ clear, clc, close all
 
 % This main code only requires the users bone model input. Select the
 % folder where the file is and then select the bone model(s) you wish the
-% apply a coordinate system to. 
+% apply a coordinate system to.
 
 % Currently, this code works for all bones from the tibia and fibula
 % through the metatarsals. It also has an option for multiple coordinate
@@ -11,7 +11,7 @@ clear, clc, close all
 
 % While it's not neccessary, naming your file with the laterality (_L_ or
 % _Left_ etc.) and the name of the bone (_Calcaneus) will speed up the
-% process. I recommend a file name similar to this for ease: 
+% process. I recommend a file name similar to this for ease:
 % group_#_bone_laterality.stl (ex. ABC_01_Tibia_Right.stl)
 
 % Determine the files in the folder selected
@@ -184,14 +184,18 @@ for m = 1:length(all_files)
     figure()
     plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
     hold on
-    arrow(coords_final(1,:),coords_final(2,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
-    arrow(coords_final(3,:),coords_final(4,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
-    arrow(coords_final(5,:),coords_final(6,:),'FaceColor','b','EdgeColor','b','LineWidth',5,'Length',10)
+    arrow(coords_final(1,:),coords_final(2,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
+    arrow(coords_final(3,:),coords_final(4,:),'FaceColor','b','EdgeColor','b','LineWidth',5,'Length',10)
+    arrow(coords_final(5,:),coords_final(6,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
     legend(' Nodal Points',' AP Axis',' SI Axis',' ML Axis')
     title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
-    text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','r');
-    text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','g');
-    text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','b');
+    text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
+    text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','b');
+    if side_indx == 1
+        text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Lateral','HorizontalAlignment','left','FontSize',15,'Color','r');
+    elseif side_indx == 2
+        text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
+    end
     xlabel('X')
     ylabel('Y')
     zlabel('Z')

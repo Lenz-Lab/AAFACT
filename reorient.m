@@ -4,6 +4,13 @@ function [nodes_final, coords_final, coords_final_unit] = reorient(Temp_Nodes,Te
 % It requires the nodes and coordinate systems, as well as the rotation and
 % translation matricies.
 
+if side_indx == 1
+    Temp_Coordinates = [Temp_Coordinates(1:5,:)
+        Temp_Coordinates(6,:)*rotz(180)];
+    Temp_Coordinates_Unit = [Temp_Coordinates_Unit(1:5,:)
+        Temp_Coordinates_Unit(6,:)*rotz(180)];
+end
+
 if isempty(RTs.sR_talus) == 0
     nodes_final_i4 = (inv(RTs.sR_talus)*(Temp_Nodes'))';
     coords_final_i4 = (inv(RTs.sR_talus)*(Temp_Coordinates'))';
