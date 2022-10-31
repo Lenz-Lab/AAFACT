@@ -3,7 +3,7 @@ clear, clc, close all
 
 % This main code only requires the users bone model input. Select the
 % folder where the file is and then select the bone model(s) you wish the
-% apply a coordinate system to. 
+% apply a coordinate system to.
 
 % Currently, this code works for all bones from the tibia and fibula
 % through the metatarsals. It also has an option for multiple coordinate
@@ -11,7 +11,7 @@ clear, clc, close all
 
 % While it's not neccessary, naming your file with the laterality (_L_ or
 % _Left_ etc.) and the name of the bone (_Calcaneus) will speed up the
-% process. I recommend a file name similar to this for ease: 
+% process. I recommend a file name similar to this for ease:
 % group_#_bone_laterality.stl (ex. ABC_01_Tibia_Right.stl)
 
 % Determine the files in the folder selected
@@ -141,13 +141,16 @@ for m = 1:length(all_files)
     end
 
     % List of different coordinate systems to choose from
-    list_talus = {'Talonavicular CS','Tibiotalar CS'};
+    list_talus = {'Talonavicular CS','Tibiotalar CS','Subtalar CS'};
     list_tibia = {'Center of Mass CS','Center of Tibiotalar Facet CS'};
     list_fibula = {'Center of Mass CS','Center of Talofibular Facet CS'};
+    list_calcaneus = {'Calcaneocuboid CS','Subtalar CS'};
     list_yesno = {'Yes','No'};
 
     if bone_indx == 1
         [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
+    elseif bone_indx == 2
+        [bone_coord,~] = listdlg('PromptString', {'Select which calcaneus CS.'}, 'ListString', list_calcaneus,'SelectionMode','single');
     elseif bone_indx == 13
         [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
     elseif bone_indx == 14
@@ -157,13 +160,13 @@ for m = 1:length(all_files)
     end
 
     %% Plot Original
-    %             figure()
-    %             plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
-    %             hold on
-    %             xlabel('X')
-    %             ylabel('Y')
-    %             zlabel('Z')
-    %             axis equal
+    %     figure()
+    %     plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
+    %     hold on
+    %     xlabel('X')
+    %     ylabel('Y')
+    %     zlabel('Z')
+    %     axis equal
 
     %% ICP to Template
     % Align users model to the prealigned template model. This orients the
@@ -176,6 +179,18 @@ for m = 1:length(all_files)
 
     %% Performs coordinate system calculation
     [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord);
+
+    if bone_indx == 1 && bone_coord == 3 % Secondary CS for Talus Subtalar
+        [Temp_Coordinates_temp, Temp_Nodes_temp, Temp_Coordinates_Unit_temp] = CoordinateSystem(aligned_nodes, 1, 2);
+
+        Temp_Coordinates = [0 0 0; ((Temp_Coordinates(2,:) + Temp_Coordinates_temp(2,:)).'/2)'
+            0 0 0; ((Temp_Coordinates(4,:) + Temp_Coordinates_temp(4,:)).'/2)'
+            0 0 0; ((Temp_Coordinates(6,:) + Temp_Coordinates_temp(6,:)).'/2)'];
+
+        Temp_Coordinates_Unit = [0 0 0; ((Temp_Coordinates_Unit(2,:) + Temp_Coordinates_Unit_temp(2,:)).'/2)'
+            0 0 0; ((Temp_Coordinates_Unit(4,:) + Temp_Coordinates_Unit_temp(4,:)).'/2)'
+            0 0 0; ((Temp_Coordinates_Unit(6,:) + Temp_Coordinates_Unit_temp(6,:)).'/2)'];
+    end
 
     %% Reorient and Translate to Original Input Origin and Orientation
     [nodes_final, coords_final, coords_final_unit] = reorient(Temp_Nodes, Temp_Coordinates, Temp_Coordinates_Unit, cm_nodes, side_indx, RTs);
@@ -220,6 +235,12 @@ for m = 1:length(all_files)
         name = strcat('TN_',name);
     elseif bone_indx == 1 && bone_coord == 2
         name = strcat('TT_',name);
+    elseif bone_indx == 1 && bone_coord == 3
+        name = strcat('ST_',name);
+    elseif bone_indx == 2 && bone_coord == 1
+        name = strcat('CC_',name);
+    elseif bone_indx == 2 && bone_coord == 2
+        name = strcat('ST_',name);
     end
 
     if length(name) > 31
