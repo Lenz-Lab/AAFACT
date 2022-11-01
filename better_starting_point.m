@@ -95,41 +95,53 @@ switch accurate_answer
         better_start = 2;
         [aligned_nodes, RTs] = icp_template(bone_indx, nodes, bone_coord, better_start);
 
-        %% Performs coordinate system calculation
-        [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord);
+       %% Performs coordinate system calculation
+    [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord);
 
-        %% Joint Origin
-        if joint_indx > 1
+    if bone_indx == 1 && bone_coord == 3 % Secondary CS for Talus Subtalar
+        [Temp_Coordinates_temp, Temp_Nodes_temp, Temp_Coordinates_Unit_temp] = CoordinateSystem(aligned_nodes, 1, 2);
+
+        Temp_Coordinates = [0 0 0; ((Temp_Coordinates(2,:) + Temp_Coordinates_temp(2,:)).'/2)'
+            0 0 0; ((Temp_Coordinates(4,:) + Temp_Coordinates_temp(4,:)).'/2)'
+            0 0 0; ((Temp_Coordinates(6,:) + Temp_Coordinates_temp(6,:)).'/2)'];
+
+        Temp_Coordinates_Unit = [0 0 0; ((Temp_Coordinates_Unit(2,:) + Temp_Coordinates_Unit_temp(2,:)).'/2)'
+            0 0 0; ((Temp_Coordinates_Unit(4,:) + Temp_Coordinates_Unit_temp(4,:)).'/2)'
+            0 0 0; ((Temp_Coordinates_Unit(6,:) + Temp_Coordinates_Unit_temp(6,:)).'/2)'];
+    end
+
+    %% Joint Origin
+    if joint_indx > 1
             [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, conlist, bone_indx, joint_indx);
-        else
+    else
             Joint = "Center";
-        end
+    end
 
-        %% Reorient and Translate to Original Input Origin and Orientation
-        [nodes_final, coords_final, coords_final_unit] = reorient(Temp_Nodes, Temp_Coordinates, Temp_Coordinates_Unit, cm_nodes, side_indx, RTs);
+    %% Reorient and Translate to Original Input Origin and Orientation
+    [nodes_final, coords_final, coords_final_unit] = reorient(Temp_Nodes, Temp_Coordinates, Temp_Coordinates_Unit, cm_nodes, side_indx, RTs);
 
-        %% Final Plotting
-        figure()
-        plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
-        hold on
-        arrow(coords_final(1,:),coords_final(2,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
-        arrow(coords_final(3,:),coords_final(4,:),'FaceColor','b','EdgeColor','b','LineWidth',5,'Length',10)
-        arrow(coords_final(5,:),coords_final(6,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
-        legend(' Nodal Points',' AP Axis',' SI Axis',' ML Axis')
-        title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
-        text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
-        text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','b');
-        if side_indx == 1
-            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Lateral','HorizontalAlignment','left','FontSize',15,'Color','r');
-        elseif side_indx == 2
-            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
-        end
-        xlabel('X')
-        ylabel('Y')
-        zlabel('Z')
-        axis equal
+    %% Final Plotting
+    figure()
+    plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
+    hold on
+    arrow(coords_final(1,:),coords_final(2,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
+    arrow(coords_final(3,:),coords_final(4,:),'FaceColor','b','EdgeColor','b','LineWidth',5,'Length',10)
+    arrow(coords_final(5,:),coords_final(6,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
+    legend(' Nodal Points',' AP Axis',' SI Axis',' ML Axis')
+    title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
+    text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
+    text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','b');
+    if side_indx == 1
+        text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Lateral','HorizontalAlignment','left','FontSize',15,'Color','r');
+    elseif side_indx == 2
+        text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
+    end
+    xlabel('X')
+    ylabel('Y')
+    zlabel('Z')
+    axis equal
 
-        %% Save both coordinate systems to spreadsheet
+    %% Save both coordinate systems to spreadsheet
     A = ["Subject"
         "Bone Model"
         "Side"];
@@ -152,6 +164,12 @@ switch accurate_answer
         name = strcat('TN_',name);
     elseif bone_indx == 1 && bone_coord == 2
         name = strcat('TT_',name);
+    elseif bone_indx == 1 && bone_coord == 3
+        name = strcat('ST_',name);
+    elseif bone_indx == 2 && bone_coord == 1
+        name = strcat('CC_',name);
+    elseif bone_indx == 2 && bone_coord == 2
+        name = strcat('ST_',name);
     end
 
     if length(name) > 31

@@ -8,16 +8,19 @@ function [aligned_nodes, RTs] = icp_template(bone_indx,nodes,bone_coord,better_s
 
 %% Read in Template Bone
 addpath('Template_Bones')
-if bone_indx == 1 && bone_coord == 1
+if bone_indx == 1 && bone_coord == 1 % TN
     TR_template = stlread('Talus_Template.stl');
     a = 2;
-elseif bone_indx == 1 && bone_coord == 2
+elseif bone_indx == 1 && bone_coord >= 2 % TT & ST
     TR_template2 = stlread('Talus_Template2.stl');
     TR_template = stlread('Talus_Template.stl');
     nodes_template2 = TR_template2.Points;
     a = 2;
-elseif bone_indx == 2
+elseif bone_indx == 2 && bone_coord == 1
     TR_template = stlread('Calcaneus_Template.stl');
+    a = 2;
+elseif bone_indx == 2 && bone_coord == 2
+    TR_template = stlread('Calcaneus_Template2.stl');
     a = 2;
 elseif bone_indx == 3
     TR_template = stlread('Navicular_Template.stl');
@@ -405,7 +408,7 @@ RTs.sT_fibula = sT_fibula; % secondary translation (for fibula) Ttw
 
 %% Visualize proper alignment
 % figure()
-% if bone_indx == 1 && bone_coord == 2
+% if bone_indx == 1 && bone_coord >= 2
 %     plot3(nodes_template2(:,1),nodes_template2(:,2),nodes_template2(:,3),'.k')
 % else
 %     plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')

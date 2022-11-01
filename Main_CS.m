@@ -142,11 +142,15 @@ for m = 1:length(all_files)
     end
 
     % List of different coordinate systems to choose from
-    list_talus = {'Talonavicular CS','Tibiotalar CS'};
+
+    list_talus = {'Talonavicular CS','Tibiotalar CS','Subtalar CS'};
+    list_calcaneus = {'Calcaneocuboid CS','Subtalar CS'};
     list_yesno = {'Yes','No'};
     
     if bone_indx == 1
         [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
+    elseif bone_indx == 2
+        [bone_coord,~] = listdlg('PromptString', {'Select which calcaneus CS.'}, 'ListString', list_calcaneus,'SelectionMode','single');
     else
         bone_coord = [];
     end
@@ -183,13 +187,13 @@ for m = 1:length(all_files)
     end
 
     %% Plot Original
-    %             figure()
-    %             plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
-    %             hold on
-    %             xlabel('X')
-    %             ylabel('Y')
-    %             zlabel('Z')
-    %             axis equal
+    %     figure()
+    %     plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
+    %     hold on
+    %     xlabel('X')
+    %     ylabel('Y')
+    %     zlabel('Z')
+    %     axis equal
 
     %% ICP to Template
     % Align users model to the prealigned template model. This orients the
@@ -203,9 +207,23 @@ for m = 1:length(all_files)
     %% Performs coordinate system calculation
     [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord);
 
+    if bone_indx == 1 && bone_coord == 3 % Secondary CS for Talus Subtalar
+        [Temp_Coordinates_temp, Temp_Nodes_temp, Temp_Coordinates_Unit_temp] = CoordinateSystem(aligned_nodes, 1, 2);
+
+        Temp_Coordinates = [0 0 0; ((Temp_Coordinates(2,:) + Temp_Coordinates_temp(2,:)).'/2)'
+            0 0 0; ((Temp_Coordinates(4,:) + Temp_Coordinates_temp(4,:)).'/2)'
+            0 0 0; ((Temp_Coordinates(6,:) + Temp_Coordinates_temp(6,:)).'/2)'];
+
+        Temp_Coordinates_Unit = [0 0 0; ((Temp_Coordinates_Unit(2,:) + Temp_Coordinates_Unit_temp(2,:)).'/2)'
+            0 0 0; ((Temp_Coordinates_Unit(4,:) + Temp_Coordinates_Unit_temp(4,:)).'/2)'
+            0 0 0; ((Temp_Coordinates_Unit(6,:) + Temp_Coordinates_Unit_temp(6,:)).'/2)'];
+    end
+
     %% Joint Origin
     if joint_indx > 1
-        [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, conlist, bone_indx, joint_indx);
+            [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, conlist, bone_indx, joint_indx);
+    else
+            Joint = "Center";
     end
 
     %% Reorient and Translate to Original Input Origin and Orientation
@@ -255,6 +273,12 @@ for m = 1:length(all_files)
         name = strcat('TN_',name);
     elseif bone_indx == 1 && bone_coord == 2
         name = strcat('TT_',name);
+    elseif bone_indx == 1 && bone_coord == 3
+        name = strcat('ST_',name);
+    elseif bone_indx == 2 && bone_coord == 1
+        name = strcat('CC_',name);
+    elseif bone_indx == 2 && bone_coord == 2
+        name = strcat('ST_',name);
     end
 
     if length(name) > 31
