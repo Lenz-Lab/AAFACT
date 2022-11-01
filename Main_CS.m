@@ -146,7 +146,7 @@ for m = 1:length(all_files)
     list_talus = {'Talonavicular CS','Tibiotalar CS','Subtalar CS'};
     list_calcaneus = {'Calcaneocuboid CS','Subtalar CS'};
     list_yesno = {'Yes','No'};
-    
+
     if bone_indx == 1
         [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
     elseif bone_indx == 2
@@ -156,9 +156,9 @@ for m = 1:length(all_files)
     end
 
     if bone_indx == 1
-        list_joint = {'Center','Talonavicular Surface','Tibiotalar Surface'};
+        list_joint = {'Center','Talonavicular Surface','Tibiotalar Surface', 'Subtalar Surface'};
     elseif bone_indx == 2
-        list_joint = {'Center','Calcaneocuboid Surface'};
+        list_joint = {'Center','Calcaneocuboid Surface', 'Subtalar Surface'};
     elseif bone_indx == 3
         list_joint = {'Center','Talonavicular Surface','Navicular-Cuneiform Surface'};
     elseif bone_indx == 4
@@ -221,9 +221,9 @@ for m = 1:length(all_files)
 
     %% Joint Origin
     if joint_indx > 1
-            [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, conlist, bone_indx, joint_indx);
+        [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, conlist, bone_indx, joint_indx);
     else
-            Joint = "Center";
+        Joint = "Center";
     end
 
     %% Reorient and Translate to Original Input Origin and Orientation

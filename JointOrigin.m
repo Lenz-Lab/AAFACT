@@ -7,11 +7,17 @@ if bone_indx == 1 % Talus
     elseif joint_indx == 3 % TT Joint
         AOI = "Superior";
         Joint = "Tibiotalar Surface";
+    elseif joint_indx == 4 % ST Joint
+        AOI = "Inferior";
+        Joint = "Subtalar Surface";
     end
 elseif bone_indx == 2 % Calcaneus
     if joint_indx == 2 % CC Joint
         AOI = "Anterior";
         Joint = "Calcaneocuboid Surface";
+    elseif joint_indx == 3 % ST Joint
+        AOI = "Anterior";
+        Joint = "Subtalar Surface";
     end
 elseif bone_indx == 3 % Navicular
     if joint_indx == 2 % TN Joint
