@@ -143,17 +143,10 @@ for m = 1:length(all_files)
 
     % List of different coordinate systems to choose from
     list_talus = {'Talonavicular CS','Tibiotalar CS'};
-    list_tibia = {'Center of Mass CS','Center of Tibiotalar Facet CS'};
-    list_fibula = {'Center of Mass CS','Center of Talofibular Facet CS'};
     list_yesno = {'Yes','No'};
     
-
     if bone_indx == 1
         [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
-    elseif bone_indx == 13
-        [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
-    elseif bone_indx == 14
-        [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
     else
         bone_coord = [];
     end
@@ -166,9 +159,28 @@ for m = 1:length(all_files)
         list_joint = {'Center','Talonavicular Surface','Navicular-Cuneiform Surface'};
     elseif bone_indx == 4
         list_joint = {'Center','Calcaneocuboid Surface'};
+    elseif bone_indx == 5 || bone_indx == 7
+        list_joint = {'Center','Navicular-Cuneiform Surface', 'Cuneiform-Metatarsal Surface', 'Intercuneiform Surface'};
+    elseif bone_indx == 6
+        list_joint = {'Center','Navicular-Cuneiform Surface', 'Cuneiform-Metatarsal Surface', 'Medial Intercuneiform Surface', 'Lateral Intercuneiform Surface'};
+    elseif bone_indx >= 8 && bone_indx <= 12
+        list_joint = {'Center','Posterior Metatarsal Surface'};
+    elseif bone_indx == 13
+        list_joint = {'Center','Tibiotalar Surface'};
+    elseif bone_indx == 14
+        list_joint = {'Center','Talofibular Surface'};
     end
 
-    [joint_indx,~] = listdlg('PromptString', {'Where do you want the origin?'}, 'ListString', list_joint,'SelectionMode','single');
+    if exist('list_joint')
+        [joint_indx,~] = listdlg('PromptString', {'Where do you want the origin?'}, 'ListString', list_joint,'SelectionMode','single');
+        if (bone_indx == 13 || 14) && joint_indx == 1
+            bone_coord = 1;
+        elseif (bone_indx == 13 || 14) && joint_indx == 2
+            bone_coord = 2;
+        end
+    else
+        joint_indx = 1;
+    end
 
     %% Plot Original
     %             figure()
@@ -194,8 +206,6 @@ for m = 1:length(all_files)
     %% Joint Origin
     if joint_indx > 1
         [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, conlist, bone_indx, joint_indx);
-    else
-        Joint = "Center";
     end
 
     %% Reorient and Translate to Original Input Origin and Orientation
