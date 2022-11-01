@@ -64,4 +64,5 @@ if side_indx == 1
     nodes_final = nodes_final.*[1,1,-1]; % Flip back to right if applicable
     coords_final = coords_final.*[1,1,-1]; % Flip back to right if applicable
     coords_final_unit = coords_final_unit.*[1,1,-1]; % Flip back to right if applicable
+%     conlist = [conlist(:,3) conlist(:,2) conlist(:,1)];
 end

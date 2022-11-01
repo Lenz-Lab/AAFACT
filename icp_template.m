@@ -308,8 +308,8 @@ elseif ERx270_wr(end) == ER_min
     iT= Tx270_wr;
 end
 
-% This loop performs an exiTrotation for the TT CS of the talus
-if bone_indx == 1 && bone_coord >= 2
+% This loop performs an alignment for the TT CS of the talus
+if bone_indx == 1 && bone_coord == 2
     [sR_talus,~,~] = icp(nodes_template2',nodes_template',25,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
     aligned_nodes = (sR_talus*(aligned_nodes'))';
 else

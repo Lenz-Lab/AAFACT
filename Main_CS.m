@@ -138,25 +138,52 @@ for m = 1:length(all_files)
 
     if side_indx == 1
         nodes = nodes.*[1,1,-1]; % Flip all rights to left
+        conlist = [conlist(:,3) conlist(:,2) conlist(:,1)];
     end
 
     % List of different coordinate systems to choose from
+
     list_talus = {'Talonavicular CS','Tibiotalar CS','Subtalar CS'};
-    list_tibia = {'Center of Mass CS','Center of Tibiotalar Facet CS'};
-    list_fibula = {'Center of Mass CS','Center of Talofibular Facet CS'};
     list_calcaneus = {'Calcaneocuboid CS','Subtalar CS'};
     list_yesno = {'Yes','No'};
-
+    
     if bone_indx == 1
         [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','single');
     elseif bone_indx == 2
         [bone_coord,~] = listdlg('PromptString', {'Select which calcaneus CS.'}, 'ListString', list_calcaneus,'SelectionMode','single');
-    elseif bone_indx == 13
-        [bone_coord,~] = listdlg('PromptString', {'Select which tibia CS.'}, 'ListString', list_tibia,'SelectionMode','single');
-    elseif bone_indx == 14
-        [bone_coord,~] = listdlg('PromptString', {'Select which fibula CS.'}, 'ListString', list_fibula,'SelectionMode','single');
     else
         bone_coord = [];
+    end
+
+    if bone_indx == 1
+        list_joint = {'Center','Talonavicular Surface','Tibiotalar Surface'};
+    elseif bone_indx == 2
+        list_joint = {'Center','Calcaneocuboid Surface'};
+    elseif bone_indx == 3
+        list_joint = {'Center','Talonavicular Surface','Navicular-Cuneiform Surface'};
+    elseif bone_indx == 4
+        list_joint = {'Center','Calcaneocuboid Surface'};
+    elseif bone_indx == 5 || bone_indx == 7
+        list_joint = {'Center','Navicular-Cuneiform Surface', 'Cuneiform-Metatarsal Surface', 'Intercuneiform Surface'};
+    elseif bone_indx == 6
+        list_joint = {'Center','Navicular-Cuneiform Surface', 'Cuneiform-Metatarsal Surface', 'Medial Intercuneiform Surface', 'Lateral Intercuneiform Surface'};
+    elseif bone_indx >= 8 && bone_indx <= 12
+        list_joint = {'Center','Posterior Metatarsal Surface'};
+    elseif bone_indx == 13
+        list_joint = {'Center','Tibiotalar Surface'};
+    elseif bone_indx == 14
+        list_joint = {'Center','Talofibular Surface'};
+    end
+
+    if exist('list_joint')
+        [joint_indx,~] = listdlg('PromptString', {'Where do you want the origin?'}, 'ListString', list_joint,'SelectionMode','single');
+        if (bone_indx == 13 || 14) && joint_indx == 1
+            bone_coord = 1;
+        elseif (bone_indx == 13 || 14) && joint_indx == 2
+            bone_coord = 2;
+        end
+    else
+        joint_indx = 1;
     end
 
     %% Plot Original
@@ -192,6 +219,13 @@ for m = 1:length(all_files)
             0 0 0; ((Temp_Coordinates_Unit(6,:) + Temp_Coordinates_Unit_temp(6,:)).'/2)'];
     end
 
+    %% Joint Origin
+    if joint_indx > 1
+            [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, conlist, bone_indx, joint_indx);
+    else
+            Joint = "Center";
+    end
+
     %% Reorient and Translate to Original Input Origin and Orientation
     [nodes_final, coords_final, coords_final_unit] = reorient(Temp_Nodes, Temp_Coordinates, Temp_Coordinates_Unit, cm_nodes, side_indx, RTs);
 
@@ -224,12 +258,12 @@ for m = 1:length(all_files)
         list_bone(bone_indx)
         list_side(side_indx)];
     C = ["Coordinate System at Original Orientation"
-        "Origin"
+        strcat(string(Joint)," Origin")
         "AP Axis"
         "SI Axis"
         "ML Axis"
         "Coordinate System at (0,0,0)"
-        "Origin"
+        strcat(string(Joint)," Origin")
         "AP Axis"
         "SI Axis"
         "ML Axis"];
@@ -271,5 +305,5 @@ end
 if length(all_files) == 1 || all(any(isnan(coords_final_unit(:,:))))
     accurate_answer = questdlg('Is the coordinate system accurately assigned to the model?',...
         'Coordiante System','Yes','No','Yes');
-    better_starting_point(accurate_answer,nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original)
+    better_starting_point(accurate_answer,nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx)
 end
