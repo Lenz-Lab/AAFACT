@@ -98,6 +98,17 @@ switch accurate_answer
         %% Performs coordinate system calculation
         [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord);
 
+        if bone_indx == 1 && bone_coord == 3 % Secondary CS for Talus Subtalar
+            [Temp_Coordinates_temp, Temp_Nodes_temp, Temp_Coordinates_Unit_temp] = CoordinateSystem(aligned_nodes, 1, 2);
+
+            Temp_Coordinates = [0 0 0; ((Temp_Coordinates(2,:) + Temp_Coordinates_temp(2,:)).'/2)'
+                0 0 0; ((Temp_Coordinates(4,:) + Temp_Coordinates_temp(4,:)).'/2)'
+                0 0 0; ((Temp_Coordinates(6,:) + Temp_Coordinates_temp(6,:)).'/2)'];
+
+            Temp_Coordinates_Unit = [0 0 0; ((Temp_Coordinates_Unit(2,:) + Temp_Coordinates_Unit_temp(2,:)).'/2)'
+                0 0 0; ((Temp_Coordinates_Unit(4,:) + Temp_Coordinates_Unit_temp(4,:)).'/2)'
+                0 0 0; ((Temp_Coordinates_Unit(6,:) + Temp_Coordinates_Unit_temp(6,:)).'/2)'];
+        end
         %% Reorient and Translate to Original Input Origin and Orientation
         [nodes_final, coords_final, coords_final_unit] = reorient(Temp_Nodes, Temp_Coordinates, Temp_Coordinates_Unit, cm_nodes, side_indx, RTs);
 
@@ -144,7 +155,13 @@ switch accurate_answer
         if bone_indx == 1 && bone_coord == 1
             name = strcat('TN_',name);
         elseif bone_indx == 1 && bone_coord == 2
-            name = strcat('TTST_',name);
+            name = strcat('TT_',name);
+        elseif bone_indx == 1 && bone_coord == 3
+            name = strcat('ST_',name);
+        elseif bone_indx == 2 && bone_coord == 1
+            name = strcat('CC_',name);
+        elseif bone_indx == 2 && bone_coord == 2
+            name = strcat('ST_',name);
         end
 
         if length(name) > 31
