@@ -136,11 +136,7 @@ for m = 1:length(all_files)
     end
 
     nodes_original = nodes;
-
-    if side_indx == 1
-        nodes = nodes.*[1,1,-1]; % Flip all rights to left
-        conlist = [conlist(:,3) conlist(:,2) conlist(:,1)];
-    end
+    conlist_original = conlist;
 
     % Lists of different coordinate systems to choose from
     list_talus = {'Talonavicular CS','Tibiotalar CS','Subtalar CS'};
@@ -160,7 +156,13 @@ for m = 1:length(all_files)
     %% Loop for each desired Coordinate System
     for n = 1:length(bone_coord)
         nodes = nodes_original;
+        conlist = conlist_original;
         name = name_original;
+
+        if side_indx == 1
+            nodes = nodes.*[1,1,-1]; % Flip all rights to left
+            conlist = [conlist(:,3) conlist(:,2) conlist(:,1)];
+        end
 
         if bone_indx == 1
             list_joint = {'Center','Talonavicular Surface','Tibiotalar Surface', 'Subtalar Surface'};
@@ -182,7 +184,6 @@ for m = 1:length(all_files)
             list_joint = {'Center','Talofibular Surface'};
         end
 
-        %     if exist('list_joint')
         [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?'," ",cs_string(n))} {''}], 'ListString', list_joint,'SelectionMode','single');
 
         if (bone_indx == 13 || bone_indx == 14) && length(joint_indx) > 1
@@ -192,18 +193,15 @@ for m = 1:length(all_files)
         elseif (bone_indx == 13 || bone_indx == 14) && joint_indx == 2
             bone_coord = 2;
         end
-        %     else
-        %         joint_indx = 1;
-        %     end
 
         %% Plot Original
-        %     figure()
-        %     plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
-        %     hold on
-        %     xlabel('X')
-        %     ylabel('Y')
-        %     zlabel('Z')
-        %     axis equal
+%             figure()
+%             plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
+%             hold on
+%             xlabel('X')
+%             ylabel('Y')
+%             zlabel('Z')
+%             axis equal
 
         %% ICP to Template
         % Align users model to the prealigned template model. This orients the
@@ -310,7 +308,7 @@ for m = 1:length(all_files)
         writematrix(Temp_Coordinates_Unit(4,:),xlfilename,'Sheet',name,'Range','B13');
         writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
 
-        vars = {'Temp_Nodes', 'Temp_Coordinates', 'Temp_Coordinates_Unit', 'cm_nodes', 'RTs', 'coords_final','coords_final_unit','nodes','aligned_nodes','name'};
+        vars = {'Temp_Nodes', 'Temp_Coordinates', 'Temp_Coordinates_Unit', 'cm_nodes', 'RTs', 'coords_final','coords_final_unit','nodes','aligned_nodes','name','conlist'};
         clear(vars{:})
     end
 
