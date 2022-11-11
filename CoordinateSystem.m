@@ -271,7 +271,7 @@ Temp_Coordinates = [AP_vector_points([1,2],:)
 
 Temp_Coordinates_Unit = Temp_Coordinates/50; % makes it a unit vector
 
-if bone_indx == 1 && bone_coord == 2
+if (bone_indx == 1 && bone_coord == 2) || bone_indx == 13
     Temp_Nodes = nodes_aligned_original;
 else
     Temp_Nodes = aligned_nodes;

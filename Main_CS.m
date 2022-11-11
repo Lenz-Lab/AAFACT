@@ -153,7 +153,7 @@ for m = 1:length(all_files)
         [bone_coord,~] = listdlg('PromptString', {'Select which calcaneus CS.'}, 'ListString', list_calcaneus,'SelectionMode','multiple');
         cs_string = string(list_calcaneus(bone_coord));
     else
-        bone_coord = [];
+        bone_coord = 0;
         cs_string = "";
     end
 
@@ -182,7 +182,6 @@ for m = 1:length(all_files)
             list_joint = {'Center','Talofibular Surface'};
         end
 
-        %     if exist('list_joint')
         [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?'," ",cs_string(n))} {''}], 'ListString', list_joint,'SelectionMode','single');
 
         if (bone_indx == 13 || bone_indx == 14) && length(joint_indx) > 1
@@ -192,9 +191,6 @@ for m = 1:length(all_files)
         elseif (bone_indx == 13 || bone_indx == 14) && joint_indx == 2
             bone_coord = 2;
         end
-        %     else
-        %         joint_indx = 1;
-        %     end
 
         %% Plot Original
         %     figure()
