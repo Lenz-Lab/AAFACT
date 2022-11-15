@@ -149,7 +149,7 @@ for m = 1:length(all_files)
         [bone_coord,~] = listdlg('PromptString', {'Select which calcaneus CS.'}, 'ListString', list_calcaneus,'SelectionMode','multiple');
         cs_string = string(list_calcaneus(bone_coord));
     else
-        bone_coord = [];
+        bone_coord = 1;
         cs_string = "";
     end
 
@@ -308,14 +308,16 @@ for m = 1:length(all_files)
         writematrix(Temp_Coordinates_Unit(4,:),xlfilename,'Sheet',name,'Range','B13');
         writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
 
+        %% Better Starting Point
+        if length(all_files) == 1 && length(bone_coord) == 1
+            accurate_answer = questdlg('Is the coordinate system accurately assigned to the model?',...
+                'Coordiante System','Yes','No','Yes');
+            better_starting_point(accurate_answer,nodes,bone_indx,bone_coord(n),side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx)
+        end
+
+        %% Clear Variables for New Loop
         vars = {'Temp_Nodes', 'Temp_Coordinates', 'Temp_Coordinates_Unit', 'cm_nodes', 'RTs', 'coords_final','coords_final_unit','nodes','aligned_nodes','name','conlist'};
         clear(vars{:})
-    end
-
-    %% Better Starting Point
-    if (length(all_files) == 1 || all(any(isnan(coords_final_unit(:,:))))) && (length(bone_coord) == 1)
-        accurate_answer = questdlg('Is the coordinate system accurately assigned to the model?',...
-            'Coordiante System','Yes','No','Yes');
-        better_starting_point(accurate_answer,nodes,bone_indx,bone_coord(n),side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx)
+        
     end
 end

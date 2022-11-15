@@ -5,10 +5,13 @@ function [nodes_final, coords_final, coords_final_unit] = reorient(Temp_Nodes,Te
 % translation matricies.
 
 if side_indx == 1
+    axang = [Temp_Coordinates(2,:) pi];
+    ML_180 = axang2rotm(axang);
+
     Temp_Coordinates = [Temp_Coordinates(1:5,:)
-        Temp_Coordinates(6,:)*rotz(180)];
+        Temp_Coordinates(6,:)*ML_180];
     Temp_Coordinates_Unit = [Temp_Coordinates_Unit(1:5,:)
-        Temp_Coordinates_Unit(6,:)*rotz(180)];
+        Temp_Coordinates_Unit(6,:)*ML_180];
 end
 
 if isempty(RTs.sR_talus) == 0
