@@ -9,11 +9,12 @@ if bone_indx == 1 && bone_coord == 2
 end
 
 %% Tibial Realignment for Medial Malleolus
-cutting_plane = min(aligned_nodes(:,3)) + 14; % Temporarily removes the tibial plafond
-
 if bone_indx == 13
+    cutting_plane = min(aligned_nodes(:,3)) + 14; % Temporarily removes the tibial plafond
+    cutting_plane2 = min(aligned_nodes(:,3)) + 100;
     nodes_aligned_original = aligned_nodes;
     aligned_nodes = [aligned_nodes(aligned_nodes(:,3)>cutting_plane,1) aligned_nodes(aligned_nodes(:,3)>cutting_plane,2) aligned_nodes(aligned_nodes(:,3)>cutting_plane,3)];
+    aligned_nodes = [aligned_nodes(aligned_nodes(:,3)<cutting_plane2,1) aligned_nodes(aligned_nodes(:,3)<cutting_plane2,2) aligned_nodes(aligned_nodes(:,3)<cutting_plane2,3)];
 end
 
 %% Split up the bone into nth sections in all three planes
