@@ -1,5 +1,5 @@
 function [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, conlist, bone_indx, joint_indx)
-
+%%
 if bone_indx == 1 % Talus
     if joint_indx == 2 % TN Joint
         AOI = "Anterior";
@@ -121,7 +121,7 @@ if AOI ~= "None"
     end
 
     int_amount = (length(joint_origin)/3);
-    joint_origin = [joint_origin(1) joint_origin(end+1-(2*int_amount)) joint_origin(end+1-int_amount)];
+    joint_origin = [joint_origin(2) joint_origin(end-(2*int_amount)) joint_origin(end)];
     Temp_Coordinates = joint_origin + Temp_Coordinates;
     Temp_Coordinates_Unit = joint_origin + Temp_Coordinates_Unit;
 else
