@@ -136,11 +136,7 @@ for m = 1:length(all_files)
     end
 
     nodes_original = nodes;
-
-    if side_indx == 1
-        nodes = nodes.*[1,1,-1]; % Flip all rights to left
-        conlist = [conlist(:,3) conlist(:,2) conlist(:,1)];
-    end
+    conlist_original = conlist;
 
     % Lists of different coordinate systems to choose from
     list_talus = {'Talonavicular CS','Tibiotalar CS','Subtalar CS'};
@@ -153,14 +149,20 @@ for m = 1:length(all_files)
         [bone_coord,~] = listdlg('PromptString', {'Select which calcaneus CS.'}, 'ListString', list_calcaneus,'SelectionMode','multiple');
         cs_string = string(list_calcaneus(bone_coord));
     else
-        bone_coord = 0;
+        bone_coord = 1;
         cs_string = "";
     end
 
     %% Loop for each desired Coordinate System
     for n = 1:length(bone_coord)
         nodes = nodes_original;
+        conlist = conlist_original;
         name = name_original;
+
+        if side_indx == 1
+            nodes = nodes.*[1,1,-1]; % Flip all rights to left
+            conlist = [conlist(:,3) conlist(:,2) conlist(:,1)];
+        end
 
         if bone_indx == 1
             list_joint = {'Center','Talonavicular Surface','Tibiotalar Surface', 'Subtalar Surface'};
@@ -193,13 +195,13 @@ for m = 1:length(all_files)
         end
 
         %% Plot Original
-        %     figure()
-        %     plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
-        %     hold on
-        %     xlabel('X')
-        %     ylabel('Y')
-        %     zlabel('Z')
-        %     axis equal
+%             figure()
+%             plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
+%             hold on
+%             xlabel('X')
+%             ylabel('Y')
+%             zlabel('Z')
+%             axis equal
 
         %% ICP to Template
         % Align users model to the prealigned template model. This orients the
@@ -306,14 +308,16 @@ for m = 1:length(all_files)
         writematrix(Temp_Coordinates_Unit(4,:),xlfilename,'Sheet',name,'Range','B13');
         writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
 
-        vars = {'Temp_Nodes', 'Temp_Coordinates', 'Temp_Coordinates_Unit', 'cm_nodes', 'RTs', 'coords_final','coords_final_unit','nodes','aligned_nodes','name'};
-        clear(vars{:})
-    end
+        %% Better Starting Point
+        if length(all_files) == 1 && length(bone_coord) == 1
+            accurate_answer = questdlg('Is the coordinate system accurately assigned to the model?',...
+                'Coordiante System','Yes','No','Yes');
+            better_starting_point(accurate_answer,nodes,bone_indx,bone_coord(n),side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx)
+        end
 
-    %% Better Starting Point
-    if (length(all_files) == 1 || all(any(isnan(coords_final_unit(:,:))))) && (length(bone_coord) == 1)
-        accurate_answer = questdlg('Is the coordinate system accurately assigned to the model?',...
-            'Coordiante System','Yes','No','Yes');
-        better_starting_point(accurate_answer,nodes,bone_indx,bone_coord(n),side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx)
+        %% Clear Variables for New Loop
+        vars = {'Temp_Nodes', 'Temp_Coordinates', 'Temp_Coordinates_Unit', 'cm_nodes', 'RTs', 'coords_final','coords_final_unit','nodes','aligned_nodes','name','conlist'};
+        clear(vars{:})
+        
     end
 end

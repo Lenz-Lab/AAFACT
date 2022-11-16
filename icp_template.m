@@ -153,6 +153,7 @@ end
 % This is the initial alignment with no rotation. 
 % Two different icp approaches are used, the first includeds the faces and
 % the second is just the points.
+
 iterations = 200;
 [R1,T1,ER1] = icp(nodes_template',nodes', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
 [R1_0,T1_0,ER1_0] = icp(nodes_template',nodes', iterations,'Matching','kDtree','WorstRejection',0.1);
@@ -409,15 +410,16 @@ RTs.sR_fibula = sR_fibula; % secondary rotation (for fibula) Rtw
 RTs.sT_fibula = sT_fibula; % secondary translation (for fibula) Ttw
 
 %% Visualize proper alignment
-figure()
-if bone_indx == 1 && bone_coord >= 2
-    plot3(nodes_template2(:,1),nodes_template2(:,2),nodes_template2(:,3),'.k')
-else
-    plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-end
-hold on
-plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
-xlabel('X')
-ylabel('Y')
-zlabel('Z')
-axis equal
+% figure()
+% if bone_indx == 1 && bone_coord >= 2
+%     plot3(nodes_template2(:,1),nodes_template2(:,2),nodes_template2(:,3),'.k')
+% else
+%     plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
+% end
+% hold on
+% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
+% xlabel('X')
+% ylabel('Y')
+% zlabel('Z')
+% axis equal
+
