@@ -69,6 +69,7 @@ end
 nodes_template = TR_template.Points;
 con_temp = TR_template.ConnectivityList;
 
+
 %% Adjusting the cropped/smaller models
 % Creates similar sized models for cropped tibia or fibula
 if bone_indx == 13 || bone_indx == 14
@@ -152,8 +153,10 @@ end
 % This is the initial alignment with no rotation. 
 % Two different icp approaches are used, the first includeds the faces and
 % the second is just the points.
-[R1,T1,ER1] = icp(nodes_template',nodes',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-[R1_0,T1_0,ER1_0] = icp(nodes_template',nodes',200,'Matching','kDtree','WorstRejection',0.1);
+
+iterations = 200;
+[R1,T1,ER1] = icp(nodes_template',nodes', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+[R1_0,T1_0,ER1_0] = icp(nodes_template',nodes', iterations,'Matching','kDtree','WorstRejection',0.1);
 
 if better_start == 1
     
@@ -162,36 +165,36 @@ if better_start == 1
     nodesz180 = nodes*rotz(180);
     nodesz270 = nodes*rotz(270);
 
-    [Rz90,Tz90,ERz90] = icp(nodes_template',nodesz90',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rz90_wr,Tz90_wr,ERz90_wr] = icp(nodes_template',nodesz90',200,'Matching','kDtree','WorstRejection',0.1);
-    [Rz180,Tz180,ERz180] = icp(nodes_template',nodesz180',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rz180_wr,Tz180_wr,ERz180_wr] = icp(nodes_template',nodesz180',200,'Matching','kDtree','WorstRejection',0.1);
-    [Rz270,Tz270,ERz270] = icp(nodes_template',nodesz270',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rz270_wr,Tz270_wr,ERz270_wr] = icp(nodes_template',nodesz270',200,'Matching','kDtree','WorstRejection',0.1);
+    [Rz90,Tz90,ERz90] = icp(nodes_template',nodesz90', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rz90_wr,Tz90_wr,ERz90_wr] = icp(nodes_template',nodesz90', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rz180,Tz180,ERz180] = icp(nodes_template',nodesz180', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rz180_wr,Tz180_wr,ERz180_wr] = icp(nodes_template',nodesz180', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rz270,Tz270,ERz270] = icp(nodes_template',nodesz270', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rz270_wr,Tz270_wr,ERz270_wr] = icp(nodes_template',nodesz270', iterations,'Matching','kDtree','WorstRejection',0.1);
 
     % The users model is rotated about the y axis and realigned
     nodesy90 = nodes*roty(90);
     nodesy180 = nodes*roty(180);
     nodesy270 = nodes*roty(270);
 
-    [Ry90,Ty90,ERy90] = icp(nodes_template',nodesy90',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Ry90_wr,Ty90_wr,ERy90_wr] = icp(nodes_template',nodesy90',200,'Matching','kDtree','WorstRejection',0.1);
-    [Ry180,Ty180,ERy180] = icp(nodes_template',nodesy180',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Ry180_wr,Ty180_wr,ERy180_wr] = icp(nodes_template',nodesy180',200,'Matching','kDtree','WorstRejection',0.1);
-    [Ry270,Ty270,ERy270] = icp(nodes_template',nodesy270',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Ry270_wr,Ty270_wr,ERy270_wr] = icp(nodes_template',nodesy270',200,'Matching','kDtree','WorstRejection',0.1);
+    [Ry90,Ty90,ERy90] = icp(nodes_template',nodesy90', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Ry90_wr,Ty90_wr,ERy90_wr] = icp(nodes_template',nodesy90', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Ry180,Ty180,ERy180] = icp(nodes_template',nodesy180', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Ry180_wr,Ty180_wr,ERy180_wr] = icp(nodes_template',nodesy180', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Ry270,Ty270,ERy270] = icp(nodes_template',nodesy270', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Ry270_wr,Ty270_wr,ERy270_wr] = icp(nodes_template',nodesy270', iterations,'Matching','kDtree','WorstRejection',0.1);
 
     % The users model is rotated about the x axis and realigned
     nodesx90 = nodes*rotx(90);
     nodesx180 = nodes*rotx(180);
     nodesx270 = nodes*rotx(270);
 
-    [Rx90,Tx90,ERx90] = icp(nodes_template',nodesx90',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rx90_wr,Tx90_wr,ERx90_wr] = icp(nodes_template',nodesx90',200,'Matching','kDtree','WorstRejection',0.1);
-    [Rx180,Tx180,ERx180] = icp(nodes_template',nodesx180',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rx180_wr,Tx180_wr,ERx180_wr] = icp(nodes_template',nodesx180',200,'Matching','kDtree','WorstRejection',0.1);
-    [Rx270,Tx270,ERx270] = icp(nodes_template',nodesx270',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rx270_wr,Tx270_wr,ERx270_wr] = icp(nodes_template',nodesx270',200,'Matching','kDtree','WorstRejection',0.1);
+    [Rx90,Tx90,ERx90] = icp(nodes_template',nodesx90', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx90_wr,Tx90_wr,ERx90_wr] = icp(nodes_template',nodesx90', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rx180,Tx180,ERx180] = icp(nodes_template',nodesx180', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx180_wr,Tx180_wr,ERx180_wr] = icp(nodes_template',nodesx180', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rx270,Tx270,ERx270] = icp(nodes_template',nodesx270', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx270_wr,Tx270_wr,ERx270_wr] = icp(nodes_template',nodesx270', iterations,'Matching','kDtree','WorstRejection',0.1);
 
     % All errors are stored in this matrix
     ER_all = [ER1(end),ER1_0(end),ERz90(end),ERz90_wr(end),ERz180(end),ERz180_wr(end),ERz270(end),ERz270_wr(end),...
@@ -347,10 +350,10 @@ if (tibfib_switch == 1 && bone_indx == 13) || (tibfib_switch == 1 && bone_indx =
     nodes_test3 = nodes_test1*rotz(180);
     nodes_test4 = nodes_test1*rotz(270);
 
-    [Rtw1,Ttw1,Etw1] = icp(nodes_template',nodes_test1',200,'Matching','kDtree','WorstRejection',0.1);
-    [Rtw2,Ttw2,Etw2] = icp(nodes_template',nodes_test2',200,'Matching','kDtree','WorstRejection',0.1);
-    [Rtw3,Ttw3,Etw3] = icp(nodes_template',nodes_test3',200,'Matching','kDtree','WorstRejection',0.1);
-    [Rtw4,Ttw4,Etw4] = icp(nodes_template',nodes_test4',200,'Matching','kDtree','WorstRejection',0.1);
+    [Rtw1,Ttw1,Etw1] = icp(nodes_template',nodes_test1', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rtw2,Ttw2,Etw2] = icp(nodes_template',nodes_test2', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rtw3,Ttw3,Etw3] = icp(nodes_template',nodes_test3', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rtw4,Ttw4,Etw4] = icp(nodes_template',nodes_test4', iterations,'Matching','kDtree','WorstRejection',0.1);
 
     Etw = min([Etw1(end),Etw2(end),Etw3(end),Etw4(end)]);
 
@@ -419,3 +422,4 @@ RTs.sT_fibula = sT_fibula; % secondary translation (for fibula) Ttw
 % ylabel('Y')
 % zlabel('Z')
 % axis equal
+
