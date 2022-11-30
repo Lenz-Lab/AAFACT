@@ -5,15 +5,6 @@ function [nodes_final, coords_final, coords_final_unit] = reorient(Temp_Nodes,Te
 % translation matricies.
 
 if side_indx == 1
-%     figure()
-%     plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'.k')
-%     hold on
-%     plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'ob')
-%     plot3(Temp_Coordinates(1:2,1),Temp_Coordinates(1:2,2),Temp_Coordinates(1:2,3),'r-')
-%     plot3(Temp_Coordinates(3:4,1),Temp_Coordinates(3:4,2),Temp_Coordinates(3:4,3),'b-')
-%     plot3(Temp_Coordinates(5:6,1),Temp_Coordinates(5:6,2),Temp_Coordinates(5:6,3),'g-')
-%     axis equal
-
     axang = [Temp_Coordinates(2,:) pi];
     ML_180 = axang2rotm(axang);
 
@@ -21,15 +12,6 @@ if side_indx == 1
         Temp_Coordinates(6,:)*ML_180];
     Temp_Coordinates_Unit = [Temp_Coordinates_Unit(1:5,:)
         Temp_Coordinates_Unit(6,:)*ML_180];
-% 
-%     figure()
-%     plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'.k')
-%     hold on
-%     plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'ob')
-%     plot3(Temp_Coordinates(1:2,1),Temp_Coordinates(1:2,2),Temp_Coordinates(1:2,3),'r-')
-%     plot3(Temp_Coordinates(3:4,1),Temp_Coordinates(3:4,2),Temp_Coordinates(3:4,3),'b-')
-%     plot3(Temp_Coordinates(5:6,1),Temp_Coordinates(5:6,2),Temp_Coordinates(5:6,3),'g-')
-%     axis equal
 end
 
 if isempty(RTs.sR_talus) == 0
