@@ -1,4 +1,4 @@
-function [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, conlist, bone_indx, joint_indx)
+function [Temp_Coordinates, Temp_Nodes,Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx)
 %%
 if bone_indx == 1 % Talus
     if joint_indx == 2 % TN Joint
@@ -134,13 +134,12 @@ if AOI ~= "None"
     joint_origin = joint_origin(mt,:);
 
     Temp_Coordinates = joint_origin + Temp_Coordinates;
-    Temp_Coordinates_Unit = joint_origin + Temp_Coordinates_Unit;
 else
     joint_origin = current_origin;
 end
 
 % figure()
-% plot3(Temp_Nodes(:,1),Temp_Nodes(:,2),Temp_Nodes(:,3),'.k')
+% % plot3(Temp_Nodes(:,1),Temp_Nodes(:,2),Temp_Nodes(:,3),'.k')
 % hold on
 % plot3(current_origin(:,1),current_origin(:,2),current_origin(:,3),'.g','MarkerSize',25)
 % plot3(joint_origin(:,1),joint_origin(:,2),joint_origin(:,3),'.r','MarkerSize',25)
@@ -150,6 +149,9 @@ end
 % plot3(Temp_Coordinates(1:2,1),Temp_Coordinates(1:2,2),Temp_Coordinates(1:2,3),'r')
 % plot3(Temp_Coordinates(3:4,1),Temp_Coordinates(3:4,2),Temp_Coordinates(3:4,3),'g')
 % plot3(Temp_Coordinates(5:6,1),Temp_Coordinates(5:6,2),Temp_Coordinates(5:6,3),'b')
+% % plot3(Temp_Coordinates_Unit(1:2,1),Temp_Coordinates_Unit(1:2,2),Temp_Coordinates_Unit(1:2,3),'m')
+% % plot3(Temp_Coordinates_Unit(3:4,1),Temp_Coordinates_Unit(3:4,2),Temp_Coordinates_Unit(3:4,3),'m')
+% % plot3(Temp_Coordinates_Unit(5:6,1),Temp_Coordinates_Unit(5:6,2),Temp_Coordinates_Unit(5:6,3),'m')
 % axis equal
 
 
