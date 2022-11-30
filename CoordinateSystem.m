@@ -1,4 +1,4 @@
-function [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord)
+function [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord)
 % This function produces the coordinate system for the users bone in the
 % temporarily aligned orientation.
 
@@ -268,8 +268,6 @@ end
 Temp_Coordinates = [AP_vector_points([1,2],:)
     SI_vector_points([1,2],:)
     ML_vector_points([1,2],:)];
-
-Temp_Coordinates_Unit = Temp_Coordinates/50; % makes it a unit vector
 
 if (bone_indx == 1 && bone_coord == 2) || bone_indx == 13
     Temp_Nodes = nodes_aligned_original;
