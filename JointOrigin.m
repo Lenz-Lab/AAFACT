@@ -110,18 +110,29 @@ vert1 = Temp_Nodes(conlist(:,1),:);
 vert2 = Temp_Nodes(conlist(:,2),:);
 vert3 = Temp_Nodes(conlist(:,3),:);
 
+%%
+
 if AOI ~= "None"
-    [~,~,~,~,joint_origin] = TriangleRayIntersection(current_origin, axis_direction, vert1, vert2, vert3);
-    joint_origin = ((joint_origin(~isnan(joint_origin))))';
+    [intersect,~,~,~,joint_origin] = TriangleRayIntersection(current_origin, axis_direction, vert1, vert2, vert3,'lineType','line');
+    joint_origin = joint_origin(intersect,:)
 
     if (AOI == "CheckSI" || AOI == "CheckML") && length(joint_origin) == 0
         joint_origin = [];
-        [~,~,~,~,joint_origin] = TriangleRayIntersection(current_origin, -axis_direction, vert1, vert2, vert3);
-        joint_origin = ((joint_origin(~isnan(joint_origin))))';
+        [intersect,t,~,~,joint_origin] = TriangleRayIntersection(current_origin, -axis_direction, vert1, vert2, vert3,'lineType','line');
+    joint_origin = joint_origin(intersect,:)
     end
 
-    int_amount = (length(joint_origin)/3);
-    joint_origin = [joint_origin(2) joint_origin(end-(2*int_amount)) joint_origin(end)];
+    comp = 10000;
+    for nt = 1:length(joint_origin(:,1))
+        tempt = norm(current_origin - joint_origin(nt,:));
+        if tempt < comp
+            comp = tempt;
+            mt = nt;
+        end
+    end
+
+    joint_origin = joint_origin(mt,:);
+
     Temp_Coordinates = joint_origin + Temp_Coordinates;
     Temp_Coordinates_Unit = joint_origin + Temp_Coordinates_Unit;
 else
