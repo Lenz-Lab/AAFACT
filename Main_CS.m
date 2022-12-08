@@ -215,11 +215,9 @@ for m = 1:length(all_files)
         %% Performs coordinate system calculation
         [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord(n));
 
-
         if bone_indx == 1 && bone_coord(n) == 3 % Secondary CS for Talus Subtalar
             [Temp_Coordinates_temp, Temp_Nodes_temp] = CoordinateSystem(aligned_nodes, 1, 2);
-
-
+            
             Temp_Coordinates = [0 0 0; ((Temp_Coordinates(2,:) + Temp_Coordinates_temp(2,:)).'/2)'
                 0 0 0; ((Temp_Coordinates(4,:) + Temp_Coordinates_temp(4,:)).'/2)'
                 0 0 0; ((Temp_Coordinates(6,:) + Temp_Coordinates_temp(6,:)).'/2)'];
@@ -306,6 +304,7 @@ for m = 1:length(all_files)
         writematrix(Temp_Coordinates_Unit(2,:),xlfilename,'Sheet',name,'Range','B12');
         writematrix(Temp_Coordinates_Unit(4,:),xlfilename,'Sheet',name,'Range','B13');
         writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
+        writematrix(Transformation_Matrix(:,:),xlfilename,'Sheet',name,'Range','B16');
 
         %% Better Starting Point
         if length(all_files) == 1 && length(bone_coord) == 1
