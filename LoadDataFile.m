@@ -31,7 +31,9 @@ end
 % FileData = [Data{1,1}, Data{1,2}]; % pulls the (x,y,z) coordinates for the nodes into a new matrix
 % end
 
+%%
 if FileType == 'vtk'
+% FileName = 'C:\Ankle_IRB_065620\DJMA\AD\AD_02\AD_02_Calcaneus_groomed.vtk';
     fid = fopen(FileName);
     temp = fgets(fid); % ignores "# vtk DataFile"
     temp = fgets(fid); % ignores "vtk output"
@@ -45,30 +47,65 @@ if FileType == 'vtk'
     fclose(fid);
     
     x = allfiledata{1,1};
-    X = [x(1:end-1); allfiledata{1,4}; allfiledata{1,7}];
-    Y = [allfiledata{1,2}; allfiledata{1,5}; allfiledata{1,8}];
-    Z = [allfiledata{1,3}; allfiledata{1,6}; allfiledata{1,9}];
+%     X = [allfiledata{1,1}; allfiledata{1,4}; allfiledata{1,7}];
+    X = {allfiledata{1,1}, allfiledata{1,4}, allfiledata{1,7}};
+    Y = {allfiledata{1,2}, allfiledata{1,5}, allfiledata{1,8}};
+    Z = {allfiledata{1,3}, allfiledata{1,6}, allfiledata{1,9}};
     
-    t = length(allfiledata{1,4});
+    t = allfiledata{1,1}; 
+    t = find(isnan(allfiledata{1,1}) == 1);
+    if isempty(t) == 0
+        allfiledata{1,1}(t) = [];
+    end
     x1 = [];
-    for n = 1:length(X)/3
-        x1(end+1,:) = X(n);
-        x1(end+1,:) = X(t+n);
-        x1(end+1,:) = X(t*2+n);
+    k = 1;
+    for n = 1:length(X{1})
+        for m = 1:3
+            if n <= length(allfiledata{1,1}) && m == 1
+                x1(k,:) = X{m}(n);
+            end
+            if n <= length(allfiledata{1,4}) && m == 2
+                x1(k,:) = X{m}(n);
+            end
+            if n <= length(allfiledata{1,7}) && m == 3
+                x1(k,:) = X{m}(n);
+            end
+            k = k + 1;
+        end
     end
     
     y1 = [];
-    for n = 1:length(Y)/3
-        y1(end+1,:) = Y(n);
-        y1(end+1,:) = Y(t+n);
-        y1(end+1,:) = Y(t*2+n);
-    end  
+    k = 1;
+    for n = 1:length(Y{1})
+        for m = 1:3
+            if n <= length(allfiledata{1,2}) && m == 1
+                y1(k,:) = Y{m}(n);
+            end
+            if n <= length(allfiledata{1,5}) && m == 2
+                y1(k,:) = Y{m}(n);
+            end
+            if n <= length(allfiledata{1,8}) && m == 3
+                y1(k,:) = Y{m}(n);
+            end
+            k = k + 1;
+        end
+    end 
     
     z1 = [];
-    for n = 1:length(Z)/3
-        z1(end+1,:) = Z(n);
-        z1(end+1,:) = Z(t+n);
-        z1(end+1,:) = Z(t*2+n);
+    k = 1;
+    for n = 1:length(Z{1})
+        for m = 1:3
+            if n <= length(allfiledata{1,3}) && m == 1
+                z1(k,:) = Z{m}(n);
+            end
+            if n <= length(allfiledata{1,6}) && m == 2
+                z1(k,:) = Z{m}(n);
+            end
+            if n <= length(allfiledata{1,9}) && m == 3
+                z1(k,:) = Z{m}(n);
+            end
+            k = k + 1;
+        end
     end    
         
     polydata = [polfiledata{1,2} polfiledata{1,3} polfiledata{1,4}]+1;
