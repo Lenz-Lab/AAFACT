@@ -213,29 +213,29 @@ for m = 1:length(all_files)
         [aligned_nodes, RTs] = icp_template(bone_indx, nodes, bone_coord(n), better_start);
 
         %% Performs coordinate system calculation
-        [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord(n));
+        [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord(n));
 
         if bone_indx == 1 && bone_coord(n) == 3 % Secondary CS for Talus Subtalar
-            [Temp_Coordinates_temp, Temp_Nodes_temp] = CoordinateSystem(aligned_nodes, 1, 2);
-            
+            [Temp_Coordinates_temp, Temp_Nodes_temp, Temp_Coordinates_Unit_temp] = CoordinateSystem(aligned_nodes, 1, 2);
+
             Temp_Coordinates = [0 0 0; ((Temp_Coordinates(2,:) + Temp_Coordinates_temp(2,:)).'/2)'
                 0 0 0; ((Temp_Coordinates(4,:) + Temp_Coordinates_temp(4,:)).'/2)'
                 0 0 0; ((Temp_Coordinates(6,:) + Temp_Coordinates_temp(6,:)).'/2)'];
+
+            Temp_Coordinates_Unit = [0 0 0; ((Temp_Coordinates_Unit(2,:) + Temp_Coordinates_Unit_temp(2,:)).'/2)'
+                0 0 0; ((Temp_Coordinates_Unit(4,:) + Temp_Coordinates_Unit_temp(4,:)).'/2)'
+                0 0 0; ((Temp_Coordinates_Unit(6,:) + Temp_Coordinates_Unit_temp(6,:)).'/2)'];
         end
 
         %% Joint Origin
         if joint_indx > 1
-            [Temp_Coordinates, Temp_Nodes, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx);
-
+            [Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, Temp_Coordinates_Unit, conlist, bone_indx, joint_indx);
         else
             Joint = "Center";
         end
 
         %% Reorient and Translate to Original Input Origin and Orientation
-        [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes, Temp_Coordinates, cm_nodes, side_indx, RTs);
-
-        %% Transformation Matrix
-        TM = TranMat(RTs,coords_final_unit,side_indx);
+        [nodes_final, coords_final, coords_final_unit] = reorient(Temp_Nodes, Temp_Coordinates, Temp_Coordinates_Unit, cm_nodes, side_indx, RTs);
 
         %% Final Plotting
         figure()
@@ -257,6 +257,35 @@ for m = 1:length(all_files)
         ylabel('Y')
         zlabel('Z')
         axis equal
+        %% Transformation Matrix Works for Right not Left Dw 221202
+%         Rot=RTs.iR;
+%         if side_indx==1
+%             Rot=RTs.iR*RTs.iflip;
+%         end
+%         Rot(:,1)=Rot(:,1)*-1; % flip back to left
+%         Rot(:,2)=Rot(:,2)*-1; % flip back to left
+% 
+%         Loc =coords_final_unit(1,:)';
+%         TransformationMat=[Rot Loc; 0 0 0 1];
+% 
+%         %% Testing TM
+%         nodes_test_trans = Temp_Nodes+(Loc');
+%         nodes_test_rot = nodes_test_trans*(Rot);
+% 
+%         nodes_test = (Temp_Nodes.*[1,1,-1]);
+%         nodes_test = nodes_test*rotx(180);
+%         [R1_0,T1_0,ER1_0] = icp(nodes_original',nodes_test', 2000,'Matching','kDtree','WorstRejection',0.1);
+%         aligned_nodes = (R1_0*(nodes_test') + repmat(T1_0,1,length(nodes_test')))';
+%         % aligned_nodes = aligned_nodes*roty(180)
+% 
+%         figure()
+%         plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'.k')
+%         hold on
+%         plot3(nodes_test_trans(:,1),nodes_test_trans(:,2),nodes_test_trans(:,3),'.b')
+%         %     plot3(nodes_test(:,1),nodes_test(:,2),nodes_test(:,3),'.r')
+%         %     plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
+%         axis equal
+
 
         %% Save both coordinate systems to spreadsheet
         A = ["Subject"
@@ -307,7 +336,7 @@ for m = 1:length(all_files)
         writematrix(Temp_Coordinates_Unit(2,:),xlfilename,'Sheet',name,'Range','B12');
         writematrix(Temp_Coordinates_Unit(4,:),xlfilename,'Sheet',name,'Range','B13');
         writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
-        writematrix(TM(:,:),xlfilename,'Sheet',name,'Range','B16');
+        writematrix(TransformationMat,xlfilename,'Sheet',name,'Range','B16');
 
         %% Better Starting Point
         if length(all_files) == 1 && length(bone_coord) == 1
@@ -317,8 +346,8 @@ for m = 1:length(all_files)
         end
 
         %% Clear Variables for New Loop
-        vars = {'Temp_Nodes', 'Temp_Coordinates', 'Temp_Coordinates_Unit', 'cm_nodes', 'RTs', 'coords_final','coords_final_unit','nodes','aligned_nodes','name','conlist'};
-        clear(vars{:})
+%         vars = {'Temp_Nodes', 'Temp_Coordinates', 'Temp_Coordinates_Unit', 'cm_nodes', 'RTs', 'coords_final','coords_final_unit','nodes','aligned_nodes','name','conlist'};
+%         clear(vars{:})
         
     end
 end
