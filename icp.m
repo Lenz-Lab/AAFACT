@@ -97,7 +97,7 @@ inp = inputParser;
 inp.addRequired('q', @(x)isreal(x) && size(x,1) == 3);
 inp.addRequired('p', @(x)isreal(x) && size(x,1) == 3);
 
-inp.addOptional('iter', 10, @(x)x > 0 && x < 10^5);
+inp.addOptional('iter', 200, @(x)x > 0 && x < 10^5);
 
 inp.addParamValue('Boundary', [], @(x)size(x,1) == 1);
 
@@ -190,7 +190,7 @@ t(1) = toc;
 
 % Go into main iteration loop
 for k=1:arg.iter
-       
+
     % Do matching
     switch arg.Matching
         case 'bruteForce'
@@ -283,7 +283,17 @@ for k=1:arg.iter
         end
     end
     t(k+1) = toc;
+
+%     if k >= 6
+%         if (round(ER(k+1),8) == round(ER(k),8)) &&  (round(ER(k),8) == round(ER(k-1),8)) &&...
+%                 (round(ER(k-1),8) == round(ER(k-2),8)) && (round(ER(k-2),8) == round(ER(k-3),8)) &&...
+%                 (round(ER(k-3),8) == round(ER(k-4),8)) && (round(ER(k-4),8) == round(ER(k-5),8))
+%             break
+%         end
+%     end
 end
+
+% ER = nonzeros(ER);
 
 if not(arg.ReturnAll)
     TR = TR(:,:,end);
