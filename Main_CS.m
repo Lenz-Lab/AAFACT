@@ -304,7 +304,6 @@ for m = 1:length(all_files)
         writematrix(Temp_Coordinates_Unit(2,:),xlfilename,'Sheet',name,'Range','B12');
         writematrix(Temp_Coordinates_Unit(4,:),xlfilename,'Sheet',name,'Range','B13');
         writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
-        writematrix(Transformation_Matrix(:,:),xlfilename,'Sheet',name,'Range','B16');
 
         %% Better Starting Point
         if length(all_files) == 1 && length(bone_coord) == 1
