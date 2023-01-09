@@ -234,9 +234,6 @@ for m = 1:length(all_files)
         %% Reorient and Translate to Original Input Origin and Orientation
         [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes, Temp_Coordinates, cm_nodes, side_indx, RTs);
 
-        %% Transformation Matrix
-        TM = TranMat(RTs,coords_final_unit,side_indx);
-
         %% Final Plotting
         figure()
         plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
@@ -307,7 +304,6 @@ for m = 1:length(all_files)
         writematrix(Temp_Coordinates_Unit(2,:),xlfilename,'Sheet',name,'Range','B12');
         writematrix(Temp_Coordinates_Unit(4,:),xlfilename,'Sheet',name,'Range','B13');
         writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
-        writematrix(TM(:,:),xlfilename,'Sheet',name,'Range','B16');
 
         %% Better Starting Point
         if length(all_files) == 1 && length(bone_coord) == 1
