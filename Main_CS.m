@@ -234,9 +234,6 @@ for m = 1:length(all_files)
         %% Reorient and Translate to Original Input Origin and Orientation
         [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes, Temp_Coordinates, cm_nodes, side_indx, RTs);
 
-        %% Transformation Matrix
-        TM = TranMat(RTs,coords_final_unit,side_indx);
-
         %% Final Plotting
         figure()
         plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
