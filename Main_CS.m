@@ -36,8 +36,8 @@ all_files = list_files(files_indx)'; % stores all files selected
 list_bone = {'Talus', 'Calcaneus', 'Navicular', 'Cuboid', 'Medial_Cuneiform','Intermediate_Cuneiform',...
     'Lateral_Cuneiform','Metatarsal1','Metatarsal2','Metatarsal3','Metatarsal4','Metatarsal5',...
     'Tibia','Fibula'};
-list_bone2 = {'Talus', 'Calcaneus', 'Navicular', 'Cuboid', 'Med_Cuneiform','Int_Cuneiform',...
-    'Lat_Cuneiform','First_Metatarsal','Second_Metatarsal','Third_Metatarsal','Fourth_Metatarsal','Fifth_Metatarsal',...
+list_bone2 = {'Talus', 'Calcaneus', 'Navicular', 'Cuboid', 'Medial_Cuneiform','Intermediate_Cuneiform',...
+    'Lateral_Cuneiform','First_Metatarsal','Second_Metatarsal','Third_Metatarsal','Fourth_Metatarsal','Fifth_Metatarsal',...
     'Tibia','Fibula'};
 list_side_folder = {'Right','_R','Left','_L'};
 list_side = {'Right','Left'};
@@ -184,8 +184,7 @@ for m = 1:length(all_files)
             list_joint = {'Center','Talofibular Surface'};
         end
 
-%         [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?'," ",cs_string(n))} {''}], 'ListString', list_joint,'SelectionMode','single');
-        joint_indx = 1;
+        [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?'," ",cs_string(n))} {''}], 'ListString', list_joint,'SelectionMode','single');
 
         if (bone_indx == 13 || bone_indx == 14) && length(joint_indx) > 1
             bone_coord = 1:2;
@@ -209,7 +208,7 @@ for m = 1:length(all_files)
         % model in a fashion that the superior region is in the positive Z
         % direction, the anterior region is in the positive Y direction, and the
         % medial region is in the positive X direction.
-        [nodes,cm_nodes] = center(nodes,1);
+        [nodes,cm_nodes] = center(nodes);
         better_start = 1;
         [aligned_nodes, RTs] = icp_template(bone_indx, nodes, bone_coord(n), better_start);
 
@@ -227,6 +226,7 @@ for m = 1:length(all_files)
         %% Joint Origin
         if joint_indx > 1
             [Temp_Coordinates, Temp_Nodes, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx);
+
         else
             Joint = "Center";
         end
@@ -307,6 +307,7 @@ for m = 1:length(all_files)
         writematrix(Temp_Coordinates_Unit(2,:),xlfilename,'Sheet',name,'Range','B12');
         writematrix(Temp_Coordinates_Unit(4,:),xlfilename,'Sheet',name,'Range','B13');
         writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
+        writematrix(TM(:,:),xlfilename,'Sheet',name,'Range','B16');
 
         %% Better Starting Point
         if length(all_files) == 1 && length(bone_coord) == 1
