@@ -98,7 +98,7 @@ if bone_indx == 13 || bone_indx == 14
             plane(:,1) plane(:,2) plane(:,3)];
 
         if bone_coord == 1
-            nodes_template = center(nodes_template);
+            nodes_template = center(nodes_template,1);
         end
 
         if nodes_template_length/5 > max_nodes_length
@@ -326,7 +326,7 @@ elseif parttib_multiplier > 1 && tibfib_switch == 2 && bone_indx >= 13
     aligned_nodes = aligned_nodes/parttib_multiplier;
 end
 
-% The ensures the tibial coordinate system is at the center of the tibial
+% This ensures the tibial coordinate system is at the center of the tibial
 % plafond
 if (tibfib_switch == 1 && bone_indx == 13) || (tibfib_switch == 1 && bone_indx == 14)
     temp = find(aligned_nodes(:,3) < 150);
@@ -397,6 +397,12 @@ else
     sT_fibula = [];
 end
 
+if bone_indx >= 8 && bone_indx <= 12
+    [aligned_nodes,cm_meta] = center(aligned_nodes,1);
+else
+    cm_meta = [];
+end
+
 
 %% Combine all rotation and translation matricies
 RTs.iflip = iflip; % initial flip flip_out
@@ -408,6 +414,9 @@ RTs.sR_tibia = sR_tibia; % secondary rotation (for tibia) Rtw
 RTs.sT_tibia = sT_tibia; % secondary translation (for tibia) Ttw
 RTs.sR_fibula = sR_fibula; % secondary rotation (for fibula) Rtw
 RTs.sT_fibula = sT_fibula; % secondary translation (for fibula) Ttw
+RTs.cm_meta = cm_meta; % centering metatarsals cm_meta
+RTs.red = [];
+RTs.yellow = [];
 
 %% Visualize proper alignment
 % figure()
@@ -422,4 +431,3 @@ RTs.sT_fibula = sT_fibula; % secondary translation (for fibula) Ttw
 % ylabel('Y')
 % zlabel('Z')
 % axis equal
-
