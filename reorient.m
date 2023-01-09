@@ -39,6 +39,9 @@ elseif isempty(RTs.sT_fibula) == 0
     coords_final_i6 = (Temp_Coordinates' - repmat(RTs.sT_fibula,1,length(Temp_Coordinates')))';
     coords_final_i5 = (inv(RTs.sR_fibula)*(coords_final_i6'))';
     coords_final_i4 = ((coords_final_i5)*inv(RTs.sflip));
+elseif isempty(RTs.cm_meta) == 0
+    nodes_final_i4 = [Temp_Nodes(:,1) + RTs.cm_meta(1), Temp_Nodes(:,2) + RTs.cm_meta(2), Temp_Nodes(:,3) + RTs.cm_meta(3)];
+    coords_final_i4 = [Temp_Coordinates(:,1) + RTs.cm_meta(1), Temp_Coordinates(:,2) + RTs.cm_meta(2), Temp_Coordinates(:,3) + RTs.cm_meta(3)];
 else
     nodes_final_i4 = Temp_Nodes;
     coords_final_i4 = Temp_Coordinates;
@@ -47,12 +50,24 @@ end
 nodes_final_i3 = (nodes_final_i4' - repmat(RTs.iT,1,length(nodes_final_i4')))';
 nodes_final_i2 = (inv(RTs.iR)*(nodes_final_i3'))';
 nodes_final_i1 = ((nodes_final_i2)*inv(RTs.iflip));
-nodes_final = [nodes_final_i1(:,1) + cm_nodes(1), nodes_final_i1(:,2) + cm_nodes(2), nodes_final_i1(:,3) + cm_nodes(3)];
 
 coords_final_i3 = (coords_final_i4' - repmat(RTs.iT,1,length(coords_final_i4')))';
 coords_final_i2 = (inv(RTs.iR)*(coords_final_i3'))';
 coords_final_i1 = ((coords_final_i2)*inv(RTs.iflip));
-coords_final = [coords_final_i1(:,1) + cm_nodes(1), coords_final_i1(:,2) + cm_nodes(2), coords_final_i1(:,3) + cm_nodes(3)];
+
+if isempty(RTs.red) == 0
+    nodes_final_i1_red = (inv(RTs.red)*(nodes_final_i1'))';
+    nodes_final_i1 = (inv(RTs.yellow)*(nodes_final_i1_red'))';
+
+    coords_final_i1_red = (inv(RTs.red)*(coords_final_i1'))';
+    coords_final_i1 = (inv(RTs.yellow)*(coords_final_i1_red'))';
+end
+
+nodes_final_i1 = center(nodes_final_i1,1);
+coords_final_i1 = center(coords_final_i1,2);
+
+nodes_final = [nodes_final_i1(:,1) + cm_nodes(1), nodes_final_i1(:,2) + cm_nodes(2), nodes_final_i1(:,3) + cm_nodes(3)];
+coords_final = cm_nodes + coords_final_i1(:,:);
 
 if side_indx == 1
     nodes_final = nodes_final.*[1,1,-1]; % Flip back to right if applicable
@@ -70,10 +85,18 @@ coords_final_unit = coords_final_temp + coods_final_origin;
 
 %%
 % figure()
-% % plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'.k')
+% plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'.k')
 % hold on
-% % plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'ob')
+% plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'ob')
+% plot3(nodes_final_i1(:,1),nodes_final_i1(:,2),nodes_final_i1(:,3),'or')
 % plot3(coords_final(1:2,1),coords_final(1:2,2),coords_final(1:2,3),'r-')
 % plot3(coords_final(3:4,1),coords_final(3:4,2),coords_final(3:4,3),'b-')
 % plot3(coords_final(5:6,1),coords_final(5:6,2),coords_final(5:6,3),'g-')
+% plot3(coords_final_i1(1:2,1),coords_final_i1(1:2,2),coords_final_i1(1:2,3),'r-')
+% plot3(coords_final_i1(3:4,1),coords_final_i1(3:4,2),coords_final_i1(3:4,3),'b-')
+% plot3(coords_final_i1(5:6,1),coords_final_i1(5:6,2),coords_final_i1(5:6,3),'g-')
+% plot3(nodes_final_i1(:,1),nodes_final_i1(:,2),nodes_final_i1(:,3),'og')
+% xlabel('X')
+% ylabel('Y')
+% zlabel('Z')
 % axis equal
