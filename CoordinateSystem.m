@@ -3,7 +3,7 @@ function [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_in
 % temporarily aligned orientation.
 
 %% TT CS for Talus
-if bone_indx == 1 && bone_coord == 2
+if bone_indx == 1 && bone_coord >= 2
     nodes_aligned_original = aligned_nodes;
     aligned_nodes = [aligned_nodes(aligned_nodes(:,2)<10,1) aligned_nodes(aligned_nodes(:,2)<10,2) aligned_nodes(aligned_nodes(:,2)<10,3)];
 end
@@ -269,7 +269,7 @@ Temp_Coordinates = [AP_vector_points([1,2],:)
     SI_vector_points([1,2],:)
     ML_vector_points([1,2],:)];
 
-if (bone_indx == 1 && bone_coord == 2) || bone_indx == 13
+if (bone_indx == 1 && bone_coord >= 2) || bone_indx == 13
     Temp_Nodes = nodes_aligned_original;
 else
     Temp_Nodes = aligned_nodes;
