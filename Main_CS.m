@@ -245,7 +245,7 @@ for m = 1:length(all_files)
         arrow(coords_final(3,:),coords_final(4,:),'FaceColor','b','EdgeColor','b','LineWidth',5,'Length',10)
         arrow(coords_final(5,:),coords_final(6,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
         legend(' Nodal Points',' AP Axis',' SI Axis',' ML Axis')
-        title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
+        title(strcat('Coordinate System of'," ", char(name)),'Interpreter','none')
         text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
         text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','b');
         if side_indx == 1
