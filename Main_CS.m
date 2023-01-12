@@ -266,6 +266,7 @@ for m = 1:length(all_files)
         elseif side_indx == 2
             text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
         end
+        view([-40 25])
         xlabel('X')
         ylabel('Y')
         zlabel('Z')
@@ -329,8 +330,8 @@ for m = 1:length(all_files)
         end
 
         %% Clear Variables for New Loop
-        %         vars = {'Temp_Nodes', 'Temp_Coordinates', 'Temp_Coordinates_Unit', 'cm_nodes', 'RTs', 'coords_final','coords_final_unit','nodes','aligned_nodes','name','conlist'};
-        %         clear(vars{:})
+        vars = {'Temp_Nodes', 'Temp_Coordinates', 'Temp_Coordinates_Unit', 'cm_nodes', 'RTs', 'coords_final','coords_final_unit','nodes','aligned_nodes','name','conlist'};
+        clear(vars{:})
 
     end
 end

@@ -208,7 +208,11 @@ if (bone_indx == 1 && bone_coord >= 2) || bone_indx == 3 % TT Talus, Navicular
 elseif bone_indx >= 13 % Tibia, Fibula
     first_point = av_positive_z_nth;
     second_point = av_negative_z_nth;
-    third_point = av_negative_x_nth;
+    if av_negative_z_nth(3) > av_negative_x_nth(3)
+        third_point = [av_negative_x_nth(1) av_negative_x_nth(2) 0];
+    else
+        third_point = av_negative_x_nth;
+    end
 else % Cuneiforms, Metatarsals, Calcaneus, Cuboid, TN Talus
     first_point = av_positive_y_nth;
     second_point = av_negative_y_nth;

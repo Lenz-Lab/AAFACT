@@ -111,14 +111,6 @@ switch accurate_answer
         %% Performs coordinate system calculation
         [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord);
 
-        if bone_indx == 1 && bone_coord == 3 % Secondary CS for Talus Subtalar
-            [Temp_Coordinates_temp, Temp_Nodes_temp] = CoordinateSystem(aligned_nodes, 1, 2);
-
-            Temp_Coordinates = [0 0 0; ((Temp_Coordinates(2,:) + Temp_Coordinates_temp(2,:)).'/2)'
-                0 0 0; ((Temp_Coordinates(4,:) + Temp_Coordinates_temp(4,:)).'/2)'
-                0 0 0; ((Temp_Coordinates(6,:) + Temp_Coordinates_temp(6,:)).'/2)'];
-        end
-
         %% Joint Origin
         if joint_indx > 1
             [Temp_Coordinates, Temp_Nodes, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx);
@@ -129,6 +121,31 @@ switch accurate_answer
 
         %% Reorient and Translate to Original Input Origin and Orientation
         [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes, Temp_Coordinates, cm_nodes, side_indx, RTs);
+
+        if bone_indx == 1 && bone_coord == 3 % Talus Subtalar CS
+            [aligned_nodes_TST, RTs_TST] = icp_template(bone_indx, nodes, 1, better_start);
+            [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1);
+
+            if joint_indx > 1
+                [Temp_Coordinates, Temp_Nodes, Joint] = JointOrigin(Temp_Coordinates_TST, Temp_Nodes_TST, conlist, bone_indx, joint_indx);
+            else
+                Joint = "Center";
+            end
+
+            [~, coords_final_TST, coords_final_unit_TST, Temp_Coordinates_Unit_TST] = reorient(Temp_Nodes_TST, Temp_Coordinates_TST, cm_nodes, side_indx, RTs_TST);
+
+            coords_final = [coords_final(1,:); ((coords_final_TST(2,:) + coords_final(2,:)).'/2)'
+                coords_final(3,:); ((coords_final_TST(4,:) + coords_final(4,:)).'/2)'
+                coords_final(5,:); ((coords_final_TST(6,:) + coords_final(6,:)).'/2)'];
+
+            coords_final_unit = [coords_final_unit(1,:); ((coords_final_unit_TST(2,:) + coords_final_unit(2,:)).'/2)'
+                coords_final_unit(3,:); ((coords_final_unit_TST(4,:) + coords_final_unit(4,:)).'/2)'
+                coords_final_unit(5,:); ((coords_final_unit_TST(6,:) + coords_final_unit(6,:)).'/2)'];
+
+            Temp_Coordinates_Unit = [Temp_Coordinates_Unit(1,:); ((Temp_Coordinates_Unit_TST(2,:) + Temp_Coordinates_Unit(2,:)).'/2)'
+                Temp_Coordinates_Unit(3,:); ((Temp_Coordinates_Unit_TST(4,:) + Temp_Coordinates_Unit(4,:)).'/2)'
+                Temp_Coordinates_Unit(5,:); ((Temp_Coordinates_Unit_TST(6,:) + Temp_Coordinates_Unit(6,:)).'/2)'];
+        end
 
         %% Final Plotting
         figure()
