@@ -15,5 +15,8 @@ if ncm == 1 % center nodal points
 
     output = [input_ox input_oy input_oz];
 elseif ncm == 2 % center coordinate systems at zero
-    output = input(1,:) + input(:,:);
+    output = -input(1,:) + input(:,:);
+elseif ncm == 3 % center stl
+    temp_output = center(input.Points,1);
+    output = triangulation(input.ConnectivityList,temp_output);
 end
