@@ -1,5 +1,5 @@
 %% Main Script for Coordinate System Toolbox
-clear, clc%, close all
+clear, clc, close all
 
 % This main code only requires the users bone model input. Select the
 % folder where the file is and then select the bone model(s) you wish the
@@ -251,7 +251,7 @@ for m = 1:length(all_files)
         end
 
         %% Final Plotting
-%         figure()
+        figure()
         plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
         hold on
         arrow(coords_final(1,:),coords_final(2,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
