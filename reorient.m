@@ -1,4 +1,4 @@
-function [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes,Temp_Coordinates,cm_nodes,side_indx,RTs)
+function [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes,Temp_Coordinates,cm_nodes,side_indx,RTs,conlist,bone_indx,joint_indx)
 % The function reorients the aligned bone and subsequent coordinate system
 % back to the bones original orientation.
 % It requires the nodes and coordinate systems, as well as the rotation and
@@ -63,8 +63,8 @@ if isempty(RTs.red) == 0
     coords_final_i1 = (inv(RTs.yellow)*(coords_final_i1_red'))';
 end
 
-nodes_final_i1 = center(nodes_final_i1,1);
-coords_final_i1 = center(coords_final_i1,2);
+[nodes_final_i1, temp_cm] = center(nodes_final_i1,1);
+coords_final_i1 = temp_cm + coords_final_i1(:,:);
 
 nodes_final = [nodes_final_i1(:,1) + cm_nodes(1), nodes_final_i1(:,2) + cm_nodes(2), nodes_final_i1(:,3) + cm_nodes(3)];
 coords_final = cm_nodes + coords_final_i1(:,:);
@@ -72,7 +72,7 @@ coords_final = cm_nodes + coords_final_i1(:,:);
 if side_indx == 1
     nodes_final = nodes_final.*[1,1,-1]; % Flip back to right if applicable
     coords_final = coords_final.*[1,1,-1]; % Flip back to right if applicable
-%     conlist = [conlist(:,3) conlist(:,2) conlist(:,1)];
+    %     conlist = [conlist(:,3) conlist(:,2) conlist(:,1)];
 end
 
 coods_final_origin = coords_final(1,:);
@@ -83,19 +83,19 @@ coords_final_temp = [0 0 0; coords_final_temp(2,:)./norm(coords_final_temp(2,:))
 coords_final_unit = coords_final_temp + coods_final_origin;
 
 
-%%
+%% Plotting
 % figure()
 % plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'.k')
 % hold on
-% plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'ob')
-% plot3(nodes_final_i1(:,1),nodes_final_i1(:,2),nodes_final_i1(:,3),'or')
+% % plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'ob')
+% % plot3(nodes_final_i1(:,1),nodes_final_i1(:,2),nodes_final_i1(:,3),'or')
 % plot3(coords_final(1:2,1),coords_final(1:2,2),coords_final(1:2,3),'r-')
 % plot3(coords_final(3:4,1),coords_final(3:4,2),coords_final(3:4,3),'b-')
 % plot3(coords_final(5:6,1),coords_final(5:6,2),coords_final(5:6,3),'g-')
 % plot3(coords_final_i1(1:2,1),coords_final_i1(1:2,2),coords_final_i1(1:2,3),'r-')
 % plot3(coords_final_i1(3:4,1),coords_final_i1(3:4,2),coords_final_i1(3:4,3),'b-')
 % plot3(coords_final_i1(5:6,1),coords_final_i1(5:6,2),coords_final_i1(5:6,3),'g-')
-% plot3(nodes_final_i1(:,1),nodes_final_i1(:,2),nodes_final_i1(:,3),'og')
+% % plot3(nodes_final_i1(:,1),nodes_final_i1(:,2),nodes_final_i1(:,3),'og')
 % xlabel('X')
 % ylabel('Y')
 % zlabel('Z')

@@ -217,20 +217,20 @@ for m = 1:length(all_files)
 
         %% Joint Origin
         if joint_indx > 1
-            [Temp_Coordinates, Temp_Nodes, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx);
+            [Temp_Coordinates, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx);
         else
             Joint = "Center";
         end
 
         %% Reorient and Translate to Original Input Origin and Orientation
-        [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes, Temp_Coordinates, cm_nodes, side_indx, RTs);
+        [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes, Temp_Coordinates, cm_nodes, side_indx, RTs, conlist, bone_indx, joint_indx);
 
         if bone_indx == 1 && bone_coord(n) == 3 % Talus Subtalar CS
             [aligned_nodes_TST, RTs_TST] = icp_template(bone_indx, nodes, 1, better_start);
             [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1);
 
             if joint_indx > 1
-                [Temp_Coordinates, Temp_Nodes, Joint] = JointOrigin(Temp_Coordinates_TST, Temp_Nodes_TST, conlist, bone_indx, joint_indx);
+                [Temp_Coordinates, Joint] = JointOrigin(Temp_Coordinates_TST, Temp_Nodes_TST, conlist, bone_indx, joint_indx);
             else
                 Joint = "Center";
             end

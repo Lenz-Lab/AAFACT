@@ -1,4 +1,4 @@
-function [Temp_Coordinates, Temp_Nodes,Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx)
+function [Temp_Coordinates, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx)
 %%
 if bone_indx == 1 % Talus
     if joint_indx == 2 % TN Joint
@@ -124,7 +124,7 @@ if AOI ~= "None"
 
     comp = 10000;
     for nt = 1:length(joint_origin(:,1))
-        tempt = norm(current_origin - joint_origin(nt,:));
+        tempt = norm(axis_direction - joint_origin(nt,:));
         if tempt < comp
             comp = tempt;
             mt = nt;
@@ -137,9 +137,9 @@ if AOI ~= "None"
 else
     joint_origin = current_origin;
 end
-
+%% Plotting
 % figure()
-% % plot3(Temp_Nodes(:,1),Temp_Nodes(:,2),Temp_Nodes(:,3),'.k')
+% plot3(Temp_Nodes(:,1),Temp_Nodes(:,2),Temp_Nodes(:,3),'.k')
 % hold on
 % plot3(current_origin(:,1),current_origin(:,2),current_origin(:,3),'.g','MarkerSize',25)
 % plot3(joint_origin(:,1),joint_origin(:,2),joint_origin(:,3),'.r','MarkerSize',25)
