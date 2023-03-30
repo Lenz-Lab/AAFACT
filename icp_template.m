@@ -103,6 +103,7 @@ if bone_indx == 13 || bone_indx == 14
 
         if nodes_template_length/5 > max_nodes_length
             tibfib_switch = 2; % under 1/5 tibia/fibula is available
+            warning('Input bone is shorter than recommended.')
         else
             tibfib_switch = 1;
         end
@@ -326,8 +327,6 @@ if multiplier > 1
     aligned_nodes = aligned_nodes/multiplier;
 elseif parttib_multiplier > 1 && tibfib_switch == 2 && bone_indx >= 13
     aligned_nodes = aligned_nodes/parttib_multiplier;
-% elseif parttib_multiplier > 1 && bone_indx == 14
-%     aligned_nodes = aligned_nodes/parttib_multiplier;
 end
 
 % This ensures the tibial coordinate system is at the center of the tibial

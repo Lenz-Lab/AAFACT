@@ -222,20 +222,25 @@ for m = 1:length(all_files)
             Joint = "Center";
         end
 
+        %% Temporarily Attach Coordinate System
+        Temp_Nodes_Coords = [Temp_Nodes; Temp_Coordinates];
+
         %% Reorient and Translate to Original Input Origin and Orientation
-        [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes, Temp_Coordinates, cm_nodes, side_indx, RTs, conlist, bone_indx, joint_indx);
+        [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes_Coords, cm_nodes, side_indx, RTs);
 
         if bone_indx == 1 && bone_coord(n) == 3 % Talus Subtalar CS
             [aligned_nodes_TST, RTs_TST] = icp_template(bone_indx, nodes, 1, better_start);
             [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1);
 
             if joint_indx > 1
-                [Temp_Coordinates, Joint] = JointOrigin(Temp_Coordinates_TST, Temp_Nodes_TST, conlist, bone_indx, joint_indx);
+                [Temp_Coordinates_TST, Joint] = JointOrigin(Temp_Coordinates_TST, Temp_Nodes_TST, conlist, bone_indx, joint_indx);
             else
                 Joint = "Center";
             end
 
-            [~, coords_final_TST, coords_final_unit_TST, Temp_Coordinates_Unit_TST] = reorient(Temp_Nodes_TST, Temp_Coordinates_TST, cm_nodes, side_indx, RTs_TST);
+            Temp_Nodes_Coords_TST = [Temp_Nodes_TST; Temp_Coordinates_TST];
+
+            [~, coords_final_TST, coords_final_unit_TST, Temp_Coordinates_Unit_TST] = reorient(Temp_Nodes_Coords_TST, cm_nodes, side_indx, RTs_TST);
 
             coords_final = [coords_final(1,:); ((coords_final_TST(2,:) + coords_final(2,:)).'/2)'
                 coords_final(3,:); ((coords_final_TST(4,:) + coords_final(4,:)).'/2)'
@@ -261,11 +266,7 @@ for m = 1:length(all_files)
         title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
         text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
         text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','b');
-        if side_indx == 1
-            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Lateral','HorizontalAlignment','left','FontSize',15,'Color','r');
-        elseif side_indx == 2
-            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
-        end
+        text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
         view([-40 25])
         xlabel('X')
         ylabel('Y')
@@ -324,13 +325,15 @@ for m = 1:length(all_files)
 
         %% Better Starting Point
         if length(all_files) == 1 && length(bone_coord) == 1
-            accurate_answer = questdlg('Is the coordinate system accurately assigned to the model?',...
-                'Coordiante System','Yes','No','Yes');
+            fig = uifigure;
+            accurate_answer = uiconfirm(fig,'Is the coordinate system accurately assigned to the model?',...
+                'Coordinate System','Options',{'Yes','No'},'DefaultOption',1);
+            delete(fig)
             better_starting_point(accurate_answer,nodes,bone_indx,bone_coord(n),side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx)
         end
 
         %% Clear Variables for New Loop
-        vars = {'Temp_Nodes', 'Temp_Coordinates', 'Temp_Coordinates_Unit', 'cm_nodes', 'RTs', 'coords_final','coords_final_unit','nodes','aligned_nodes','name','conlist'};
+        vars = {'Temp_Nodes', 'Temp_Coordinates', 'Temp_Coordinates_Unit', 'Temp_Nodes_Coords', 'cm_nodes', 'RTs', 'coords_final','coords_final_unit','nodes','aligned_nodes','name','conlist'};
         clear(vars{:})
 
     end
