@@ -1,6 +1,7 @@
 function better_starting_point(accurate_answer,nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx)
 % This function allows the user to choose a better starting point for their
 % bone model if the icp alignment isn't working. This is only ran if you
+close all
 
 switch accurate_answer
     case 'No'
@@ -24,6 +25,7 @@ switch accurate_answer
                     'Options',{'Anterior','Posterior'},'DefaultOption',1);
                 delete(Fig)
                 delete(fig)
+                close all
                 switch ant2_selection
                     case 'Posterior'
                         R_yellow = rotz(180);
@@ -38,6 +40,7 @@ switch accurate_answer
                     'Options',{'Medial','Lateral'},'DefaultOption',1);
                 delete(Fig)
                 delete(fig)
+                close all
                 switch ant2_selection
                     case 'Medial'
                         R_yellow = rotz(-90);
@@ -52,6 +55,7 @@ switch accurate_answer
                     'Options',{'Superior','Inferior'},'DefaultOption',1);
                 delete(Fig)
                 delete(fig)
+                close all
                 switch ant2_selection
                     case 'Superior'
                         R_yellow = rotz(90);
@@ -97,42 +101,35 @@ switch accurate_answer
         RTs.red = R_red;
         RTs.yellow = R_yellow;
 
-        %         figure()
-        %         plot3(nodes_new(:,1),nodes_new(:,2),nodes_new(:,3),'r.')
-        %         hold on
-        %         plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'.k')
-        % plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.b')
-        %
-        %         xlabel('X')
-        %         ylabel('Y')
-        %         zlabel('Z')
-        %         axis equal
-
         %% Performs coordinate system calculation
         [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord);
 
         %% Joint Origin
         if joint_indx > 1
-            [Temp_Coordinates, Temp_Nodes, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx);
-
+            [Temp_Coordinates, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx);
         else
             Joint = "Center";
         end
 
-        %% Reorient and Translate to Original Input Origin and Orientation
-        [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes, Temp_Coordinates, cm_nodes, side_indx, RTs);
+        %% Temporarily Attach Coordinate System
+        Temp_Nodes_Coords = [Temp_Nodes; Temp_Coordinates];
 
-        if bone_indx == 1 && bone_coord == 3 % Talus Subtalar CS
+        %% Reorient and Translate to Original Input Origin and Orientation
+        [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes_Coords, cm_nodes, side_indx, RTs);
+
+        if bone_indx == 1 && bone_coord(n) == 3 % Talus Subtalar CS
             [aligned_nodes_TST, RTs_TST] = icp_template(bone_indx, nodes, 1, better_start);
             [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1);
 
             if joint_indx > 1
-                [Temp_Coordinates, Temp_Nodes, Joint] = JointOrigin(Temp_Coordinates_TST, Temp_Nodes_TST, conlist, bone_indx, joint_indx);
+                [Temp_Coordinates_TST, Joint] = JointOrigin(Temp_Coordinates_TST, Temp_Nodes_TST, conlist, bone_indx, joint_indx);
             else
                 Joint = "Center";
             end
 
-            [~, coords_final_TST, coords_final_unit_TST, Temp_Coordinates_Unit_TST] = reorient(Temp_Nodes_TST, Temp_Coordinates_TST, cm_nodes, side_indx, RTs_TST);
+            Temp_Nodes_Coords_TST = [Temp_Nodes_TST; Temp_Coordinates_TST];
+
+            [~, coords_final_TST, coords_final_unit_TST, Temp_Coordinates_Unit_TST] = reorient(Temp_Nodes_Coords_TST, cm_nodes, side_indx, RTs_TST);
 
             coords_final = [coords_final(1,:); ((coords_final_TST(2,:) + coords_final(2,:)).'/2)'
                 coords_final(3,:); ((coords_final_TST(4,:) + coords_final(4,:)).'/2)'
@@ -158,11 +155,8 @@ switch accurate_answer
         title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
         text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
         text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','b');
-        if side_indx == 1
-            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Lateral','HorizontalAlignment','left','FontSize',15,'Color','r');
-        elseif side_indx == 2
-            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
-        end
+        text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
+        view([-40 25])
         xlabel('X')
         ylabel('Y')
         zlabel('Z')
