@@ -213,7 +213,7 @@ for m = 1:length(all_files)
         [aligned_nodes, RTs] = icp_template(bone_indx, nodes, bone_coord(n), better_start);
 
         %% Performs coordinate system calculation
-        [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord(n));
+        [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord(n),side_indx);
 
         %% Joint Origin
         if joint_indx > 1
@@ -266,7 +266,11 @@ for m = 1:length(all_files)
         title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
         text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
         text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','b');
-        text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
+        if side_indx == 1
+            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Lateral','HorizontalAlignment','left','FontSize',15,'Color','r');
+        else
+            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
+        end
         view([-40 25])
         xlabel('X')
         ylabel('Y')

@@ -138,21 +138,21 @@ else
     joint_origin = current_origin;
 end
 %% Plotting
-figure()
-plot3(Temp_Nodes(:,1),Temp_Nodes(:,2),Temp_Nodes(:,3),'.k')
-hold on
-plot3(current_origin(:,1),current_origin(:,2),current_origin(:,3),'.g','MarkerSize',25)
-plot3(joint_origin(:,1),joint_origin(:,2),joint_origin(:,3),'.r','MarkerSize',25)
-% plot3(Temp_Coordinates_test(1:2,1),Temp_Coordinates_test(1:2,2),Temp_Coordinates_test(1:2,3),'r')
-% plot3(Temp_Coordinates_test(3:4,1),Temp_Coordinates_test(3:4,2),Temp_Coordinates_test(3:4,3),'g')
-% plot3(Temp_Coordinates_test(5:6,1),Temp_Coordinates_test(5:6,2),Temp_Coordinates_test(5:6,3),'b')
-plot3(Temp_Coordinates(1:2,1),Temp_Coordinates(1:2,2),Temp_Coordinates(1:2,3),'r')
-plot3(Temp_Coordinates(3:4,1),Temp_Coordinates(3:4,2),Temp_Coordinates(3:4,3),'g')
-plot3(Temp_Coordinates(5:6,1),Temp_Coordinates(5:6,2),Temp_Coordinates(5:6,3),'b')
-% plot3(Temp_Coordinates_Unit(1:2,1),Temp_Coordinates_Unit(1:2,2),Temp_Coordinates_Unit(1:2,3),'m')
-% plot3(Temp_Coordinates_Unit(3:4,1),Temp_Coordinates_Unit(3:4,2),Temp_Coordinates_Unit(3:4,3),'m')
-% plot3(Temp_Coordinates_Unit(5:6,1),Temp_Coordinates_Unit(5:6,2),Temp_Coordinates_Unit(5:6,3),'m')
-axis equal
+% figure()
+% plot3(Temp_Nodes(:,1),Temp_Nodes(:,2),Temp_Nodes(:,3),'.k')
+% hold on
+% plot3(current_origin(:,1),current_origin(:,2),current_origin(:,3),'.g','MarkerSize',25)
+% plot3(joint_origin(:,1),joint_origin(:,2),joint_origin(:,3),'.r','MarkerSize',25)
+% % plot3(Temp_Coordinates_test(1:2,1),Temp_Coordinates_test(1:2,2),Temp_Coordinates_test(1:2,3),'r')
+% % plot3(Temp_Coordinates_test(3:4,1),Temp_Coordinates_test(3:4,2),Temp_Coordinates_test(3:4,3),'g')
+% % plot3(Temp_Coordinates_test(5:6,1),Temp_Coordinates_test(5:6,2),Temp_Coordinates_test(5:6,3),'b')
+% plot3(Temp_Coordinates(1:2,1),Temp_Coordinates(1:2,2),Temp_Coordinates(1:2,3),'r')
+% plot3(Temp_Coordinates(3:4,1),Temp_Coordinates(3:4,2),Temp_Coordinates(3:4,3),'g')
+% plot3(Temp_Coordinates(5:6,1),Temp_Coordinates(5:6,2),Temp_Coordinates(5:6,3),'b')
+% % plot3(Temp_Coordinates_Unit(1:2,1),Temp_Coordinates_Unit(1:2,2),Temp_Coordinates_Unit(1:2,3),'m')
+% % plot3(Temp_Coordinates_Unit(3:4,1),Temp_Coordinates_Unit(3:4,2),Temp_Coordinates_Unit(3:4,3),'m')
+% % plot3(Temp_Coordinates_Unit(5:6,1),Temp_Coordinates_Unit(5:6,2),Temp_Coordinates_Unit(5:6,3),'m')
+% axis equal
 
 
 
