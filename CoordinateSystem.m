@@ -1,4 +1,4 @@
-function [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord)
+function [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,side_indx)
 % This function produces the coordinate system for the users bone in the
 % temporarily aligned orientation.
 
@@ -232,21 +232,27 @@ close_dist = (total_distance == min(total_distance)); % closest point between th
 origin = [0 0 0];
 temp_origin = long_axis_points(close_dist,:); % 90 degree intersecting point between long axis and third point
 
+if side_indx == 1
+    ml = -1;
+else
+    ml = 1;
+end
+
 if (bone_indx == 1 && bone_coord >= 2) || bone_indx == 3 % TT Talus, Navicular
-    ML_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
+    ML_vector_points = ml*[origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
     SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
     normal_vector = cross(ML_vector_points(2,:), SI_vector_points(2,:));
-    AP_vector_points = -[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
+    AP_vector_points = -ml*[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
 elseif bone_indx == 13 || bone_indx == 14 % Tibia, Fibula
     SI_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    ML_vector_points = -[origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
+    ML_vector_points = -ml*[origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
     normal_vector = cross(ML_vector_points(2,:), SI_vector_points(2,:));
-    AP_vector_points = -[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
+    AP_vector_points = -ml*[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
 else % Cuneiforms, Metatarsals, Calcaneus, Cuboid, TN Talus
     AP_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
     SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
     normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
-    ML_vector_points = [origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
+    ML_vector_points = ml*[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
 end
 
 % figure()
@@ -262,7 +268,11 @@ end
 % legend('Nodal Points','AP Axis','SI Axis','ML Axis')
 % text(AP_vector_points(2,1),AP_vector_points(2,2),AP_vector_points(2,3),'Anterior','HorizontalAlignment','left','FontSize',10,'Color','r');
 % text(SI_vector_points(2,1),SI_vector_points(2,2),SI_vector_points(2,3),'Superior','HorizontalAlignment','left','FontSize',10,'Color','g');
-% text(ML_vector_points(2,1),ML_vector_points(2,2),ML_vector_points(2,3),'Medial','HorizontalAlignment','left','FontSize',10,'Color','b');
+% if side_indx == 1
+%     text(ML_vector_points(2,1),ML_vector_points(2,2),ML_vector_points(2,3),'Lateral','HorizontalAlignment','left','FontSize',10,'Color','b');
+% else
+%     text(ML_vector_points(2,1),ML_vector_points(2,2),ML_vector_points(2,3),'Medial','HorizontalAlignment','left','FontSize',10,'Color','b');
+% end
 % xlabel('X')
 % ylabel('Y')
 % zlabel('Z')
