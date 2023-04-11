@@ -4,8 +4,13 @@ function better_starting_point(accurate_answer,nodes,bone_indx,bone_coord,side_i
 
 switch accurate_answer
     case 'No'
-        Fig = figure;
-        figure()
+        screen_size = get(0, 'ScreenSize');
+        fig_width = 800;
+        fig_height = 600;
+        fig_left = (screen_size(3) - fig_width) / 2;
+        fig_bottom = (screen_size(4) - fig_height) / 2;
+
+        fig3 = figure('Position', [fig_left, fig_bottom+15, fig_width, fig_height]);
         plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
         hold on
         plot3(nodes(nodes(:,2) > 0,1),nodes(nodes(:,2) > 0,2),nodes(nodes(:,2) > 0,3),'yo')
@@ -13,17 +18,19 @@ switch accurate_answer
         ylabel('Y')
         zlabel('Z')
         axis equal
-        fig = uifigure;
-        ant1_selection = uiconfirm(fig,'What side is highlighted yellow?','Manual Alignment',...
+
+        uifig_pose = [(screen_size(3) - 500) / 2, 50, 500, 175];
+        fig4 = uifigure('Position',uifig_pose);
+        ant1_selection = uiconfirm(fig4,'What side is highlighted yellow?','Manual Alignment',...
             'Options',{'Anterior/Posterior','Medial/Lateral','Superior/Inferior'},'DefaultOption',1);
-        delete(fig)
+        delete(fig4)
         switch ant1_selection
             case 'Anterior/Posterior'
-                fig = uifigure;
-                ant2_selection = uiconfirm(fig,'Is the anterior or posterior highlighted yellow?','Manual Alignment',...
+                fig5 = uifigure('Position',uifig_pose);
+                ant2_selection = uiconfirm(fig5,'Is the anterior or posterior highlighted yellow?','Manual Alignment',...
                     'Options',{'Anterior','Posterior'},'DefaultOption',1);
-                delete(Fig)
-                delete(fig)
+                delete(fig3)
+                delete(fig5)
                 close all
                 switch ant2_selection
                     case 'Posterior'
@@ -34,11 +41,11 @@ switch accurate_answer
                         nodes_ant = nodes;
                 end
             case 'Medial/Lateral'
-                fig = uifigure;
-                ant2_selection = uiconfirm(fig,'Is the medial or lateral highlighted yellow?','Manual Alignment',...
+                fig6 = uifigure('Position',uifig_pose);
+                ant2_selection = uiconfirm(fig6,'Is the medial or lateral highlighted yellow?','Manual Alignment',...
                     'Options',{'Medial','Lateral'},'DefaultOption',1);
-                delete(Fig)
-                delete(fig)
+                delete(fig3)
+                delete(fig6)
                 close all
                 switch ant2_selection
                     case 'Medial'
@@ -49,11 +56,11 @@ switch accurate_answer
                         nodes_ant = (R_yellow*nodes')';
                 end
             case 'Superior/Inferior'
-                fig = uifigure;
-                ant2_selection = uiconfirm(fig,'Is the superior or inferior highlighted yellow?','Manual Alignment',...
+                fig7 = uifigure('Position',uifig_pose);
+                ant2_selection = uiconfirm(fig7,'Is the superior or inferior highlighted yellow?','Manual Alignment',...
                     'Options',{'Superior','Inferior'},'DefaultOption',1);
-                delete(Fig)
-                delete(fig)
+                delete(fig3)
+                delete(fig7)
                 close all
                 switch ant2_selection
                     case 'Superior'
@@ -65,8 +72,7 @@ switch accurate_answer
                 end
         end
 
-        Fig = figure;
-        figure()
+        fig8 = figure('Position', [fig_left, fig_bottom+15, fig_width, fig_height]);
         plot3(nodes_ant(:,1),nodes_ant(:,2),nodes_ant(:,3),'k.')
         hold on
         plot3(nodes_ant(nodes_ant(:,1) > 0,1),nodes_ant(nodes_ant(:,1) > 0,2),nodes_ant(nodes_ant(:,1) > 0,3),'ro')
@@ -74,11 +80,11 @@ switch accurate_answer
         ylabel('Y')
         zlabel('Z')
         axis equal
-        fig = uifigure;
-        med1_selection = uiconfirm(fig,'What side is highlighted red?','Manual Alignment',...
+        fig9 = uifigure('Position',uifig_pose);
+        med1_selection = uiconfirm(fig9,'What side is highlighted red?','Manual Alignment',...
             'Options',{'Medial','Lateral','Superior','Inferior'},'DefaultOption',1);
-        delete(fig)
-        delete(Fig)
+        delete(fig9)
+        delete(fig8)
         switch med1_selection
             case 'Medial'
                 R_red = rotz(0);
@@ -101,7 +107,7 @@ switch accurate_answer
         RTs.yellow = R_yellow;
 
         %% Performs coordinate system calculation
-        [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord);
+        [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord(n),side_indx);
 
         %% Joint Origin
         if joint_indx > 1
@@ -118,7 +124,7 @@ switch accurate_answer
 
         if bone_indx == 1 && bone_coord == 3 % Talus Subtalar CS
             [aligned_nodes_TST, RTs_TST] = icp_template(bone_indx, nodes, 1, better_start);
-            [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1);
+            [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1, side_indx);
 
             if joint_indx > 1
                 [Temp_Coordinates_TST, Joint] = JointOrigin(Temp_Coordinates_TST, Temp_Nodes_TST, conlist, bone_indx, joint_indx);
@@ -144,7 +150,13 @@ switch accurate_answer
         end
 
         %% Final Plotting
-        figure()
+        screen_size = get(0, 'ScreenSize');
+        fig_width = 800;
+        fig_height = 600;
+        fig_left = (screen_size(3) - fig_width) / 2;
+        fig_bottom = (screen_size(4) - fig_height) / 2;
+
+        fig10 = figure('Position', [fig_left, fig_bottom+15, fig_width, fig_height]);
         plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
         hold on
         arrow(coords_final(1,:),coords_final(2,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)

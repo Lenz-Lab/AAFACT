@@ -230,7 +230,7 @@ for m = 1:length(all_files)
 
         if bone_indx == 1 && bone_coord(n) == 3 % Talus Subtalar CS
             [aligned_nodes_TST, RTs_TST] = icp_template(bone_indx, nodes, 1, better_start);
-            [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1);
+            [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1, side_indx);
 
             if joint_indx > 1
                 [Temp_Coordinates_TST, Joint] = JointOrigin(Temp_Coordinates_TST, Temp_Nodes_TST, conlist, bone_indx, joint_indx);
@@ -256,7 +256,13 @@ for m = 1:length(all_files)
         end
 
         %% Final Plotting
-        figure()
+        screen_size = get(0, 'ScreenSize');
+        fig_width = 800;
+        fig_height = 600;
+        fig_left = (screen_size(3) - fig_width) / 2;
+        fig_bottom = (screen_size(4) - fig_height) / 2;
+
+        fig1 = figure('Position', [fig_left, fig_bottom+15, fig_width, fig_height]);
         plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
         hold on
         arrow(coords_final(1,:),coords_final(2,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
@@ -329,10 +335,11 @@ for m = 1:length(all_files)
 
         %% Better Starting Point
         if length(all_files) == 1 && length(bone_coord) == 1
-            fig = uifigure;
-            accurate_answer = uiconfirm(fig,'Is the coordinate system accurately assigned to the model?',...
+            fig2_pos = [(screen_size(3) - 500) / 2, 50, 500, 175];
+            fig2 = uifigure('Position',fig2_pos);
+            accurate_answer = uiconfirm(fig2,'Is the coordinate system accurately assigned to the model?',...
                 'Coordinate System','Options',{'Yes','No'},'DefaultOption',1);
-            delete(fig)
+            delete(fig2)
             better_starting_point(accurate_answer,nodes,bone_indx,bone_coord(n),side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx)
         end
 
