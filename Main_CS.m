@@ -1,5 +1,5 @@
 %% Main Script for Coordinate System Toolbox
-clear, clc, close all
+clear, clc%, close all
 
 % This main code only requires the users bone model input. Select the
 % folder where the file is and then select the bone model(s) you wish the
@@ -263,21 +263,35 @@ for m = 1:length(all_files)
         fig_bottom = (screen_size(4) - fig_height) / 2;
 
         fig1 = figure('Position', [fig_left, fig_bottom+15, fig_width, fig_height]);
-        plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
+        if ext == ".stl"
+            Final_Bone = triangulation(conlist,nodes_original);
+            patch('Faces',Final_Bone.ConnectivityList,'Vertices',Final_Bone.Points,...
+                'FaceColor', [0.85 0.85 0.85], ...
+                'EdgeColor','none',...
+                'FaceLighting','gouraud',...
+                'AmbientStrength', 0.15);
+            view([-15 20])
+            camlight HEADLIGHT
+            material('dull');
+        else
+            plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
+            view([-15 20])
+        end
         hold on
         arrow(coords_final(1,:),coords_final(2,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
         arrow(coords_final(3,:),coords_final(4,:),'FaceColor','b','EdgeColor','b','LineWidth',5,'Length',10)
         arrow(coords_final(5,:),coords_final(6,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
         legend(' Nodal Points',' AP Axis',' SI Axis',' ML Axis')
         title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
-        text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
-        text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','b');
-        if side_indx == 1
-            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Lateral','HorizontalAlignment','left','FontSize',15,'Color','r');
-        else
-            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
-        end
-        view([-40 25])
+%         text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
+%         text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','b');
+%         if side_indx == 1
+%             text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Lateral','HorizontalAlignment','left','FontSize',15,'Color','r');
+%         else
+%             text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
+%         end
+        grid off
+        axis off
         xlabel('X')
         ylabel('Y')
         zlabel('Z')
