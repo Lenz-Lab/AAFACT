@@ -5,6 +5,9 @@ clear, clc, close all
 % folder where the file is and then select the bone model(s) you wish the
 % apply a coordinate system to.
 
+% Ensure that there are no spaces in the folder name, consider replacing 
+% spaces with underscores (_).
+
 % Currently, this code works for all bones from the tibia and fibula
 % through the metatarsals. It has an option for multiple coordinate
 % systems for the talus and calcaneus. I also can place the origin of the
