@@ -1,5 +1,5 @@
 %% Main Script for Coordinate System Toolbox
-clear, clc%, close all
+clear, clc, close all
 
 % This main code only requires the users bone model input. Select the
 % folder where the file is and then select the bone model(s) you wish the
@@ -283,13 +283,13 @@ for m = 1:length(all_files)
         arrow(coords_final(5,:),coords_final(6,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
         legend(' Nodal Points',' AP Axis',' SI Axis',' ML Axis')
         title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
-%         text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
-%         text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','b');
-%         if side_indx == 1
-%             text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Lateral','HorizontalAlignment','left','FontSize',15,'Color','r');
-%         else
-%             text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
-%         end
+        text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
+        text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','b');
+        if side_indx == 1
+            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Lateral','HorizontalAlignment','left','FontSize',15,'Color','r');
+        else
+            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
+        end
         grid off
         axis off
         xlabel('X')
