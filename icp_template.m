@@ -354,17 +354,28 @@ if (tibfib_switch == 1 && bone_indx == 13) || (tibfib_switch == 1 && bone_indx =
     nodes_test4 = nodes_test1*rotz(270);
 
     [Rtw1,Ttw1,Etw1] = icp(nodes_template',nodes_test1', iterations,'Matching','kDtree','WorstRejection',0.1);
-    [Rtw2,Ttw2,Etw2] = icp(nodes_template',nodes_test2', iterations,'Matching','kDtree','WorstRejection',0.1);
-    [Rtw3,Ttw3,Etw3] = icp(nodes_template',nodes_test3', iterations,'Matching','kDtree','WorstRejection',0.1);
-    [Rtw4,Ttw4,Etw4] = icp(nodes_template',nodes_test4', iterations,'Matching','kDtree','WorstRejection',0.1);
 
-    Etw = min([Etw1(end),Etw2(end),Etw3(end),Etw4(end)]);
+    if better_start == 1
+        [Rtw2,Ttw2,Etw2] = icp(nodes_template',nodes_test2', iterations,'Matching','kDtree','WorstRejection',0.1);
+        [Rtw3,Ttw3,Etw3] = icp(nodes_template',nodes_test3', iterations,'Matching','kDtree','WorstRejection',0.1);
+        [Rtw4,Ttw4,Etw4] = icp(nodes_template',nodes_test4', iterations,'Matching','kDtree','WorstRejection',0.1);
+        Etw = min([Etw1(end),Etw2(end),Etw3(end),Etw4(end)]);
+    else
+        Etw = min([Etw1(end)]);
+    end
 
     if Etw == Etw1(end)
-        sflip = [1 0 0; 0 1 0; 0 0 1];
-        aligned_nodes = (Rtw1*(aligned_nodes') + repmat(Ttw1,1,length(aligned_nodes')))';
-        sR_tibia= Rtw1;
-        sT_tibia = Ttw1;
+        if better_start == 1
+            sflip = [1 0 0; 0 1 0; 0 0 1];
+            aligned_nodes = (Rtw1*(aligned_nodes') + repmat(Ttw1,1,length(aligned_nodes')))';
+            sR_tibia= Rtw1;
+            sT_tibia = Ttw1;
+        else
+            sflip = [1 0 0; 0 1 0; 0 0 1];
+            aligned_nodes = (aligned_nodes' + repmat(Ttw1,1,length(aligned_nodes')))';
+            sR_tibia= Rtw1;
+            sT_tibia = Ttw1;
+        end
     elseif Etw == Etw2(end)
         sflip = rotz(90);
         aligned_nodes = aligned_nodes*rotz(90);
