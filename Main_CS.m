@@ -6,8 +6,9 @@ clear, clc, close all
 % apply a coordinate system to.
 
 % Currently, this code works for all bones from the tibia and fibula
-% through the metatarsals. It also has an option for multiple coordinate
-% systems for the talus, tibia and fibula.
+% through the metatarsals. It has an option for multiple coordinate
+% systems for the talus and calcaneus. I also can place the origin of the
+% coordinate system at a joint surface.
 
 % While it's not neccessary, naming your file with the laterality (_L_ or
 % _Left_ etc.) and the name of the bone (_Calcaneus) will speed up the
