@@ -10,7 +10,7 @@ This code takes a bone model, currently the tibia, fibula, talus, calcaneus, nav
 
 ### Dependencies
 
-* MATLAB R2020A or later
+* MATLAB R2020B or later
 * Robotics System Toolbox
 * Phased Array System Toolbox
 
