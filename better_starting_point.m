@@ -1,4 +1,4 @@
-function better_starting_point(accurate_answer,nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx)
+function better_starting_point(accurate_answer,nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx,conlist)
 % This function allows the user to choose a better starting point for their
 % bone model if the icp alignment isn't working. This is only ran if you
 
@@ -157,7 +157,20 @@ switch accurate_answer
         fig_bottom = (screen_size(4) - fig_height) / 2;
 
         fig10 = figure('Position', [fig_left, fig_bottom+15, fig_width, fig_height]);
-        plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
+        if ext == ".stl"
+            Final_Bone = triangulation(conlist,nodes_original);
+            patch('Faces',Final_Bone.ConnectivityList,'Vertices',Final_Bone.Points,...
+                'FaceColor', [0.85 0.85 0.85], ...
+                'EdgeColor','none',...
+                'FaceLighting','gouraud',...
+                'AmbientStrength', 0.15);
+            view([-15 20])
+            camlight HEADLIGHT
+            material('dull');
+        else
+            plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
+            view([-15 20])
+        end
         hold on
         arrow(coords_final(1,:),coords_final(2,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
         arrow(coords_final(3,:),coords_final(4,:),'FaceColor','b','EdgeColor','b','LineWidth',5,'Length',10)
@@ -166,8 +179,13 @@ switch accurate_answer
         title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
         text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
         text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','b');
-        text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
-        view([-40 25])
+        if side_indx == 1
+            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Lateral','HorizontalAlignment','left','FontSize',15,'Color','r');
+        else
+            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
+        end
+        grid off
+        axis off
         xlabel('X')
         ylabel('Y')
         zlabel('Z')
@@ -192,21 +210,21 @@ switch accurate_answer
             "ML Axis"];
         D = ["X" "Y" "Z"];
 
-        if bone_indx == 1 && bone_coord == 1
-            name = strcat('TN_',name);
-        elseif bone_indx == 1 && bone_coord == 2
-            name = strcat('TT_',name);
-        elseif bone_indx == 1 && bone_coord == 3
-            name = strcat('ST_',name);
-        elseif bone_indx == 2 && bone_coord == 1
-            name = strcat('CC_',name);
-        elseif bone_indx == 2 && bone_coord == 2
-            name = strcat('ST_',name);
-        end
-
-        if length(name) > 31
-            name = name(1:31);
-        end
+%         if bone_indx == 1 && bone_coord == 1
+%             name = strcat('TN_',name);
+%         elseif bone_indx == 1 && bone_coord == 2
+%             name = strcat('TT_',name);
+%         elseif bone_indx == 1 && bone_coord == 3
+%             name = strcat('ST_',name);
+%         elseif bone_indx == 2 && bone_coord == 1
+%             name = strcat('CC_',name);
+%         elseif bone_indx == 2 && bone_coord == 2
+%             name = strcat('ST_',name);
+%         end
+% 
+%         if length(name) > 31
+%             name = name(1:31);
+%         end
 
         xlfilename = strcat(FolderPathName,'\CoordinateSystem_',FolderName,'.xlsx');
         writematrix(A,xlfilename,'Sheet',name);
