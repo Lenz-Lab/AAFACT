@@ -118,6 +118,7 @@ for m = 1:length(all_files)
         side_indx = 2;
     else
         [side_indx,~] = listdlg('PromptString', [{strcat('Select which side this file is:'," ",string(FileName))} {''}], 'ListString', list_side,'SelectionMode','single');
+%         side_indx = 2;
     end
 
     %% Load in file based on file type
@@ -148,9 +149,11 @@ for m = 1:length(all_files)
 
     if bone_indx == 1
         [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','multiple');
+%         bone_coord = [1 2 3];
         cs_string = string(list_talus(bone_coord));
     elseif bone_indx == 2
         [bone_coord,~] = listdlg('PromptString', {'Select which calcaneus CS.'}, 'ListString', list_calcaneus,'SelectionMode','multiple');
+%         bone_coord = [1 2];
         cs_string = string(list_calcaneus(bone_coord));
     else
         bone_coord = 1;
@@ -188,7 +191,8 @@ for m = 1:length(all_files)
             list_joint = {'Center','Talofibular Surface'};
         end
 
-        [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?'," ",cs_string(n))} {''}], 'ListString', list_joint,'SelectionMode','single');
+%         [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?'," ",cs_string(n))} {''}], 'ListString', list_joint,'SelectionMode','single');
+        joint_indx = 1;
 
         if (bone_indx == 13 || bone_indx == 14) && length(joint_indx) > 1
             bone_coord = 1:2;

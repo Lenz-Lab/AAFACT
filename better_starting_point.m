@@ -107,7 +107,7 @@ switch accurate_answer
         RTs.yellow = R_yellow;
 
         %% Performs coordinate system calculation
-        [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord(n),side_indx);
+        [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord,side_indx);
 
         %% Joint Origin
         if joint_indx > 1
