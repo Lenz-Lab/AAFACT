@@ -1,4 +1,4 @@
-function better_starting_point(accurate_answer,nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx,conlist)
+function better_starting_point(accurate_answer,nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx,conlist,ext)
 % This function allows the user to choose a better starting point for their
 % bone model if the icp alignment isn't working. This is only ran if you
 
@@ -107,7 +107,7 @@ switch accurate_answer
         RTs.yellow = R_yellow;
 
         %% Performs coordinate system calculation
-        [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord(n),side_indx);
+        [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord,side_indx);
 
         %% Joint Origin
         if joint_indx > 1

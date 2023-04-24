@@ -232,6 +232,10 @@ close_dist = (total_distance == min(total_distance)); % closest point between th
 origin = [0 0 0];
 temp_origin = long_axis_points(close_dist,:); % 90 degree intersecting point between long axis and third point
 
+if all(temp_origin == first_point) || all(temp_origin == second_point) || all(temp_origin == third_point)
+    temp_origin = temp_origin + 0.0001;
+end
+
 if side_indx == 1
     ml = -1;
 else

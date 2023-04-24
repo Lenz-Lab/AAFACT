@@ -358,7 +358,7 @@ for m = 1:length(all_files)
             accurate_answer = uiconfirm(fig2,'Is the coordinate system accurately assigned to the model?',...
                 'Coordinate System','Options',{'Yes','No'},'DefaultOption',1);
             delete(fig2)
-            better_starting_point(accurate_answer,nodes,bone_indx,bone_coord(n),side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx,conlist)
+            better_starting_point(accurate_answer,nodes,bone_indx,bone_coord(n),side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx,conlist,ext)
         end
 
         %% Clear Variables for New Loop
