@@ -132,7 +132,7 @@ if AOI ~= "None"
     [intersect,~,~,~,joint_origin] = TriangleRayIntersection(current_origin, axis_direction, vert1, vert2, vert3,'lineType','line');
     joint_origin = joint_origin(intersect,:);
 
-    if (AOI == "CheckSI" || AOI == "CheckML") && length(joint_origin) == 0
+    if (AOI == "CheckSI" || AOI == "CheckML") && isempty(joint_origin)
         joint_origin = [];
         [intersect,~,~,~,joint_origin] = TriangleRayIntersection(current_origin, -axis_direction, vert1, vert2, vert3,'lineType','line');
         joint_origin = joint_origin(intersect,:);

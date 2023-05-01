@@ -81,8 +81,8 @@ if bone_indx == 13 || bone_indx == 14
     if nodes_template_length/2 > max_nodes_length % Determines if the user's model is half the length of the template model
         temp = find(nodes_template(:,3) < (min(nodes_template(:,a)) + max_nodes_length));
         nodes_template = [nodes_template(temp,1) nodes_template(temp,2) nodes_template(temp,3)];
-        x = [-20:4:10]';
-        y = [-10:4:20]';
+        x = (-20:4:10)';
+        y = (-10:4:20)';
         [x, y] = meshgrid(x,y);
         z = (min(nodes_template(:,a)) + max_nodes_length) .* ones(length(x(:,1)),1);
         k = 1;
@@ -121,9 +121,9 @@ if bone_indx >= 8 && bone_indx <= 12
     if nodes_template_length/1.25 > max_nodes_length
         temp = find(nodes_template(:,2) < (min(nodes_template(:,a)) + max_nodes_length));
         nodes_template = [nodes_template(temp,1) nodes_template(temp,2) nodes_template(temp,3)];
-        x = [-10:1:10]';
-        z = [-10:1:10]';
-        [x z] = meshgrid(x,z);
+        x = (-10:1:10)';
+        z = (-10:1:10)';
+        [x, z] = meshgrid(x,z);
         y = (min(nodes_template(:,a)) + max_nodes_length) .* ones(length(x(:,1)),1);
         k = 1;
         for n = 1:length(y)
@@ -334,8 +334,8 @@ end
 if (tibfib_switch == 1 && bone_indx == 13) || (tibfib_switch == 1 && bone_indx == 14)
     temp = find(aligned_nodes(:,3) < 150);
     nodes_test = [aligned_nodes(temp,1) aligned_nodes(temp,2) aligned_nodes(temp,3)];
-    x = [-20:4:20]';
-    y = [-20:4:20]';
+    x = (-20:4:20)';
+    y = (-20:4:20)';
     [x, y] = meshgrid(x,y);
     z = (max(nodes_test(:,3))) .* ones(length(x(:,1)),1);
     k = 1;

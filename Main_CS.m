@@ -70,7 +70,7 @@ for m = 1:length(all_files)
 
     % If the folder doesn't have the bone name, this looks through the file
     % name for the bone name
-    if exist('bone_indx') == 0
+    if exist('bone_indx','var') == 0
         for n = 1:length(list_bone)
             if any(string(extract(FileName,list_bone(n))) == string(list_bone(n))) ||...
                     any(string(extract(FileName,lower(list_bone(n)))) == lower(string(list_bone(n)))) ||...
@@ -85,7 +85,7 @@ for m = 1:length(all_files)
 
     % If the folder and the file don't have the bone name, the user must select
     % the bone name
-    if exist('bone_indx') == 0
+    if exist('bone_indx','var') == 0
         [bone_indx,~] = listdlg('PromptString', [{strcat('Select which bone this file is:'," ",string(FileName))} {''}], 'ListString', list_bone,'SelectionMode','single');
     end
 
@@ -100,7 +100,7 @@ for m = 1:length(all_files)
 
     % If the folder doesn't have the bone side, this looks through the file
     % name for the bone side
-    if exist('side_folder_indx') == 0
+    if exist('side_folder_indx','var') == 0
         for n = 1:length(list_side_folder)
             if any(string(extract(FileName,list_side_folder(n))) == string(list_side_folder(n))) ||...
                     any(string(extract(FileName,lower(list_side_folder(n)))) == lower(string(list_side_folder(n)))) ||...
@@ -112,9 +112,9 @@ for m = 1:length(all_files)
 
     % If the folder and the file don't have the bone side, the user must select
     % the bone side
-    if exist('side_folder_indx') && side_folder_indx <= 2
+    if exist('side_folder_indx','var') && side_folder_indx <= 2
         side_indx = 1;
-    elseif exist('side_folder_indx') && side_folder_indx >= 3
+    elseif exist('side_folder_indx','var') && side_folder_indx >= 3
         side_indx = 2;
     else
         [side_indx,~] = listdlg('PromptString', [{strcat('Select which side this file is:'," ",string(FileName))} {''}], 'ListString', list_side,'SelectionMode','single');

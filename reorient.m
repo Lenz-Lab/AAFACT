@@ -13,15 +13,18 @@ Temp_Coordinates_temp = [0 0 0; Temp_Coordinates_temp(2,:)./norm(Temp_Coordinate
 Temp_Coordinates_Unit = Temp_Coordinates_temp + Temp_Coordinates_origin;
 
 if isempty(RTs.sR_talus) == 0
-    nodes_coords_final_i4 = (inv(RTs.sR_talus)*(Temp_Nodes_Coords'))';
+%     nodes_coords_final_i4 = (inv(RTs.sR_talus)*(Temp_Nodes_Coords'))';
+nodes_coords_final_i4 = ((RTs.sR_talus)\(Temp_Nodes_Coords'))';
 elseif isempty(RTs.sT_tibia) == 0
     nodes_coords_final_i6 = (Temp_Nodes_Coords' - repmat(RTs.sT_tibia,1,length(Temp_Nodes_Coords')))';
-    nodes_coords_final_i5 = (inv(RTs.sR_tibia)*(nodes_coords_final_i6'))';
-    nodes_coords_final_i4 = ((nodes_coords_final_i5)*inv(RTs.sflip));
+%     nodes_coords_final_i5 = (inv(RTs.sR_tibia)*(nodes_coords_final_i6'))';
+    nodes_coords_final_i5 = ((RTs.sR_tibia)\(nodes_coords_final_i6'))';
+%     nodes_coords_final_i4 = ((nodes_coords_final_i5)*inv(RTs.sflip));
+    nodes_coords_final_i4 = ((nodes_coords_final_i5)/(RTs.sflip));
 elseif isempty(RTs.sT_fibula) == 0
     nodes_coords_final_i6 = (Temp_Nodes_Coords' - repmat(RTs.sT_fibula,1,length(Temp_Nodes_Coords')))';
-    nodes_coords_final_i5 = (inv(RTs.sR_fibula)*(nodes_coords_final_i6'))';
-    nodes_coords_final_i4 = ((nodes_coords_final_i5)*inv(RTs.sflip));
+    nodes_coords_final_i5 = ((RTs.sR_fibula)\(nodes_coords_final_i6'))';
+    nodes_coords_final_i4 = ((nodes_coords_final_i5)/(RTs.sflip));
 elseif isempty(RTs.cm_meta) == 0
     nodes_coords_final_i4 = [Temp_Nodes_Coords(:,1) + RTs.cm_meta(1), Temp_Nodes_Coords(:,2) + RTs.cm_meta(2), Temp_Nodes_Coords(:,3) + RTs.cm_meta(3)];
 else
@@ -29,12 +32,12 @@ else
 end
 
 nodes_coords_final_i3 = (nodes_coords_final_i4' - repmat(RTs.iT,1,length(nodes_coords_final_i4')))';
-nodes_coords_final_i2 = (inv(RTs.iR)*(nodes_coords_final_i3'))';
-nodes_coords_final_i1 = ((nodes_coords_final_i2)*inv(RTs.iflip));
+nodes_coords_final_i2 = ((RTs.iR)\(nodes_coords_final_i3'))';
+nodes_coords_final_i1 = ((nodes_coords_final_i2)/(RTs.iflip));
 
 if isempty(RTs.red) == 0
-    nodes_coords_final_i1_red = (inv(RTs.red)*(nodes_coords_final_i1'))';
-    nodes_coords_final_i1 = (inv(RTs.yellow)*(nodes_coords_final_i1_red'))';
+    nodes_coords_final_i1_red = ((RTs.red)\(nodes_coords_final_i1'))';
+    nodes_coords_final_i1 = ((RTs.yellow)\(nodes_coords_final_i1_red'))';
 end
 
 [nodes_coords_final_i1, ~] = center(nodes_coords_final_i1,1);
