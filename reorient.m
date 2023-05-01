@@ -13,13 +13,10 @@ Temp_Coordinates_temp = [0 0 0; Temp_Coordinates_temp(2,:)./norm(Temp_Coordinate
 Temp_Coordinates_Unit = Temp_Coordinates_temp + Temp_Coordinates_origin;
 
 if isempty(RTs.sR_talus) == 0
-%     nodes_coords_final_i4 = (inv(RTs.sR_talus)*(Temp_Nodes_Coords'))';
 nodes_coords_final_i4 = ((RTs.sR_talus)\(Temp_Nodes_Coords'))';
 elseif isempty(RTs.sT_tibia) == 0
     nodes_coords_final_i6 = (Temp_Nodes_Coords' - repmat(RTs.sT_tibia,1,length(Temp_Nodes_Coords')))';
-%     nodes_coords_final_i5 = (inv(RTs.sR_tibia)*(nodes_coords_final_i6'))';
     nodes_coords_final_i5 = ((RTs.sR_tibia)\(nodes_coords_final_i6'))';
-%     nodes_coords_final_i4 = ((nodes_coords_final_i5)*inv(RTs.sflip));
     nodes_coords_final_i4 = ((nodes_coords_final_i5)/(RTs.sflip));
 elseif isempty(RTs.sT_fibula) == 0
     nodes_coords_final_i6 = (Temp_Nodes_Coords' - repmat(RTs.sT_fibula,1,length(Temp_Nodes_Coords')))';
@@ -55,8 +52,17 @@ coords_final_temp = [0 0 0; coords_final_temp(2,:)./norm(coords_final_temp(2,:))
     0 0 0; coords_final_temp(6,:)./norm(coords_final_temp(6,:));];
 coords_final_unit = coords_final_temp + coods_final_origin;
 
+ap = coords_final_unit(1,:) - coords_final_unit(2,:)
+test = Temp_Coordinates_Unit(2,:) - ap
+
+new = ap + test
+
+
+
 nodes_final = nodes_coords_final(1:end-6,:);
 coords_final = nodes_coords_final(end-5:end,:);
+
+
 
 %% Plotting
 % figure()
