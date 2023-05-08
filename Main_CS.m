@@ -64,7 +64,11 @@ for m = 1:length(all_files)
                 any(string(extract(FolderName,list_bone2(n))) == string(list_bone2(n))) ||...
                 any(string(extract(FolderName,lower(list_bone2(n)))) == lower(string(list_bone2(n)))) ||...
                 any(string(extract(FolderName,upper(list_bone2(n)))) == upper(string(list_bone2(n))))
-            bone_indx = n;
+            if exist('bone_indx','var') == 0
+                bone_indx = n;
+            else
+                clear bone_indx
+            end
         end
     end
 
@@ -78,7 +82,11 @@ for m = 1:length(all_files)
                     any(string(extract(FileName,list_bone2(n))) == string(list_bone2(n))) ||...
                     any(string(extract(FileName,lower(list_bone2(n)))) == lower(string(list_bone2(n)))) ||...
                     any(string(extract(FileName,upper(list_bone2(n)))) == upper(string(list_bone2(n))))
-                bone_indx = n;
+                if exist('bone_indx','var') == 0
+                    bone_indx = n;
+                else
+                    clear bone_indx
+                end
             end
         end
     end
@@ -94,7 +102,11 @@ for m = 1:length(all_files)
         if any(string(extract(FolderName,list_side_folder(n))) == string(list_side_folder(n))) ||...
                 any(string(extract(FolderName,lower(list_side_folder(n)))) == lower(string(list_side_folder(n)))) ||...
                 any(string(extract(FolderName,upper(list_side_folder(n)))) == upper(string(list_side_folder(n))))
-            side_folder_indx = n;
+            if exist('side_folder_indx','var') == 0
+                side_folder_indx = n;
+            else
+                clear side_folder_indx
+            end
         end
     end
 
@@ -105,7 +117,11 @@ for m = 1:length(all_files)
             if any(string(extract(FileName,list_side_folder(n))) == string(list_side_folder(n))) ||...
                     any(string(extract(FileName,lower(list_side_folder(n)))) == lower(string(list_side_folder(n)))) ||...
                     any(string(extract(FileName,upper(list_side_folder(n)))) == upper(string(list_side_folder(n))))
-                side_folder_indx = n;
+                if exist('side_folder_indx','var') == 0
+                    side_folder_indx = n;
+                else
+                    clear side_folder_indx
+                end
             end
         end
     end
