@@ -8,16 +8,19 @@ function [aligned_nodes, RTs] = icp_template(bone_indx,nodes,bone_coord,better_s
 
 %% Read in Template Bone
 addpath('Template_Bones')
-if bone_indx == 1 && bone_coord == 1
+if bone_indx == 1 && bone_coord == 1 % TN
     TR_template = stlread('Talus_Template.stl');
     a = 2;
-elseif bone_indx == 1 && bone_coord == 2
+elseif bone_indx == 1 && bone_coord >= 2 % TT & ST
     TR_template2 = stlread('Talus_Template2.stl');
     TR_template = stlread('Talus_Template.stl');
     nodes_template2 = TR_template2.Points;
     a = 2;
-elseif bone_indx == 2
+elseif bone_indx == 2 && bone_coord == 1
     TR_template = stlread('Calcaneus_Template.stl');
+    a = 2;
+elseif bone_indx == 2 && bone_coord == 2
+    TR_template = stlread('Calcaneus_Template2.stl');
     a = 2;
 elseif bone_indx == 3
     TR_template = stlread('Navicular_Template.stl');
@@ -66,6 +69,7 @@ end
 nodes_template = TR_template.Points;
 con_temp = TR_template.ConnectivityList;
 
+
 %% Adjusting the cropped/smaller models
 % Creates similar sized models for cropped tibia or fibula
 if bone_indx == 13 || bone_indx == 14
@@ -77,8 +81,8 @@ if bone_indx == 13 || bone_indx == 14
     if nodes_template_length/2 > max_nodes_length % Determines if the user's model is half the length of the template model
         temp = find(nodes_template(:,3) < (min(nodes_template(:,a)) + max_nodes_length));
         nodes_template = [nodes_template(temp,1) nodes_template(temp,2) nodes_template(temp,3)];
-        x = [-20:4:10]';
-        y = [-10:4:20]';
+        x = (-20:4:10)';
+        y = (-10:4:20)';
         [x, y] = meshgrid(x,y);
         z = (min(nodes_template(:,a)) + max_nodes_length) .* ones(length(x(:,1)),1);
         k = 1;
@@ -94,11 +98,12 @@ if bone_indx == 13 || bone_indx == 14
             plane(:,1) plane(:,2) plane(:,3)];
 
         if bone_coord == 1
-            nodes_template = center(nodes_template);
+            nodes_template = center(nodes_template,1);
         end
 
         if nodes_template_length/5 > max_nodes_length
             tibfib_switch = 2; % under 1/5 tibia/fibula is available
+            warning('Input bone is shorter than recommended.')
         else
             tibfib_switch = 1;
         end
@@ -116,9 +121,9 @@ if bone_indx >= 8 && bone_indx <= 12
     if nodes_template_length/1.25 > max_nodes_length
         temp = find(nodes_template(:,2) < (min(nodes_template(:,a)) + max_nodes_length));
         nodes_template = [nodes_template(temp,1) nodes_template(temp,2) nodes_template(temp,3)];
-        x = [-10:1:10]';
-        z = [-10:1:10]';
-        [x z] = meshgrid(x,z);
+        x = (-10:1:10)';
+        z = (-10:1:10)';
+        [x, z] = meshgrid(x,z);
         y = (min(nodes_template(:,a)) + max_nodes_length) .* ones(length(x(:,1)),1);
         k = 1;
         for n = 1:length(y)
@@ -143,14 +148,18 @@ if multiplier > 1
     nodes = nodes*multiplier;
 elseif parttib_multiplier > 1 && tibfib_switch == 2 && bone_indx >= 13
     nodes = nodes*parttib_multiplier;
+% elseif parttib_multiplier > 1 && bone_indx == 14
+%     nodes = nodes*parttib_multiplier;
 end
 
 %% Performing ICP alignment
 % This is the initial alignment with no rotation. 
 % Two different icp approaches are used, the first includeds the faces and
 % the second is just the points.
-[R1,T1,ER1] = icp(nodes_template',nodes',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-[R1_0,T1_0,ER1_0] = icp(nodes_template',nodes',200,'Matching','kDtree','WorstRejection',0.1);
+
+iterations = 200;
+[R1,T1,ER1] = icp(nodes_template',nodes', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+[R1_0,T1_0,ER1_0] = icp(nodes_template',nodes', iterations,'Matching','kDtree','WorstRejection',0.1);
 
 if better_start == 1
     
@@ -159,36 +168,36 @@ if better_start == 1
     nodesz180 = nodes*rotz(180);
     nodesz270 = nodes*rotz(270);
 
-    [Rz90,Tz90,ERz90] = icp(nodes_template',nodesz90',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rz90_wr,Tz90_wr,ERz90_wr] = icp(nodes_template',nodesz90',200,'Matching','kDtree','WorstRejection',0.1);
-    [Rz180,Tz180,ERz180] = icp(nodes_template',nodesz180',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rz180_wr,Tz180_wr,ERz180_wr] = icp(nodes_template',nodesz180',200,'Matching','kDtree','WorstRejection',0.1);
-    [Rz270,Tz270,ERz270] = icp(nodes_template',nodesz270',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rz270_wr,Tz270_wr,ERz270_wr] = icp(nodes_template',nodesz270',200,'Matching','kDtree','WorstRejection',0.1);
+    [Rz90,Tz90,ERz90] = icp(nodes_template',nodesz90', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rz90_wr,Tz90_wr,ERz90_wr] = icp(nodes_template',nodesz90', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rz180,Tz180,ERz180] = icp(nodes_template',nodesz180', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rz180_wr,Tz180_wr,ERz180_wr] = icp(nodes_template',nodesz180', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rz270,Tz270,ERz270] = icp(nodes_template',nodesz270', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rz270_wr,Tz270_wr,ERz270_wr] = icp(nodes_template',nodesz270', iterations,'Matching','kDtree','WorstRejection',0.1);
 
     % The users model is rotated about the y axis and realigned
     nodesy90 = nodes*roty(90);
     nodesy180 = nodes*roty(180);
     nodesy270 = nodes*roty(270);
 
-    [Ry90,Ty90,ERy90] = icp(nodes_template',nodesy90',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Ry90_wr,Ty90_wr,ERy90_wr] = icp(nodes_template',nodesy90',200,'Matching','kDtree','WorstRejection',0.1);
-    [Ry180,Ty180,ERy180] = icp(nodes_template',nodesy180',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Ry180_wr,Ty180_wr,ERy180_wr] = icp(nodes_template',nodesy180',200,'Matching','kDtree','WorstRejection',0.1);
-    [Ry270,Ty270,ERy270] = icp(nodes_template',nodesy270',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Ry270_wr,Ty270_wr,ERy270_wr] = icp(nodes_template',nodesy270',200,'Matching','kDtree','WorstRejection',0.1);
+    [Ry90,Ty90,ERy90] = icp(nodes_template',nodesy90', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Ry90_wr,Ty90_wr,ERy90_wr] = icp(nodes_template',nodesy90', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Ry180,Ty180,ERy180] = icp(nodes_template',nodesy180', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Ry180_wr,Ty180_wr,ERy180_wr] = icp(nodes_template',nodesy180', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Ry270,Ty270,ERy270] = icp(nodes_template',nodesy270', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Ry270_wr,Ty270_wr,ERy270_wr] = icp(nodes_template',nodesy270', iterations,'Matching','kDtree','WorstRejection',0.1);
 
     % The users model is rotated about the x axis and realigned
     nodesx90 = nodes*rotx(90);
     nodesx180 = nodes*rotx(180);
     nodesx270 = nodes*rotx(270);
 
-    [Rx90,Tx90,ERx90] = icp(nodes_template',nodesx90',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rx90_wr,Tx90_wr,ERx90_wr] = icp(nodes_template',nodesx90',200,'Matching','kDtree','WorstRejection',0.1);
-    [Rx180,Tx180,ERx180] = icp(nodes_template',nodesx180',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rx180_wr,Tx180_wr,ERx180_wr] = icp(nodes_template',nodesx180',200,'Matching','kDtree','WorstRejection',0.1);
-    [Rx270,Tx270,ERx270] = icp(nodes_template',nodesx270',200,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rx270_wr,Tx270_wr,ERx270_wr] = icp(nodes_template',nodesx270',200,'Matching','kDtree','WorstRejection',0.1);
+    [Rx90,Tx90,ERx90] = icp(nodes_template',nodesx90', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx90_wr,Tx90_wr,ERx90_wr] = icp(nodes_template',nodesx90', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rx180,Tx180,ERx180] = icp(nodes_template',nodesx180', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx180_wr,Tx180_wr,ERx180_wr] = icp(nodes_template',nodesx180', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rx270,Tx270,ERx270] = icp(nodes_template',nodesx270', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx270_wr,Tx270_wr,ERx270_wr] = icp(nodes_template',nodesx270', iterations,'Matching','kDtree','WorstRejection',0.1);
 
     % All errors are stored in this matrix
     ER_all = [ER1(end),ER1_0(end),ERz90(end),ERz90_wr(end),ERz180(end),ERz180_wr(end),ERz270(end),ERz270_wr(end),...
@@ -305,8 +314,8 @@ elseif ERx270_wr(end) == ER_min
     iT= Tx270_wr;
 end
 
-% This loop performs an exiTrotation for the TT CS of the talus
-if bone_indx == 1 && bone_coord == 2
+% This loop performs an alignment for the TT CS of the talus
+if bone_indx == 1 && bone_coord >= 2
     [sR_talus,~,~] = icp(nodes_template2',nodes_template',25,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
     aligned_nodes = (sR_talus*(aligned_nodes'))';
 else
@@ -320,13 +329,13 @@ elseif parttib_multiplier > 1 && tibfib_switch == 2 && bone_indx >= 13
     aligned_nodes = aligned_nodes/parttib_multiplier;
 end
 
-% The ensures the tibial coordinate system is at the center of the tibial
+% This ensures the tibial coordinate system is at the center of the tibial
 % plafond
-if tibfib_switch == 1 && bone_indx == 13
+if (tibfib_switch == 1 && bone_indx == 13) || (tibfib_switch == 1 && bone_indx == 14)
     temp = find(aligned_nodes(:,3) < 150);
     nodes_test = [aligned_nodes(temp,1) aligned_nodes(temp,2) aligned_nodes(temp,3)];
-    x = [-20:4:20]';
-    y = [-20:4:20]';
+    x = (-20:4:20)';
+    y = (-20:4:20)';
     [x, y] = meshgrid(x,y);
     z = (max(nodes_test(:,3))) .* ones(length(x(:,1)),1);
     k = 1;
@@ -344,18 +353,29 @@ if tibfib_switch == 1 && bone_indx == 13
     nodes_test3 = nodes_test1*rotz(180);
     nodes_test4 = nodes_test1*rotz(270);
 
-    [Rtw1,Ttw1,Etw1] = icp(nodes_template',nodes_test1',200,'Matching','kDtree','WorstRejection',0.1);
-    [Rtw2,Ttw2,Etw2] = icp(nodes_template',nodes_test2',200,'Matching','kDtree','WorstRejection',0.1);
-    [Rtw3,Ttw3,Etw3] = icp(nodes_template',nodes_test3',200,'Matching','kDtree','WorstRejection',0.1);
-    [Rtw4,Ttw4,Etw4] = icp(nodes_template',nodes_test4',200,'Matching','kDtree','WorstRejection',0.1);
+    [Rtw1,Ttw1,Etw1] = icp(nodes_template',nodes_test1', iterations,'Matching','kDtree','WorstRejection',0.1);
 
-    Etw = min([Etw1(end),Etw2(end),Etw3(end),Etw4(end)]);
+    if better_start == 1
+        [Rtw2,Ttw2,Etw2] = icp(nodes_template',nodes_test2', iterations,'Matching','kDtree','WorstRejection',0.1);
+        [Rtw3,Ttw3,Etw3] = icp(nodes_template',nodes_test3', iterations,'Matching','kDtree','WorstRejection',0.1);
+        [Rtw4,Ttw4,Etw4] = icp(nodes_template',nodes_test4', iterations,'Matching','kDtree','WorstRejection',0.1);
+        Etw = min([Etw1(end),Etw2(end),Etw3(end),Etw4(end)]);
+    else
+        Etw = min([Etw1(end)]);
+    end
 
     if Etw == Etw1(end)
-        sflip = [1 0 0; 0 1 0; 0 0 1];
-        aligned_nodes = (Rtw1*(aligned_nodes') + repmat(Ttw1,1,length(aligned_nodes')))';
-        sR_tibia= Rtw1;
-        sT_tibia = Ttw1;
+        if better_start == 1
+            sflip = [1 0 0; 0 1 0; 0 0 1];
+            aligned_nodes = (Rtw1*(aligned_nodes') + repmat(Ttw1,1,length(aligned_nodes')))';
+            sR_tibia= Rtw1;
+            sT_tibia = Ttw1;
+        else
+            sflip = [1 0 0; 0 1 0; 0 0 1];
+            aligned_nodes = (aligned_nodes' + repmat(Ttw1,1,length(aligned_nodes')))';
+            sR_tibia= Rtw1;
+            sT_tibia = Ttw1;
+        end
     elseif Etw == Etw2(end)
         sflip = rotz(90);
         aligned_nodes = aligned_nodes*rotz(90);
@@ -381,18 +401,40 @@ else
     sflip = [];
 end
 
+if bone_indx == 14
+    sR_fibula = sR_tibia;
+    sT_fibula = sT_tibia;
+    sR_tibia= [];
+    sT_tibia= [];
+else
+    sR_fibula = [];
+    sT_fibula = [];
+end
+
+if bone_indx >= 8 && bone_indx <= 12
+    [aligned_nodes,cm_meta] = center(aligned_nodes,1);
+else
+    cm_meta = [];
+end
+
+
 %% Combine all rotation and translation matricies
 RTs.iflip = iflip; % initial flip flip_out
 RTs.sflip = sflip; % secondary flip (for tibia) tib_flip
 RTs.iR = iR; % initial rotation Rot
-RTs.iT= iT; %initial translation Tra
+RTs.iT = iT; %initial translation Tra
 RTs.sR_talus = sR_talus; % secondary rotation (for talus) Rr
-RTs.sR_tibia= sR_tibia; % secondary rotation (for tibia) Rtw
+RTs.sR_tibia = sR_tibia; % secondary rotation (for tibia) Rtw
 RTs.sT_tibia = sT_tibia; % secondary translation (for tibia) Ttw
+RTs.sR_fibula = sR_fibula; % secondary rotation (for fibula) Rtw
+RTs.sT_fibula = sT_fibula; % secondary translation (for fibula) Ttw
+RTs.cm_meta = cm_meta; % centering metatarsals cm_meta
+RTs.red = [];
+RTs.yellow = [];
 
 %% Visualize proper alignment
 % figure()
-% if bone_indx == 1 && bone_coord == 2
+% if bone_indx == 1 && bone_coord >= 2
 %     plot3(nodes_template2(:,1),nodes_template2(:,2),nodes_template2(:,3),'.k')
 % else
 %     plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
