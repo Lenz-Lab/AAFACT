@@ -243,20 +243,20 @@ else
 end
 
 if (bone_indx == 1 && bone_coord >= 2) || bone_indx == 3 % TT Talus, Navicular
-    ML_vector_points = ml*[origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
+    ML_vector_points = ml*[origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*15];
+    SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*15];
     normal_vector = cross(ML_vector_points(2,:), SI_vector_points(2,:));
-    AP_vector_points = -ml*[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
+    AP_vector_points = -ml*[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*15];
 elseif bone_indx == 13 || bone_indx == 14 % Tibia, Fibula
-    SI_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    ML_vector_points = -ml*[origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
+    SI_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*400];
+    ML_vector_points = -ml*[origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*15];
     normal_vector = cross(ML_vector_points(2,:), SI_vector_points(2,:));
-    AP_vector_points = -ml*[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
+    AP_vector_points = -ml*[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*15];
 else % Cuneiforms, Metatarsals, Calcaneus, Cuboid, TN Talus
-    AP_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
+    AP_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*15];
+    SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*15];
     normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
-    ML_vector_points = ml*[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
+    ML_vector_points = ml*[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*15];
 end
 
 % figure()

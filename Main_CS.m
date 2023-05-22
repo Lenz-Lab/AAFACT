@@ -228,6 +228,13 @@ for m = 1:length(all_files)
         %% Reorient and Translate to Original Input Origin and Orientation
         [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes_Coords, cm_nodes, side_indx, RTs);
 
+        Temp_Coordinates_origin = Temp_Nodes_Coords(end-1,:);
+        Temp_Coordinates_temp = Temp_Nodes_Coords(end-5:end,:) - Temp_Coordinates_origin;
+        Temp_Coordinates_temp = [0 0 0; Temp_Coordinates_temp(2,:)./norm(Temp_Coordinates_temp(2,:));
+            0 0 0; Temp_Coordinates_temp(4,:)./norm(Temp_Coordinates_temp(4,:));
+            0 0 0; Temp_Coordinates_temp(6,:)./norm(Temp_Coordinates_temp(6,:));];
+        Temp_Coordinates_Unit = Temp_Coordinates_temp + Temp_Coordinates_origin;
+
         if bone_indx == 1 && bone_coord(n) == 3 % Talus Subtalar CS
             [aligned_nodes_TST, RTs_TST] = icp_template(bone_indx, nodes, 1, better_start);
             [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1, side_indx);
@@ -256,13 +263,15 @@ for m = 1:length(all_files)
         end
 
         %% Final Plotting
-        screen_size = get(0, 'ScreenSize');
-        fig_width = 800;
-        fig_height = 600;
-        fig_left = (screen_size(3) - fig_width) / 2;
-        fig_bottom = (screen_size(4) - fig_height) / 2;
+        if m == 1 && n == 1
+            screen_size = get(0, 'ScreenSize');
+            fig_width = 800;
+            fig_height = 600;
+            fig_left = (screen_size(3) - fig_width) / 2;
+            fig_bottom = (screen_size(4) - fig_height) / 2;
 
-        fig1 = figure('Position', [fig_left, fig_bottom+15, fig_width, fig_height]);
+            fig1 = figure('Position', [fig_left, fig_bottom+15, fig_width, fig_height]);
+        end
         if ext == ".stl"
             Final_Bone = triangulation(conlist,nodes_original);
             patch('Faces',Final_Bone.ConnectivityList,'Vertices',Final_Bone.Points,...
@@ -270,8 +279,12 @@ for m = 1:length(all_files)
                 'EdgeColor','none',...
                 'FaceLighting','gouraud',...
                 'AmbientStrength', 0.15);
-            view([-15 20])
-            camlight HEADLIGHT
+            alpha(0.75)
+            if m == 1 && n == 1
+                view([-40 20])
+                % view([100 5])
+                camlight HEADLIGHT
+            end
             material('dull');
         else
             plot3(nodes_original(:,1),nodes_original(:,2),nodes_original(:,3),'k.')
@@ -281,15 +294,15 @@ for m = 1:length(all_files)
         arrow(coords_final(1,:),coords_final(2,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
         arrow(coords_final(3,:),coords_final(4,:),'FaceColor','b','EdgeColor','b','LineWidth',5,'Length',10)
         arrow(coords_final(5,:),coords_final(6,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
-        legend(' Nodal Points',' AP Axis',' SI Axis',' ML Axis')
-        title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
-        text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
-        text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','b');
-        if side_indx == 1
-            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Lateral','HorizontalAlignment','left','FontSize',15,'Color','r');
-        else
-            text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
-        end
+        % legend(' Nodal Points',' AP Axis',' SI Axis',' ML Axis')
+        % title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
+        % text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
+        % text(coords_final(4,1),coords_final(4,2),coords_final(4,3),'   Superior','HorizontalAlignment','left','FontSize',15,'Color','b');
+        % if side_indx == 1
+        %     text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Lateral','HorizontalAlignment','left','FontSize',15,'Color','r');
+        % else
+        %     text(coords_final(6,1),coords_final(6,2),coords_final(6,3),'   Medial','HorizontalAlignment','left','FontSize',15,'Color','r');
+        % end
         grid off
         axis off
         xlabel('X')
