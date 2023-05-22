@@ -58,12 +58,8 @@ for m = 1:length(all_files)
 
     % Looks through the folder name for the bone name
     for n = 1:length(list_bone)
-        if any(string(extract(FolderName,list_bone(n))) == string(list_bone(n))) ||...
-                any(string(extract(FolderName,lower(list_bone(n)))) == lower(string(list_bone(n)))) ||...
-                any(string(extract(FolderName,upper(list_bone(n)))) == upper(string(list_bone(n)))) ||...
-                any(string(extract(FolderName,list_bone2(n))) == string(list_bone2(n))) ||...
-                any(string(extract(FolderName,lower(list_bone2(n)))) == lower(string(list_bone2(n)))) ||...
-                any(string(extract(FolderName,upper(list_bone2(n)))) == upper(string(list_bone2(n))))
+        if any(string(extract(lower(FolderName),lower(list_bone(n)))) == lower(string(list_bone(n)))) ||...
+                any(string(extract(lower(FolderName),lower(list_bone2(n)))) == lower(string(list_bone2(n))))
             if exist('bone_indx','var') == 0
                 bone_indx = n;
             else
@@ -76,12 +72,8 @@ for m = 1:length(all_files)
     % name for the bone name
     if exist('bone_indx','var') == 0
         for n = 1:length(list_bone)
-            if any(string(extract(FileName,list_bone(n))) == string(list_bone(n))) ||...
-                    any(string(extract(FileName,lower(list_bone(n)))) == lower(string(list_bone(n)))) ||...
-                    any(string(extract(FileName,upper(list_bone(n)))) == upper(string(list_bone(n)))) ||...
-                    any(string(extract(FileName,list_bone2(n))) == string(list_bone2(n))) ||...
-                    any(string(extract(FileName,lower(list_bone2(n)))) == lower(string(list_bone2(n)))) ||...
-                    any(string(extract(FileName,upper(list_bone2(n)))) == upper(string(list_bone2(n))))
+            if any(string(extract(lower(FileName),lower(list_bone(n)))) == lower(string(list_bone(n)))) ||...
+                any(string(extract(lower(FileName),lower(list_bone2(n)))) == lower(string(list_bone2(n))))
                 if exist('bone_indx','var') == 0
                     bone_indx = n;
                 else
@@ -99,14 +91,8 @@ for m = 1:length(all_files)
 
     % Looks through the folder name for the bone side
     for n = 1:length(list_side_folder)
-        if any(string(extract(FolderName,list_side_folder(n))) == string(list_side_folder(n))) ||...
-                any(string(extract(FolderName,lower(list_side_folder(n)))) == lower(string(list_side_folder(n)))) ||...
-                any(string(extract(FolderName,upper(list_side_folder(n)))) == upper(string(list_side_folder(n))))
-            if exist('side_folder_indx','var') == 0
+        if any(string(extract(lower(FolderName),lower(list_side_folder(n)))) == lower(string(list_side_folder(n))))
                 side_folder_indx = n;
-            else
-                clear side_folder_indx
-            end
         end
     end
 
@@ -114,14 +100,8 @@ for m = 1:length(all_files)
     % name for the bone side
     if exist('side_folder_indx','var') == 0
         for n = 1:length(list_side_folder)
-            if any(string(extract(FileName,list_side_folder(n))) == string(list_side_folder(n))) ||...
-                    any(string(extract(FileName,lower(list_side_folder(n)))) == lower(string(list_side_folder(n)))) ||...
-                    any(string(extract(FileName,upper(list_side_folder(n)))) == upper(string(list_side_folder(n))))
-                if exist('side_folder_indx','var') == 0
-                    side_folder_indx = n;
-                else
-                    clear side_folder_indx
-                end
+            if any(string(extract(lower(FileName),lower(list_side_folder(n)))) == lower(string(list_side_folder(n))))
+                side_folder_indx = n;
             end
         end
     end
