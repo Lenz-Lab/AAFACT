@@ -81,8 +81,8 @@ if bone_indx == 13 || bone_indx == 14
     if nodes_template_length/2 > max_nodes_length % Determines if the user's model is half the length of the template model
         temp = find(nodes_template(:,3) < (min(nodes_template(:,a)) + max_nodes_length));
         nodes_template = [nodes_template(temp,1) nodes_template(temp,2) nodes_template(temp,3)];
-        x = [-20:4:10]';
-        y = [-10:4:20]';
+        x = (-20:4:10)';
+        y = (-10:4:20)';
         [x, y] = meshgrid(x,y);
         z = (min(nodes_template(:,a)) + max_nodes_length) .* ones(length(x(:,1)),1);
         k = 1;
@@ -103,6 +103,7 @@ if bone_indx == 13 || bone_indx == 14
 
         if nodes_template_length/5 > max_nodes_length
             tibfib_switch = 2; % under 1/5 tibia/fibula is available
+            warning('Input bone is shorter than recommended.')
         else
             tibfib_switch = 1;
         end
@@ -120,9 +121,9 @@ if bone_indx >= 8 && bone_indx <= 12
     if nodes_template_length/1.25 > max_nodes_length
         temp = find(nodes_template(:,2) < (min(nodes_template(:,a)) + max_nodes_length));
         nodes_template = [nodes_template(temp,1) nodes_template(temp,2) nodes_template(temp,3)];
-        x = [-10:1:10]';
-        z = [-10:1:10]';
-        [x z] = meshgrid(x,z);
+        x = (-10:1:10)';
+        z = (-10:1:10)';
+        [x, z] = meshgrid(x,z);
         y = (min(nodes_template(:,a)) + max_nodes_length) .* ones(length(x(:,1)),1);
         k = 1;
         for n = 1:length(y)
@@ -147,6 +148,8 @@ if multiplier > 1
     nodes = nodes*multiplier;
 elseif parttib_multiplier > 1 && tibfib_switch == 2 && bone_indx >= 13
     nodes = nodes*parttib_multiplier;
+% elseif parttib_multiplier > 1 && bone_indx == 14
+%     nodes = nodes*parttib_multiplier;
 end
 
 %% Performing ICP alignment
@@ -312,7 +315,7 @@ elseif ERx270_wr(end) == ER_min
 end
 
 % This loop performs an alignment for the TT CS of the talus
-if bone_indx == 1 && bone_coord == 2
+if bone_indx == 1 && bone_coord >= 2
     [sR_talus,~,~] = icp(nodes_template2',nodes_template',25,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
     aligned_nodes = (sR_talus*(aligned_nodes'))';
 else
@@ -331,8 +334,8 @@ end
 if (tibfib_switch == 1 && bone_indx == 13) || (tibfib_switch == 1 && bone_indx == 14)
     temp = find(aligned_nodes(:,3) < 150);
     nodes_test = [aligned_nodes(temp,1) aligned_nodes(temp,2) aligned_nodes(temp,3)];
-    x = [-20:4:20]';
-    y = [-20:4:20]';
+    x = (-20:4:20)';
+    y = (-20:4:20)';
     [x, y] = meshgrid(x,y);
     z = (max(nodes_test(:,3))) .* ones(length(x(:,1)),1);
     k = 1;
@@ -351,17 +354,28 @@ if (tibfib_switch == 1 && bone_indx == 13) || (tibfib_switch == 1 && bone_indx =
     nodes_test4 = nodes_test1*rotz(270);
 
     [Rtw1,Ttw1,Etw1] = icp(nodes_template',nodes_test1', iterations,'Matching','kDtree','WorstRejection',0.1);
-    [Rtw2,Ttw2,Etw2] = icp(nodes_template',nodes_test2', iterations,'Matching','kDtree','WorstRejection',0.1);
-    [Rtw3,Ttw3,Etw3] = icp(nodes_template',nodes_test3', iterations,'Matching','kDtree','WorstRejection',0.1);
-    [Rtw4,Ttw4,Etw4] = icp(nodes_template',nodes_test4', iterations,'Matching','kDtree','WorstRejection',0.1);
 
-    Etw = min([Etw1(end),Etw2(end),Etw3(end),Etw4(end)]);
+    if better_start == 1
+        [Rtw2,Ttw2,Etw2] = icp(nodes_template',nodes_test2', iterations,'Matching','kDtree','WorstRejection',0.1);
+        [Rtw3,Ttw3,Etw3] = icp(nodes_template',nodes_test3', iterations,'Matching','kDtree','WorstRejection',0.1);
+        [Rtw4,Ttw4,Etw4] = icp(nodes_template',nodes_test4', iterations,'Matching','kDtree','WorstRejection',0.1);
+        Etw = min([Etw1(end),Etw2(end),Etw3(end),Etw4(end)]);
+    else
+        Etw = min([Etw1(end)]);
+    end
 
     if Etw == Etw1(end)
-        sflip = [1 0 0; 0 1 0; 0 0 1];
-        aligned_nodes = (Rtw1*(aligned_nodes') + repmat(Ttw1,1,length(aligned_nodes')))';
-        sR_tibia= Rtw1;
-        sT_tibia = Ttw1;
+        if better_start == 1
+            sflip = [1 0 0; 0 1 0; 0 0 1];
+            aligned_nodes = (Rtw1*(aligned_nodes') + repmat(Ttw1,1,length(aligned_nodes')))';
+            sR_tibia= Rtw1;
+            sT_tibia = Ttw1;
+        else
+            sflip = [1 0 0; 0 1 0; 0 0 1];
+            aligned_nodes = (aligned_nodes' + repmat(Ttw1,1,length(aligned_nodes')))';
+            sR_tibia= Rtw1;
+            sT_tibia = Ttw1;
+        end
     elseif Etw == Etw2(end)
         sflip = rotz(90);
         aligned_nodes = aligned_nodes*rotz(90);

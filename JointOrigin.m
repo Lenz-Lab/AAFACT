@@ -1,4 +1,4 @@
-function [Temp_Coordinates, Temp_Nodes,Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx)
+function [Temp_Coordinates, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx, side_indx)
 %%
 if bone_indx == 1 % Talus
     if joint_indx == 2 % TN Joint
@@ -91,20 +91,36 @@ elseif AOI == "Inferior"
     current_origin = Temp_Coordinates(3,:);
     axis_direction = -Temp_Coordinates(4,:);
 elseif AOI == "Medial"
-    current_origin = Temp_Coordinates(5,:);
-    axis_direction = Temp_Coordinates(6,:);
+    if side_indx == 1
+        current_origin = Temp_Coordinates(5,:);
+        axis_direction = -Temp_Coordinates(6,:);
+    else
+        current_origin = Temp_Coordinates(5,:);
+        axis_direction = Temp_Coordinates(6,:);
+    end
 elseif AOI == "Lateral"
-    current_origin = Temp_Coordinates(5,:);
-    axis_direction = -Temp_Coordinates(6,:);
+    if side_indx == 1
+        current_origin = Temp_Coordinates(5,:);
+        axis_direction = Temp_Coordinates(6,:);
+    else
+        current_origin = Temp_Coordinates(5,:);
+        axis_direction = -Temp_Coordinates(6,:);
+    end
 elseif AOI == "CheckSI"
     current_origin = Temp_Coordinates(3,:);
     axis_direction = -Temp_Coordinates(4,:);
 elseif AOI == "CheckML"
-    current_origin = Temp_Coordinates(5,:);
-    axis_direction = Temp_Coordinates(6,:);
+    if side_indx == 1
+        current_origin = Temp_Coordinates(5,:);
+        axis_direction = -Temp_Coordinates(6,:);
+    else
+        current_origin = Temp_Coordinates(5,:);
+        axis_direction = Temp_Coordinates(6,:);
+    end
 elseif AOI == "None"
     current_origin = Temp_Coordinates(1,:);
 end
+
 
 vert1 = Temp_Nodes(conlist(:,1),:);
 vert2 = Temp_Nodes(conlist(:,2),:);
@@ -116,15 +132,15 @@ if AOI ~= "None"
     [intersect,~,~,~,joint_origin] = TriangleRayIntersection(current_origin, axis_direction, vert1, vert2, vert3,'lineType','line');
     joint_origin = joint_origin(intersect,:);
 
-    if (AOI == "CheckSI" || AOI == "CheckML") && length(joint_origin) == 0
+    if (AOI == "CheckSI" || AOI == "CheckML") && isempty(joint_origin)
         joint_origin = [];
-        [intersect,t,~,~,joint_origin] = TriangleRayIntersection(current_origin, -axis_direction, vert1, vert2, vert3,'lineType','line');
-    joint_origin = joint_origin(intersect,:);
+        [intersect,~,~,~,joint_origin] = TriangleRayIntersection(current_origin, -axis_direction, vert1, vert2, vert3,'lineType','line');
+        joint_origin = joint_origin(intersect,:);
     end
 
     comp = 10000;
     for nt = 1:length(joint_origin(:,1))
-        tempt = norm(current_origin - joint_origin(nt,:));
+        tempt = norm(axis_direction - joint_origin(nt,:));
         if tempt < comp
             comp = tempt;
             mt = nt;
@@ -137,9 +153,9 @@ if AOI ~= "None"
 else
     joint_origin = current_origin;
 end
-
+%% Plotting
 % figure()
-% % plot3(Temp_Nodes(:,1),Temp_Nodes(:,2),Temp_Nodes(:,3),'.k')
+% plot3(Temp_Nodes(:,1),Temp_Nodes(:,2),Temp_Nodes(:,3),'.k')
 % hold on
 % plot3(current_origin(:,1),current_origin(:,2),current_origin(:,3),'.g','MarkerSize',25)
 % plot3(joint_origin(:,1),joint_origin(:,2),joint_origin(:,3),'.r','MarkerSize',25)

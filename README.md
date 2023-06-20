@@ -10,8 +10,9 @@ This code takes a bone model, currently the tibia, fibula, talus, calcaneus, nav
 
 ### Dependencies
 
-* MATLAB R2020A or later
+* MATLAB R2020B or later
 * Robotics System Toolbox
+* Phased Array System Toolbox
 
 ### Installing
 
@@ -23,14 +24,8 @@ This code takes a bone model, currently the tibia, fibula, talus, calcaneus, nav
 * Create a new folder in 'C:' drive called 'AutoCoordinateSystem'
 * Execute the matlab script 'MainCS.m'
 * Select an individual bone model or a folder including the bone models
+* Ensure that folder names do not contain spaces
 * If the folder name or the file name does not contains the name of the bone and/or the laterally, you will need to manually select both of those for each bone
-
-## Help
-
-Any advise for common problems or issues.
-```
-command to run if program contains helper info
-```
 
 ## Authors
 
