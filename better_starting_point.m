@@ -149,6 +149,9 @@ switch accurate_answer
                 Temp_Coordinates_Unit(5,:); ((Temp_Coordinates_Unit_TST(6,:) + Temp_Coordinates_Unit(6,:)).'/2)'];
         end
 
+        %% Transformation Matrix
+        TM = TranMat(RTs,coords_final_unit,side_indx);
+
         %% Final Plotting
         screen_size = get(0, 'ScreenSize');
         fig_width = 800;
@@ -240,4 +243,5 @@ switch accurate_answer
         writematrix(Temp_Coordinates_Unit(2,:),xlfilename,'Sheet',name,'Range','B12');
         writematrix(Temp_Coordinates_Unit(4,:),xlfilename,'Sheet',name,'Range','B13');
         writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
+        writematrix(TM(:,:),xlfilename,'Sheet',name,'Range','B16');
 end
