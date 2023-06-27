@@ -161,6 +161,8 @@ iterations = 200;
 [R1,T1,ER1] = icp(nodes_template',nodes', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
 [R1_0,T1_0,ER1_0] = icp(nodes_template',nodes', iterations,'Matching','kDtree','WorstRejection',0.1);
 
+iterations = 50;
+
 if better_start == 1
     
     % The users model is rotated about the z axis and realigned
@@ -199,10 +201,72 @@ if better_start == 1
     [Rx270,Tx270,ERx270] = icp(nodes_template',nodesx270', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
     [Rx270_wr,Tx270_wr,ERx270_wr] = icp(nodes_template',nodesx270', iterations,'Matching','kDtree','WorstRejection',0.1);
 
+    % The users model is rotated about the x axis and z axis and realigned
+    nodesx90z90 = nodes*rotx(90)*rotz(90);
+    nodesx90z180 = nodes*rotx(90)*rotz(180);
+    nodesx90z270 = nodes*rotx(90)*rotz(270);
+
+    [Rx90z90,Tx90z90,ERx90z90] = icp(nodes_template',nodesx90z90', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx90z90_wr,Tx90z90_wr,ERx90z90_wr] = icp(nodes_template',nodesx90z90', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rx90z180,Tx90z180,ERx90z180] = icp(nodes_template',nodesx90z180', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx90z180_wr,Tx90z180_wr,ERx90z180_wr] = icp(nodes_template',nodesx90z180', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rx90z270,Tx90z270,ERx90z270] = icp(nodes_template',nodesx90z270', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx90z270_wr,Tx90z270_wr,ERx90z270_wr] = icp(nodes_template',nodesx90z270', iterations,'Matching','kDtree','WorstRejection',0.1);
+
+    % The users model is rotated about the y axis and z axis and realigned
+    nodesy90z90 = nodes*roty(90)*rotz(90);
+    nodesy90z180 = nodes*roty(90)*rotz(180);
+    nodesy90z270 = nodes*roty(90)*rotz(270);
+
+    [Ry90z90,Ty90z90,ERy90z90] = icp(nodes_template',nodesy90z90', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Ry90z90_wr,Ty90z90_wr,ERy90z90_wr] = icp(nodes_template',nodesy90z90', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Ry90z180,Ty90z180,ERy90z180] = icp(nodes_template',nodesy90z180', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Ry90z180_wr,Ty90z180_wr,ERy90z180_wr] = icp(nodes_template',nodesy90z180', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Ry90z270,Ty90z270,ERy90z270] = icp(nodes_template',nodesy90z270', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Ry90z270_wr,Ty90z270_wr,ERy90z270_wr] = icp(nodes_template',nodesy90z270', iterations,'Matching','kDtree','WorstRejection',0.1);
+
+    % The users model is rotated about the x axis and y axis and realigned
+    nodesx90y90 = nodes*rotx(90)*roty(90);
+    nodesx90y180 = nodes*rotx(90)*roty(180);
+    nodesx90y270 = nodes*rotx(90)*roty(270);
+
+    [Rx90y90,Tx90y90,ERx90y90] = icp(nodes_template',nodesx90y90', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx90y90_wr,Tx90y90_wr,ERx90y90_wr] = icp(nodes_template',nodesx90y90', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rx90y180,Tx90y180,ERx90y180] = icp(nodes_template',nodesx90y180', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx90y180_wr,Tx90y180_wr,ERx90y180_wr] = icp(nodes_template',nodesx90y180', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rx90y270,Tx90y270,ERx90y270] = icp(nodes_template',nodesx90y270', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx90y270_wr,Tx90y270_wr,ERx90y270_wr] = icp(nodes_template',nodesx90y270', iterations,'Matching','kDtree','WorstRejection',0.1);
+
+    % The users model is rotated about the x axis and y axis and realigned
+    nodesx180y90 = nodes*rotx(180)*roty(90);
+    nodesx180y270 = nodes*rotx(180)*roty(270);
+
+    [Rx180y90,Tx180y90,ERx180y90] = icp(nodes_template',nodesx180y90', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx180y90_wr,Tx180y90_wr,ERx180y90_wr] = icp(nodes_template',nodesx180y90', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rx180y270,Tx180y270,ERx180y270] = icp(nodes_template',nodesx180y270', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx180y270_wr,Tx180y270_wr,ERx180y270_wr] = icp(nodes_template',nodesx180y270', iterations,'Matching','kDtree','WorstRejection',0.1);
+
+    % The users model is rotated about the x axis and y axis and realigned
+    nodesx90y90z90 = nodes*rotx(90)*roty(90)*rotz(90);
+    nodesx90y90z180 = nodes*rotx(90)*roty(90)*rotz(180);
+    nodesx90y90z270 = nodes*rotx(90)*roty(90)*rotz(270);
+
+    [Rx90y90z90,Tx90y90z90,ERx90y90z90] = icp(nodes_template',nodesx90y90z90', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx90y90z90_wr,Tx90y90z90_wr,ERx90y90z90_wr] = icp(nodes_template',nodesx90y90z90', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rx90y90z180,Tx90y90z180,ERx90y90z180] = icp(nodes_template',nodesx90y90z180', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx90y90z180_wr,Tx90y90z180_wr,ERx90y90z180_wr] = icp(nodes_template',nodesx90y90z180', iterations,'Matching','kDtree','WorstRejection',0.1);
+    [Rx90y90z270,Tx90y90z270,ERx90y90z270] = icp(nodes_template',nodesx90y90z270', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rx90y90z270_wr,Tx90y90z270_wr,ERx90y90z270_wr] = icp(nodes_template',nodesx90y90z270', iterations,'Matching','kDtree','WorstRejection',0.1);
+
     % All errors are stored in this matrix
     ER_all = [ER1(end),ER1_0(end),ERz90(end),ERz90_wr(end),ERz180(end),ERz180_wr(end),ERz270(end),ERz270_wr(end),...
         ERy90(end),ERy90_wr(end),ERy180(end),ERy180_wr(end),ERy270(end),ERy270_wr(end),...
-        ERx90(end),ERx90_wr(end),ERx180(end),ERx180_wr(end),ERx270(end),ERx270_wr(end)];
+        ERx90(end),ERx90_wr(end),ERx180(end),ERx180_wr(end),ERx270(end),ERx270_wr(end),...
+        ERx90z90(end),ERx90z90_wr(end),ERx90z180(end),ERx90z180_wr(end),ERx90z270(end),ERx90z270_wr(end),...
+        ERy90z90(end),ERy90z90_wr(end),ERy90z180(end),ERy90z180_wr(end),ERy90z270(end),ERy90z270_wr(end),...
+        ERx90y90(end),ERx90y90_wr(end),ERx90y180(end),ERx90y180_wr(end),ERx90y270(end),ERx90y270_wr(end),...
+        ERx180y90(end),ERx180y90_wr(end),ERx180y270(end),ERx180y270_wr(end),ERx90y90z90(end),ERx90y90z90_wr(end),...
+        ERx90y90z180(end),ERx90y90z180_wr(end),ERx90y90z270(end),ERx90y90z270_wr(end)];
 else
     ER_all = [ER1(end),ER1_0(end)];
 end
@@ -312,6 +376,146 @@ elseif ERx270_wr(end) == ER_min
     iflip = rotx(270);
     iR = Rx270_wr;
     iT= Tx270_wr;
+elseif ERx90z90(end) == ER_min
+    aligned_nodes = (Rx90z90*(nodesx90z90') + repmat(Tx90z90,1,length(nodesx90z90')))';
+    iflip = rotx(90)*rotz(90);
+    iR = Rx90z90;
+    iT= Tx90z90;
+elseif ERx90z90_wr(end) == ER_min
+    aligned_nodes = (Rx90z90_wr*(nodesx90z90') + repmat(Tx90z90_wr,1,length(nodesx90z90')))';
+    iflip = rotx(90)*rotz(90);
+    iR = Rx90z90_wr;
+    iT= Tx90z90_wr;
+ elseif ERx90z180(end) == ER_min
+    aligned_nodes = (Rx90z180*(nodesx90z180') + repmat(Tx90z180,1,length(nodesx90z180')))';
+    iflip = rotx(90)*rotz(180);
+    iR = Rx90z180;
+    iT= Tx90z180;
+elseif ERx90z180_wr(end) == ER_min
+    aligned_nodes = (Rx90z180_wr*(nodesx90z180') + repmat(Tx90z180_wr,1,length(nodesx90z180')))';
+    iflip = rotx(90)*rotz(180);
+    iR = Rx90z180_wr;
+    iT= Tx90z180_wr;
+elseif ERx90z270(end) == ER_min
+    aligned_nodes = (Rx90z270*(nodesx90z270') + repmat(Tx90z270,1,length(nodesx90z270')))';
+    iflip = rotx(90)*rotz(270);
+    iR = Rx90z270;
+    iT= Tx90z270;
+elseif ERx90z270_wr(end) == ER_min
+    aligned_nodes = (Rx90z270_wr*(nodesx90z270') + repmat(Tx90z270_wr,1,length(nodesx90z270')))';
+    iflip = rotx(90)*rotz(270);
+    iR = Rx90z270_wr;
+    iT= Tx90z270_wr;
+elseif ERy90z90(end) == ER_min
+    aligned_nodes = (Ry90z90*(nodesy90z90') + repmat(Ty90z90,1,length(nodesy90z90')))';
+    iflip = roty(90)*rotz(90);
+    iR = Ry90z90;
+    iT= Ty90z90;
+elseif ERy90z90_wr(end) == ER_min
+    aligned_nodes = (Ry90z90_wr*(nodesy90z90') + repmat(Ty90z90_wr,1,length(nodesy90z90')))';
+    iflip = roty(90)*rotz(90);
+    iR = Ry90z90_wr;
+    iT= Ty90z90_wr;
+elseif ERy90z180(end) == ER_min
+    aligned_nodes = (Ry90z180*(nodesy90z180') + repmat(Ty90z180,1,length(nodesy90z180')))';
+    iflip = roty(90)*rotz(180);
+    iR = Ry90z180;
+    iT= Ty90z180;
+elseif ERy90z180_wr(end) == ER_min
+    aligned_nodes = (Ry90z180_wr*(nodesy90z180') + repmat(Ty90z180_wr,1,length(nodesy90z180')))';
+    iflip = roty(90)*rotz(180);
+    iR = Ry90z180_wr;
+    iT= Ty90z180_wr;
+elseif ERy90z270(end) == ER_min
+    aligned_nodes = (Ry90z270*(nodesy90z270') + repmat(Ty90z270,1,length(nodesy90z270')))';
+    iflip = roty(90)*rotz(270);
+    iR = Ry90z270;
+    iT= Ty90z270;
+elseif ERy90z270_wr(end) == ER_min
+    aligned_nodes = (Ry90z270_wr*(nodesy90z270') + repmat(Ty90z270_wr,1,length(nodesy90z270')))';
+    iflip = roty(90)*rotz(270);
+    iR = Ry90z270_wr;
+    iT= Ty90z270_wr;
+elseif ERx90y90(end) == ER_min
+    aligned_nodes = (Rx90y90*(nodesx90y90') + repmat(Tx90y90,1,length(nodesx90y90')))';
+    iflip = rotx(90)*roty(90);
+    iR = Rx90y90;
+    iT= Tx90y90;
+elseif ERx90y90_wr(end) == ER_min
+    aligned_nodes = (Rx90y90_wr*(nodesx90y90') + repmat(Tx90y90_wr,1,length(nodesx90y90')))';
+    iflip = rotx(90)*roty(90);
+    iR = Rx90y90_wr;
+    iT= Tx90y90_wr;
+elseif ERx90y180(end) == ER_min
+    aligned_nodes = (Rx90y180*(nodesx90y180') + repmat(Tx90y180,1,length(nodesx90y180')))';
+    iflip = rotx(90)*roty(180);
+    iR = Rx90y180;
+    iT= Tx90y180;
+elseif ERx90y180_wr(end) == ER_min
+    aligned_nodes = (Rx90y180_wr*(nodesx90y180') + repmat(Tx90y180_wr,1,length(nodesx90y180')))';
+    iflip = rotx(90)*roty(180);
+    iR = Rx90y180_wr;
+    iT= Tx90y180_wr;
+elseif ERx90y270(end) == ER_min
+    aligned_nodes = (Rx90y270*(nodesx90y270') + repmat(Tx90y270,1,length(nodesx90y270')))';
+    iflip = rotx(90)*roty(270);
+    iR = Rx90y270;
+    iT= Tx90y270;
+elseif ERx90y270_wr(end) == ER_min
+    aligned_nodes = (Rx90y270_wr*(nodesx90y270') + repmat(Tx90y270_wr,1,length(nodesx90y270')))';
+    iflip = rotx(90)*roty(270);
+    iR = Rx90y270_wr;
+    iT= Tx90y270_wr;
+elseif ERx180y90(end) == ER_min
+    aligned_nodes = (Rx180y90*(nodesx180y90') + repmat(Tx180y90,1,length(nodesx180y90')))';
+    iflip = rotx(180)*roty(90);
+    iR = Rx180y90;
+    iT= Tx180y90;
+elseif ERx180y90_wr(end) == ER_min
+    aligned_nodes = (Rx180y90_wr*(nodesx180y90') + repmat(Tx180y90_wr,1,length(nodesx180y90')))';
+    iflip = rotx(180)*roty(90);
+    iR = Rx180y90_wr;
+    iT= Tx180y90_wr;
+elseif ERx180y270(end) == ER_min
+    aligned_nodes = (Rx180y270*(nodesx180y270') + repmat(Tx180y270,1,length(nodesx180y270')))';
+    iflip = rotx(180)*roty(270);
+    iR = Rx180y270;
+    iT= Tx180y270;
+elseif ERx180y270_wr(end) == ER_min
+    aligned_nodes = (Rx180y270_wr*(nodesx180y270') + repmat(Tx180y270_wr,1,length(nodesx180y270')))';
+    iflip = rotx(180)*roty(270);
+    iR = Rx180y270_wr;
+    iT= Tx180y270_wr;
+elseif ERx90y90z90(end) == ER_min
+    aligned_nodes = (Rx90y90z90*(nodesx90y90z90') + repmat(Tx90y90z90,1,length(nodesx90y90z90')))';
+    iflip = rotx(90)*roty(90)*rotz(90);
+    iR = Rx90y90z90;
+    iT= Tx90y90z90;
+elseif ERx90y90z90_wr(end) == ER_min
+    aligned_nodes = (Rx90y90z90_wr*(nodesx90y90z90') + repmat(Tx90y90z90_wr,1,length(nodesx90y90z90')))';
+    iflip = rotx(90)*roty(90)*rotz(90);
+    iR = Rx90y90z90_wr;
+    iT= Tx90y90z90_wr;
+elseif ERx90y90z180(end) == ER_min
+    aligned_nodes = (Rx90y90z180*(nodesx90y90z180') + repmat(Tx90y90z180,1,length(nodesx90y90z180')))';
+    iflip = rotx(90)*roty(90)*rotz(180);
+    iR = Rx90y90z180;
+    iT= Tx90y90z180;
+elseif ERx90y90z180_wr(end) == ER_min
+    aligned_nodes = (Rx90y90z180_wr*(nodesx90y90z180') + repmat(Tx90y90z180_wr,1,length(nodesx90y90z180')))';
+    iflip = rotx(90)*roty(90)*rotz(180);
+    iR = Rx90y90z180_wr;
+    iT= Tx90y90z180_wr;
+elseif ERx90y90z270(end) == ER_min
+    aligned_nodes = (Rx90y90z270*(nodesx90y90z270') + repmat(Tx90y90z270,1,length(nodesx90y90z270')))';
+    iflip = rotx(90)*roty(90)*rotz(270);
+    iR = Rx90y90z270;
+    iT= Tx90y90z270;
+elseif ERx90y90z270_wr(end) == ER_min
+    aligned_nodes = (Rx90y90z270_wr*(nodesx90y90z270') + repmat(Tx90y90z270_wr,1,length(nodesx90y90z270')))';
+    iflip = rotx(90)*roty(90)*rotz(270);
+    iR = Rx90y90z270_wr;
+    iT= Tx90y90z270_wr;
 end
 
 % This loop performs an alignment for the TT CS of the talus
@@ -417,7 +621,6 @@ else
     cm_meta = [];
 end
 
-
 %% Combine all rotation and translation matricies
 RTs.iflip = iflip; % initial flip flip_out
 RTs.sflip = sflip; % secondary flip (for tibia) tib_flip
@@ -433,15 +636,15 @@ RTs.red = [];
 RTs.yellow = [];
 
 %% Visualize proper alignment
-% figure()
-% if bone_indx == 1 && bone_coord >= 2
-%     plot3(nodes_template2(:,1),nodes_template2(:,2),nodes_template2(:,3),'.k')
-% else
-%     plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-% end
-% hold on
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
+figure()
+if bone_indx == 1 && bone_coord >= 2
+    plot3(nodes_template2(:,1),nodes_template2(:,2),nodes_template2(:,3),'.k')
+else
+    plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
+end
+hold on
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
