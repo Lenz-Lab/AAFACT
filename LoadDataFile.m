@@ -1,10 +1,11 @@
 function FileData = LoadDataFile(FileName)
+% This function is used to load .k and .vtk files efficiently
 
 FileSplit = split(FileName,".");
 
 FileType = string(FileSplit(2,1));
 
-if FileType == 'xplt';
+if FileType == 'xplt'
     fid = fopen(FileName);
     temp = fgets(fid); % ignores "ASCII EXPORT"
     temp = fgets(fid); % ignores "STATE 1"
@@ -24,16 +25,7 @@ if FileType == 'k'
     FileData = [Data{1,2}, Data{1,3}, Data{1,4}]; % pulls the (x,y,z) coordinates for the nodes into a new matrix
 end
 
-% if FileType == 'xplt';
-% fid = fopen(FileName);
-% Data = textscan(fid,'%f %f', 'Delimiter',','); % fixes the spacing that happens when you ignore the first two lines and makes a matrix with jus the (x,y,z) coordinates
-% fclose(fid);
-% FileData = [Data{1,1}, Data{1,2}]; % pulls the (x,y,z) coordinates for the nodes into a new matrix
-% end
-
-%%
 if FileType == 'vtk'
-% FileName = 'C:\Ankle_IRB_065620\DJMA\AD\AD_02\AD_02_Calcaneus_groomed.vtk';
     fid = fopen(FileName);
     temp = fgets(fid); % ignores "# vtk DataFile"
     temp = fgets(fid); % ignores "vtk output"
@@ -41,13 +33,11 @@ if FileType == 'vtk'
     temp = fgets(fid); % ignores "Dataset Polydata"
     temp = fgets(fid); % ignores "Points float"
     allfiledata = textscan(fid,'%f %f %f %f %f %f %f %f %f', 'Delimiter', '\n');
-%     temp = fgets(fid); % ignores " "
     temp = fgets(fid); % ignores "Polygons"
     polfiledata = textscan(fid,'%f %f %f %f', 'Delimiter', '\n');
     fclose(fid);
     
     x = allfiledata{1,1};
-%     X = [allfiledata{1,1}; allfiledata{1,4}; allfiledata{1,7}];
     X = {allfiledata{1,1}, allfiledata{1,4}, allfiledata{1,7}};
     Y = {allfiledata{1,2}, allfiledata{1,5}, allfiledata{1,8}};
     Z = {allfiledata{1,3}, allfiledata{1,6}, allfiledata{1,9}};

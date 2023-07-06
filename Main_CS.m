@@ -194,15 +194,6 @@ for m = 1:length(all_files)
             bone_coord = 2;
         end
 
-        %% Plot Original
-%         figure()
-%         plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
-%         hold on
-%         xlabel('X')
-%         ylabel('Y')
-%         zlabel('Z')
-%         axis equal
-
         %% ICP to Template
         % Align users model to the prealigned template model. This orients the
         % model in a fashion that the superior region is in the positive Z
@@ -228,7 +219,7 @@ for m = 1:length(all_files)
         %% Reorient and Translate to Original Input Origin and Orientation
         [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes_Coords, cm_nodes, side_indx, RTs);
 
-        if bone_indx == 1 && bone_coord(n) == 3 % Talus Subtalar CS
+        if bone_indx == 1 && bone_coord(n) == 3 % Additional alignment for talus subtalar ACS
             [aligned_nodes_TST, RTs_TST] = icp_template(bone_indx, nodes, 1, better_start);
             [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1, side_indx);
 

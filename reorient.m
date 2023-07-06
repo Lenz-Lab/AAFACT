@@ -13,13 +13,10 @@ Temp_Coordinates_temp = [0 0 0; Temp_Coordinates_temp(2,:)./norm(Temp_Coordinate
 Temp_Coordinates_Unit = Temp_Coordinates_temp + Temp_Coordinates_origin;
 
 if isempty(RTs.sR_talus) == 0
-%     nodes_coords_final_i4 = (inv(RTs.sR_talus)*(Temp_Nodes_Coords'))';
-nodes_coords_final_i4 = ((RTs.sR_talus)\(Temp_Nodes_Coords'))';
+    nodes_coords_final_i4 = ((RTs.sR_talus)\(Temp_Nodes_Coords'))';
 elseif isempty(RTs.sT_tibia) == 0
     nodes_coords_final_i6 = (Temp_Nodes_Coords' - repmat(RTs.sT_tibia,1,length(Temp_Nodes_Coords')))';
-%     nodes_coords_final_i5 = (inv(RTs.sR_tibia)*(nodes_coords_final_i6'))';
     nodes_coords_final_i5 = ((RTs.sR_tibia)\(nodes_coords_final_i6'))';
-%     nodes_coords_final_i4 = ((nodes_coords_final_i5)*inv(RTs.sflip));
     nodes_coords_final_i4 = ((nodes_coords_final_i5)/(RTs.sflip));
 elseif isempty(RTs.sT_fibula) == 0
     nodes_coords_final_i6 = (Temp_Nodes_Coords' - repmat(RTs.sT_fibula,1,length(Temp_Nodes_Coords')))';

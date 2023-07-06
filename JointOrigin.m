@@ -126,7 +126,7 @@ vert1 = Temp_Nodes(conlist(:,1),:);
 vert2 = Temp_Nodes(conlist(:,2),:);
 vert3 = Temp_Nodes(conlist(:,3),:);
 
-%%
+%% Move the ACS to the desired joint using TriangleRayIntersection
 
 if AOI ~= "None"
     [intersect,~,~,~,joint_origin] = TriangleRayIntersection(current_origin, axis_direction, vert1, vert2, vert3,'lineType','line');

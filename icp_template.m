@@ -148,8 +148,6 @@ if multiplier > 1
     nodes = nodes*multiplier;
 elseif parttib_multiplier > 1 && tibfib_switch == 2 && bone_indx >= 13
     nodes = nodes*parttib_multiplier;
-% elseif parttib_multiplier > 1 && bone_indx == 14
-%     nodes = nodes*parttib_multiplier;
 end
 
 %% Performing ICP alignment

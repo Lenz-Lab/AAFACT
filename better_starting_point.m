@@ -1,9 +1,11 @@
 function better_starting_point(accurate_answer,nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx,conlist,ext)
 % This function allows the user to choose a better starting point for their
 % bone model if the icp alignment isn't working. This is only ran if you
+% run a single bone, single ACS and select that it wasn't appropriate.
 
 switch accurate_answer
     case 'No'
+        % Has the user tell the program which way the bone is facing
         screen_size = get(0, 'ScreenSize');
         fig_width = 800;
         fig_height = 600;
@@ -122,7 +124,7 @@ switch accurate_answer
         %% Reorient and Translate to Original Input Origin and Orientation
         [~, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes_Coords, cm_nodes, side_indx, RTs);
 
-        if bone_indx == 1 && bone_coord == 3 % Talus Subtalar CS
+        if bone_indx == 1 && bone_coord == 3 % Additional alignment for talus subtalar ACS
             [aligned_nodes_TST, RTs_TST] = icp_template(bone_indx, nodes, 1, better_start);
             [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1, side_indx);
 
@@ -209,22 +211,6 @@ switch accurate_answer
             "SI Axis"
             "ML Axis"];
         D = ["X" "Y" "Z"];
-
-%         if bone_indx == 1 && bone_coord == 1
-%             name = strcat('TN_',name);
-%         elseif bone_indx == 1 && bone_coord == 2
-%             name = strcat('TT_',name);
-%         elseif bone_indx == 1 && bone_coord == 3
-%             name = strcat('ST_',name);
-%         elseif bone_indx == 2 && bone_coord == 1
-%             name = strcat('CC_',name);
-%         elseif bone_indx == 2 && bone_coord == 2
-%             name = strcat('ST_',name);
-%         end
-% 
-%         if length(name) > 31
-%             name = name(1:31);
-%         end
 
         xlfilename = strcat(FolderPathName,'\CoordinateSystem_',FolderName,'.xlsx');
         writematrix(A,xlfilename,'Sheet',name);
