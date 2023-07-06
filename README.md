@@ -25,7 +25,7 @@ This code takes a bone model as an input, currently, the tibia, fibula, talus, c
 
 ## Authors
 
-* Andrew Peterson ([acpeterson96](https://github.com/acpeterson96), andrew.c.peterson@utah.edu)
+* Andrew Peterson ([Github](https://github.com/AndrewCPeters0n), [Twitter](https://twitter.com/AndrewCPeters0n), andrew.c.peterson@utah.edu)
 
 ## Version History
 
