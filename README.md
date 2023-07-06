@@ -1,10 +1,10 @@
-# AutoCoordinateSystem
+# Automatic Anatomical Foot and Ankle Coordinate Toolbox
 
-Use this code to automatically assign a coordinate system to bone models.
+Use this toolbox to automatically assign a coordinate system to bone models.
 
 ## Description
 
-This code takes a bone model, currently the tibia, fibula, talus, calcaneus, navicular, cuboid and the three cuneiforms, and automatically assigns a coordinate system. The input file type currently supported is ".k", ".stl", ".particles", ".vtk", ".ply" and the output is an .xlsx file with two different coordinate systems. The first is the starting and ending points for all three axes with the origin at the location that the user input the bone. The second is the starting and ending points for all three axes with the origin at (0,0,0).
+This code takes a bone model as an input, currently, the tibia, fibula, talus, calcaneus, navicular, cuboid, three cuneiforms, and the five metatarsals automatically assigns an anatomical coordinate system (ACS). The input file type currently supported is ".k", ".stl", ".particles", ".vtk", ".ply" and the output is an interactive figure displaying the ACS and a .xlsx file with the ACS in two different coordinate spaces. The first is the starting and ending points for all three axes, originating at the location where the user inputs the bone. The second is the starting and ending points for all three axes, originating at (0,0,0).
 
 ## Getting Started
 
@@ -14,18 +14,14 @@ This code takes a bone model, currently the tibia, fibula, talus, calcaneus, nav
 * Robotics System Toolbox
 * Phased Array System Toolbox
 
-### Installing
-
-* How/where to download your program
-* Any modifications needed to be made to files/folders
-
 ### Executing program
 
-* Create a new folder in 'C:' drive called 'AutoCoordinateSystem'
-* Execute the matlab script 'MainCS.m'
-* Select an individual bone model or a folder including the bone models
-* Ensure that folder names do not contain spaces
-* If the folder name or the file name does not contains the name of the bone and/or the laterally, you will need to manually select both of those for each bone
+* Pull the main repository
+* Execute the Matlab script 'MainCS.m'
+* Select the folder where the bone models are located
+* It is recommended to have the bone name and laterality in each file name, but it isn't necessary
+* If the file name does not contain the name of the bone and/or the laterally, you will need to manually select both of those for each bone
+* You will also be prompted to input which ACS you would like for the talus and calcaneus and the desired location of the ACS
 
 ## Authors
 
