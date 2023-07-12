@@ -184,8 +184,7 @@ for m = 1:length(all_files)
             list_joint = {'Center','Talofibular Surface'};
         end
 
-        %         [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?'," ",cs_string(n))} {''}], 'ListString', list_joint,'SelectionMode','single');
-        joint_indx = 1;
+        [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?'," ",cs_string(n))} {''}], 'ListString', list_joint,'SelectionMode','single');
 
         if (bone_indx == 13 || bone_indx == 14) && length(joint_indx) > 1
             bone_coord = 1:2;
@@ -257,7 +256,7 @@ for m = 1:length(all_files)
         end
 
         %% Transformation Matrix
-        TM = TranMat(RTs,coords_final_unit,side_indx);
+        TM = TranMat(coords_final_unit,Temp_Coordinates_Unit);
 
         %% Final Plotting
         screen_size = get(0, 'ScreenSize');
@@ -319,6 +318,7 @@ for m = 1:length(all_files)
             "SI Axis"
             "ML Axis"];
         D = ["X" "Y" "Z"];
+        E = "Transformation Matrix from Original Orientation to (0,0,0)";
 
         if bone_indx == 1 && bone_coord(n) == 1
             name = strcat('TN_',name);
@@ -342,6 +342,7 @@ for m = 1:length(all_files)
         writematrix(C,xlfilename,'Sheet',name,'Range','A5');
         writematrix(D,xlfilename,'Sheet',name,'Range','B5')
         writematrix(D,xlfilename,'Sheet',name,'Range','B10')
+        writematrix(E,xlfilename,'Sheet',name,'Range','A16')
         writematrix(coords_final_unit(1,:),xlfilename,'Sheet',name,'Range','B6');
         writematrix(coords_final_unit(2,:),xlfilename,'Sheet',name,'Range','B7');
         writematrix(coords_final_unit(4,:),xlfilename,'Sheet',name,'Range','B8');
