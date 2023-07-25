@@ -16,5 +16,32 @@ TM = eye(4);
 TM(1:3, 1:3) = R;
 TM(1:3, 4) = T;
 
-A_new = TM*B_new; % Check TM
+Rot = TM(1:3,1:3);
 
+normalizedRot = zeros(size(Rot));  % Initialize a matrix to store the normalized rows
+
+for i = 1:size(Rot, 1)
+    normalizedRot(i, :) = Rot(i, :) / norm(Rot(i, :));
+end
+
+TM(1:3, 1:3) = normalizedRot;
+
+%%
+% Rotation and scaling components
+R = A(2:4, 1:3) / B(2:4, 1:3);
+
+normalizedRot = zeros(size(R));  % Initialize a matrix to store the normalized rows
+
+for i = 1:size(R, 1)
+    normalizedRot(i, :) = R(i, :) / norm(R(i, :));
+end
+
+R = normalizedRot;
+
+% Translation components
+T = A(1, 1:3)' - R * B(1, 1:3)';
+
+% Transformation matrix
+TM = eye(4);
+TM(1:3, 1:3) = R;
+TM(1:3, 4) = T;
