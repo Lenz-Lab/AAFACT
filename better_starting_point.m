@@ -150,7 +150,7 @@ switch accurate_answer
         end
 
         %% Transformation Matrix
-        TM = TranMat(RTs,coords_final_unit,side_indx);
+        TM = TranMat(coords_final_unit,Temp_Coordinates_Unit);
 
         %% Final Plotting
         screen_size = get(0, 'ScreenSize');
