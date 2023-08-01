@@ -78,7 +78,7 @@ if bone_indx == 13 || bone_indx == 14
     max_nodes_y = (max(nodes(:,2)) - min(nodes(:,2)));
     max_nodes_z = (max(nodes(:,3)) - min(nodes(:,3)));
     max_nodes_length = max([max_nodes_x  max_nodes_y max_nodes_z]);
-    if nodes_template_length/2 > max_nodes_length % Determines if the user's model is half the length of the template model
+    if nodes_template_length/1.5 > max_nodes_length % Determines if the user's model is 2/3 the length of the template model
         temp = find(nodes_template(:,3) < (min(nodes_template(:,a)) + max_nodes_length));
         nodes_template = [nodes_template(temp,1) nodes_template(temp,2) nodes_template(temp,3)];
         x = (-20:4:10)';
