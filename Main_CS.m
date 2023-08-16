@@ -257,9 +257,9 @@ for m = 1:length(all_files)
 
         %% Transformation Matrix
         % format long
-        TM = TranMat(coords_final_unit,Temp_Coordinates_Unit);
+        TM = TranMat(coords_final);
 
-        % writematrix(TM,'test.txt')
+        writematrix(TM,'tranmat_identity9.txt')
 
         %% Final Plotting
         screen_size = get(0, 'ScreenSize');
