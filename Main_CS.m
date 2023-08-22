@@ -246,6 +246,16 @@ for m = 1:length(all_files)
                 Temp_Coordinates_Unit(5,:); ((Temp_Coordinates_Unit_TST(6,:) + Temp_Coordinates_Unit(6,:)).'/2)'];
         end
 
+        %% Similarity
+        max_Z = similaritytest(Temp_Coordinates_Unit, bone_indx, bone_coord(n));
+        crit_Z = 1.645; % alpha = 0.05
+
+        if max_Z <= crit_Z
+            fprintf(strcat('The Coordinate System is statistically SIMILAR to existing data (alpha = 0.05)\n'))
+        else
+            fprintf(strcat('The Coordinate System of is statistically DIFFERENT to existing data (alpha = 0.05)\n'))
+        end
+
         %% Final Plotting
         screen_size = get(0, 'ScreenSize');
         fig_width = 800;
