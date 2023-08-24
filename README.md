@@ -2,6 +2,10 @@
 
 Use this toolbox to automatically assign a coordinate system to bone models.
 
+## Example anatomical coordinate systems
+
+![Fig_CS_Manuscript_CoordinateSystems_v2](https://github.com/Lenz-Lab/AAFACT/assets/70289972/9beab321-2de5-40a1-9bb1-667924df24a9)
+
 ## Description
 
 This code takes a bone model as an input, currently, the tibia, fibula, talus, calcaneus, navicular, cuboid, three cuneiforms, and the five metatarsals automatically assigns an anatomical coordinate system (ACS). The input file type currently supported is ".k", ".stl", ".particles", ".vtk", ".ply" and the output is an interactive figure displaying the ACS and a .xlsx file with the ACS in two different coordinate spaces. The first is the starting and ending points for all three axes, originating at the location where the user inputs the bone. The second is the starting and ending points for all three axes, originating at (0,0,0).
