@@ -231,6 +231,7 @@ end
 close_dist = (total_distance == min(total_distance)); % closest point between third point and the long axis
 origin = [0 0 0];
 temp_origin = long_axis_points(close_dist,:); % 90 degree intersecting point between long axis and third point
+temp_origin = [mean(temp_origin(:,1)) mean(temp_origin(:,2)) mean(temp_origin(:,3))];
 
 if all(temp_origin == first_point) || all(temp_origin == second_point) || all(temp_origin == third_point)
     temp_origin = temp_origin + 0.0001;

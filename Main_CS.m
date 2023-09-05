@@ -43,7 +43,7 @@ list_bone = {'Talus', 'Calcaneus', 'Navicular', 'Cuboid', 'Medial_Cuneiform','In
 list_bone2 = {'Talus', 'Calcaneus', 'Navicular', 'Cuboid', 'Med_Cuneiform','Int_Cuneiform',...
     'Lat_Cuneiform','First_Metatarsal','Second_Metatarsal','Third_Metatarsal','Fourth_Metatarsal','Fifth_Metatarsal',...
     'Tibia','Fibula'};
-list_side_folder = {'Right','_R','Left','_L'};
+list_side_folder = {'Right','_R.','_R_','Left','_L.','_L_'};
 list_side = {'Right','Left'};
 
 %% Iterate through each model selected
@@ -184,7 +184,8 @@ for m = 1:length(all_files)
             list_joint = {'Center','Talofibular Surface'};
         end
 
-        [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?'," ",cs_string(n))} {''}], 'ListString', list_joint,'SelectionMode','single');
+        % [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?'," ",cs_string(n))} {''}], 'ListString', list_joint,'SelectionMode','single');
+        joint_indx = 1;
 
         if (bone_indx == 13 || bone_indx == 14) && length(joint_indx) > 1
             bone_coord = 1:2;
@@ -251,9 +252,9 @@ for m = 1:length(all_files)
         crit_Z = 1.645; % alpha = 0.05
 
         if max_Z <= crit_Z
-            fprintf(strcat('The Coordinate System is statistically SIMILAR to existing data (alpha = 0.05)\n'))
+            fprintf(strcat('The Coordinate System is SIMILAR to existing data\n'))
         else
-            fprintf(strcat('The Coordinate System of is statistically DIFFERENT to existing data (alpha = 0.05)\n'))
+            fprintf(strcat('The Coordinate System may be DIFFERENT than existing data, double check figure\n'))
         end
 
         %% Final Plotting
