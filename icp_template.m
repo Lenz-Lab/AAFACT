@@ -438,7 +438,7 @@ RTs.yellow = [];
 %     plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
 % end
 % hold on
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.g')
+% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.b')
 % xlabel('X')
 % ylabel('Y')
 % zlabel('Z')

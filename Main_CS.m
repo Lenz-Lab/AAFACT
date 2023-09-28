@@ -108,9 +108,9 @@ for m = 1:length(all_files)
 
     % If the folder and the file don't have the bone side, the user must select
     % the bone side
-    if exist('side_folder_indx','var') && side_folder_indx <= 2
+    if exist('side_folder_indx','var') && side_folder_indx <= 3
         side_indx = 1;
-    elseif exist('side_folder_indx','var') && side_folder_indx >= 3
+    elseif exist('side_folder_indx','var') && side_folder_indx >= 4
         side_indx = 2;
     else
         [side_indx,~] = listdlg('PromptString', [{strcat('Select which side this file is:'," ",string(FileName))} {''}], 'ListString', list_side,'SelectionMode','single');
@@ -184,8 +184,7 @@ for m = 1:length(all_files)
             list_joint = {'Center','Talofibular Surface'};
         end
 
-        % [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?'," ",cs_string(n))} {''}], 'ListString', list_joint,'SelectionMode','single');
-        joint_indx = 1;
+        [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?'," ",cs_string(n))} {''}], 'ListString', list_joint,'SelectionMode','single');
 
         if (bone_indx == 13 || bone_indx == 14) && length(joint_indx) > 1
             bone_coord = 1:2;
