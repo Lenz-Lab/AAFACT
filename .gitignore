@@ -171,7 +171,6 @@ octave-workspace
 *.dylib
 
 # Executables
-*.exe
 
 # Metadata
 *.aliases
