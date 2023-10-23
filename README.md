@@ -38,7 +38,7 @@ This code takes a bone model as an input, currently, the tibia, fibula, talus, c
 
 ## License
 
-This project is licensed under the Creative Commons Zero License.
+This project is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives (CC BY-NC-ND).
 
 ## Acknowledgments
 
