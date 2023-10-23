@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration file="C:\Users\arcanine\Github\AAFACT\AAFACT.prj" location="C:\Users\arcanine\Github\AAFACT" name="AAFACT" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="2753180376" file="C:\Users\arcanine\Github\AAFACT\AAFACT.prj" location="C:\Users\arcanine\Github\AAFACT" name="AAFACT" preferred-package-location="C:\Users\arcanine\Github\AAFACT\AAFACT\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>AAFACT</param.appname>
     <param.icon />
     <param.icons />
@@ -24,8 +24,8 @@
     <param.user.defined.mcr.options />
     <param.target.type>subtarget.standalone</param.target.type>
     <param.support.packages />
-    <param.web.mcr>true</param.web.mcr>
-    <param.package.mcr>false</param.package.mcr>
+    <param.web.mcr>false</param.web.mcr>
+    <param.package.mcr>true</param.package.mcr>
     <param.no.mcr>false</param.no.mcr>
     <param.web.mcr.name>MyAppInstaller_web</param.web.mcr.name>
     <param.package.mcr.name>MyAppInstaller_mcr</param.package.mcr.name>
@@ -64,8 +64,6 @@
       <param.user.defined.mcr.options />
       <param.target.type />
       <param.support.packages />
-      <param.web.mcr />
-      <param.package.mcr />
       <param.no.mcr />
       <param.web.mcr.name />
       <param.package.mcr.name />
