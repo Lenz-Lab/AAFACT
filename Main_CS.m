@@ -130,8 +130,12 @@ for m = 1:length(all_files)
     elseif ext == ".ply"
         ptCloud = pcread(FileName);
         nodes = ptCloud.Location;
+    elseif ext == ".obj"
+        obj = readObj(FileName);
+        nodes = obj.v;
+        conlist = obj.f.v;
     else
-        disp('This is not an acceptable file type at this time, please choose either a ".k", ".stl", ".vtk", ".ply" or ".particles" file type.')
+        disp('This is not an acceptable file type at this time, please choose either a ".k", ".stl", ".vtk", ".obj", ".ply" or ".particles" file type.')
         return
     end
 
