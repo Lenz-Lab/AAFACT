@@ -14,14 +14,30 @@ This code takes a bone model as an input, currently, the tibia, fibula, talus, c
 
 ### Dependencies
 
+If you want to run it in MATLAB:
 * MATLAB R2020B or later
 * Robotics System Toolbox
 * Phased Array System Toolbox
 
+If you want to run it outside of MATLAB:
+* No dependencies
+
 ### Executing program
 
+If you want to run it in MATLAB:
 * Pull the main repository
 * Execute the Matlab script 'MainCS.m'
+* Select the folder where the bone models are located
+* It is recommended to have the bone name and laterality in each file name, but it isn't necessary
+* If the file name does not contain the name of the bone and/or the laterally, you will need to manually select both of those for each bone
+* You will also be prompted to input which ACS you would like for the talus and calcaneus and the desired location of the ACS
+
+If you want to run it outside of MATLAB:
+* Navigate to "AAFACT_App" folder on GitHub repository
+* Download "AAFACT_Install.exe"
+* Follow install instructions (this will take a bit the first time, every future application update should be faster)
+* Once installed, navigate to the the install location (typically this is in your program files directory, where other applications are)
+* Within "application", run AAFACT application
 * Select the folder where the bone models are located
 * It is recommended to have the bone name and laterality in each file name, but it isn't necessary
 * If the file name does not contain the name of the bone and/or the laterally, you will need to manually select both of those for each bone
@@ -38,7 +54,7 @@ This code takes a bone model as an input, currently, the tibia, fibula, talus, c
 
 ## License
 
-This project is licensed under the Creative Commons Zero License.
+This project is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives (CC BY-NC-ND).
 
 ## Acknowledgments
 

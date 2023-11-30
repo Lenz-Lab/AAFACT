@@ -7,7 +7,6 @@ function [aligned_nodes, RTs] = icp_template(bone_indx,nodes,bone_coord,better_s
 % position.
 
 %% Read in Template Bone
-addpath('Template_Bones')
 if bone_indx == 1 && bone_coord == 1 % TN
     TR_template = stlread('Talus_Template.stl');
     a = 2;

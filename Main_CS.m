@@ -20,7 +20,6 @@ clear, clc, close all
 
 % Determine the files in the folder selected
 FolderPathName = uigetdir('*.*', 'Select folder with your bones');
-addpath(FolderPathName)
 files = dir(fullfile(FolderPathName, '*.*'));
 files = files(~ismember({files.name},{'.','..'}));
 
@@ -117,18 +116,19 @@ for m = 1:length(all_files)
     end
 
     %% Load in file based on file type
+
     if ext == ".k"
-        nodes = LoadDataFile(FileName);
+        nodes = LoadDataFile(strcat(FolderPathName,'\',FileName));
     elseif ext == ".stl"
-        TR = stlread(FileName);
+        TR = stlread(strcat(FolderPathName,'\',FileName));
         nodes = TR.Points;
         conlist = TR.ConnectivityList;
     elseif ext == ".particles"
-        nodes = load(FileName);
+        nodes = load(strcat(FolderPathName,'\',FileName));
     elseif ext == ".vtk"
-        nodes = LoadDataFile(FileName);
+        nodes = LoadDataFile(strcat(FolderPathName,'\',FileName));
     elseif ext == ".ply"
-        ptCloud = pcread(FileName);
+        ptCloud = pcread(strcat(FolderPathName,'\',FileName));
         nodes = ptCloud.Location;
     elseif ext == ".obj"
         obj = readObj(FileName);
