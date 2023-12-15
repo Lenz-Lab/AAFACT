@@ -219,23 +219,23 @@ else % Cuneiforms, Metatarsals, Calcaneus, Cuboid, Talus
     third_point = av_positive_z_nth;
 end
 
-long_axis_slope = first_point - second_point; % slope of long axis
-discretize = (0:0.0000001:1)';
-long_axis_points = second_point + discretize*long_axis_slope; % points along the long axis
+origin = [0,0,0];
 
-total_distance = zeros([length(discretize),1]);
-for i = 1:length(long_axis_points)
-    total_distance(i,:) = norm(third_point - long_axis_points(i,:)); % find the distances between the third point and the long axis
-end
+% Define the primary axis based on first_point and second_point
+primary_axis_vector = first_point - second_point;
+primary_axis_unit = primary_axis_vector / norm(primary_axis_vector); % Normalize
 
-close_dist = (total_distance == min(total_distance)); % closest point between third point and the long axis
-origin = [0 0 0];
-temp_origin = long_axis_points(close_dist,:); % 90 degree intersecting point between long axis and third point
-temp_origin = [mean(temp_origin(:,1)) mean(temp_origin(:,2)) mean(temp_origin(:,3))];
+% Project the third_point onto the primary axis to find the closest point
+projection_length = dot(third_point - second_point, primary_axis_unit);
+closest_point_on_primary = second_point + projection_length * primary_axis_unit;
 
-if all(temp_origin == first_point) || all(temp_origin == second_point) || all(temp_origin == third_point)
-    temp_origin = temp_origin + 0.0001;
-end
+% Define the secondary axis
+secondary_axis_vector = third_point - closest_point_on_primary;
+secondary_axis_unit = secondary_axis_vector / norm(secondary_axis_vector); % Normalize
+
+% Define the tertiary axis as cross product of primary and secondary axes
+tertiary_axis_vector = cross(primary_axis_unit, secondary_axis_unit);
+tertiary_axis_unit = tertiary_axis_vector / norm(tertiary_axis_vector); % Normalize
 
 if side_indx == 1
     ml = -1;
@@ -243,21 +243,19 @@ else
     ml = 1;
 end
 
+% Adjust axes based on bone index and side index
 if bone_indx == 3 % Navicular
-    ML_vector_points = ml*[origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
-    normal_vector = cross(ML_vector_points(2,:), SI_vector_points(2,:));
-    AP_vector_points = -ml*[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
+    ML_vector_points = ml*[origin; origin + 50 * primary_axis_unit];
+    SI_vector_points = [origin; origin + 50 * secondary_axis_unit];
+    AP_vector_points = -ml*[origin; origin + 50 * tertiary_axis_unit];
 elseif bone_indx == 13 || bone_indx == 14 % Tibia, Fibula
-    SI_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    ML_vector_points = -ml*[origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
-    normal_vector = cross(ML_vector_points(2,:), SI_vector_points(2,:));
-    AP_vector_points = -ml*[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
-else % Cuneiforms, Metatarsals, Calcaneus, Cuboid, TN Talus
-    AP_vector_points = [origin; ((first_point - temp_origin)/norm(first_point - temp_origin))*50];
-    SI_vector_points = [origin; ((third_point - temp_origin)/norm(third_point - temp_origin))*50];
-    normal_vector = cross(AP_vector_points(2,:), SI_vector_points(2,:));
-    ML_vector_points = ml*[origin; ((normal_vector - temp_origin)/norm(normal_vector - temp_origin))*50];
+    SI_vector_points = [origin; origin + 50 * primary_axis_unit];
+    ML_vector_points = -ml*[origin; origin + 50 * secondary_axis_unit];
+    AP_vector_points = -ml*[origin; origin + 50 * tertiary_axis_unit];
+else % Cuneiforms, Metatarsals, Calcaneus, Cuboid, Talus
+    AP_vector_points = [origin; origin + 50 * primary_axis_unit];
+    SI_vector_points = [origin; origin + 50 * secondary_axis_unit];
+    ML_vector_points = ml*[origin; origin + 50 * tertiary_axis_unit];
 end
 
 % figure()
