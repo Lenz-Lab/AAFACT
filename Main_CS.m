@@ -131,7 +131,7 @@ for m = 1:length(all_files)
         ptCloud = pcread(strcat(FolderPathName,'\',FileName));
         nodes = ptCloud.Location;
     elseif ext == ".obj"
-        obj = readObj(FileName);
+        obj = readObj(strcat(FolderPathName,'\',FileName));
         nodes = obj.v;
         conlist = obj.f.v;
     else
