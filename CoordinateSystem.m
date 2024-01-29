@@ -247,11 +247,11 @@ end
 if bone_indx == 3 % Navicular
     ML_vector_points = ml*[origin; origin + 50 * primary_axis_unit];
     SI_vector_points = [origin; origin + 50 * secondary_axis_unit];
-    AP_vector_points = -ml*[origin; origin + 50 * tertiary_axis_unit];
+    AP_vector_points = -[origin; origin + 50 * tertiary_axis_unit];
 elseif bone_indx == 13 || bone_indx == 14 % Tibia, Fibula
     SI_vector_points = [origin; origin + 50 * primary_axis_unit];
     ML_vector_points = -ml*[origin; origin + 50 * secondary_axis_unit];
-    AP_vector_points = -ml*[origin; origin + 50 * tertiary_axis_unit];
+    AP_vector_points = -[origin; origin + 50 * tertiary_axis_unit];
 else % Cuneiforms, Metatarsals, Calcaneus, Cuboid, Talus
     AP_vector_points = [origin; origin + 50 * primary_axis_unit];
     SI_vector_points = [origin; origin + 50 * secondary_axis_unit];
