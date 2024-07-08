@@ -37,7 +37,8 @@ elseif bone_indx == 2 % Calcaneus
 elseif bone_indx == 3 % Navicular
     n = 5;
 elseif bone_indx == 4 % Cuboid
-    n = 5;
+    n = 6;
+    % n = 5
 elseif bone_indx >= 5 && bone_indx <= 7 % Cuneiforms
     n = 3;
 elseif bone_indx >= 8 && bone_indx <= 12 % Metatarsals
