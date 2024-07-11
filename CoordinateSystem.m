@@ -1,4 +1,4 @@
-function [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,side_indx)
+function [Temp_Coordinates, Temp_Nodes, MDTA, TLSA, SVA] = CoordinateSystem(aligned_nodes,bone_indx,bone_coord,side_indx)
 % This function produces the coordinate system for the users bone in the
 % temporarily aligned orientation.
 
@@ -51,6 +51,60 @@ nth_y = range_y/n;
 nth_z = range_z/n;
 
 %% Positive Y Nth ROI
+nth_y = range_y/10;
+
+positive_y_nth = y_max - nth_y;
+
+positive_y_nth_ROI = aligned_nodes(:,2) >= positive_y_nth;
+
+positive_y_nth_x = nonzeros(aligned_nodes(:,1).*positive_y_nth_ROI);
+positive_y_nth_y = nonzeros(aligned_nodes(:,2).*positive_y_nth_ROI);
+positive_y_nth_z = nonzeros(aligned_nodes(:,3).*positive_y_nth_ROI);
+
+av_positive_y_nth_x = mean(positive_y_nth_x);
+av_positive_y_nth_y = mean(positive_y_nth_y);
+av_positive_y_nth_z = mean(positive_y_nth_z);
+
+av_positive_y_nth_tlsa = [av_positive_y_nth_x,av_positive_y_nth_y,av_positive_y_nth_z];
+
+figure()
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
+hold on
+plot3(positive_y_nth_x,positive_y_nth_y,positive_y_nth_z,'ys')
+plot3(av_positive_y_nth_x,av_positive_y_nth_y,av_positive_y_nth_z,'r.','MarkerSize',50)
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
+
+%% Negative Y nth ROI
+negative_y_nth = y_min + nth_y;
+
+negative_y_nth_ROI = aligned_nodes(:,2) <= negative_y_nth;
+
+negative_y_nth_x = nonzeros(aligned_nodes(:,1).*negative_y_nth_ROI);
+negative_y_nth_y = nonzeros(aligned_nodes(:,2).*negative_y_nth_ROI);
+negative_y_nth_z = nonzeros(aligned_nodes(:,3).*negative_y_nth_ROI);
+
+av_negative_y_nth_x = mean(negative_y_nth_x);
+av_negative_y_nth_y = mean(negative_y_nth_y);
+av_negative_y_nth_z = mean(negative_y_nth_z);
+
+av_negative_y_nth_tlsa = [av_negative_y_nth_x,av_negative_y_nth_y,av_negative_y_nth_z];
+
+figure()
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
+hold on
+plot3(negative_y_nth_x,negative_y_nth_y,negative_y_nth_z,'ys')
+plot3(av_negative_y_nth_x,av_negative_y_nth_y,av_negative_y_nth_z,'r.','MarkerSize',50)
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
+
+%% Positive Y Nth ROI
+nth_y = range_y/n;
+
 positive_y_nth = y_max - nth_y;
 
 positive_y_nth_ROI = aligned_nodes(:,2) >= positive_y_nth;
@@ -65,15 +119,15 @@ av_positive_y_nth_z = mean(positive_y_nth_z);
 
 av_positive_y_nth = [av_positive_y_nth_x,av_positive_y_nth_y,av_positive_y_nth_z];
 
-% figure()
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
-% hold on
-% plot3(positive_y_nth_x,positive_y_nth_y,positive_y_nth_z,'ys')
-% plot3(av_positive_y_nth_x,av_positive_y_nth_y,av_positive_y_nth_z,'r.','MarkerSize',50)
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
+figure()
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
+hold on
+plot3(positive_y_nth_x,positive_y_nth_y,positive_y_nth_z,'ys')
+plot3(av_positive_y_nth_x,av_positive_y_nth_y,av_positive_y_nth_z,'r.','MarkerSize',50)
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
 
 %% Negative Y nth ROI
 negative_y_nth = y_min + nth_y;
@@ -90,15 +144,15 @@ av_negative_y_nth_z = mean(negative_y_nth_z);
 
 av_negative_y_nth = [av_negative_y_nth_x,av_negative_y_nth_y,av_negative_y_nth_z];
 
-% figure()
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
-% hold on
-% plot3(negative_y_nth_x,negative_y_nth_y,negative_y_nth_z,'ys')
-% plot3(av_negative_y_nth_x,av_negative_y_nth_y,av_negative_y_nth_z,'r.','MarkerSize',50)
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
+figure()
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
+hold on
+plot3(negative_y_nth_x,negative_y_nth_y,negative_y_nth_z,'ys')
+plot3(av_negative_y_nth_x,av_negative_y_nth_y,av_negative_y_nth_z,'r.','MarkerSize',50)
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
 
 %% Positive Z nth ROI
 positive_z_nth = z_max - nth_z;
@@ -115,15 +169,15 @@ av_positive_z_nth_z = mean(positive_z_nth_z);
 
 av_positive_z_nth = [av_positive_z_nth_x,av_positive_z_nth_y,av_positive_z_nth_z];
 
-% figure()
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
-% hold on
-% plot3(positive_z_nth_x,positive_z_nth_y,positive_z_nth_z,'ys')
-% plot3(av_positive_z_nth_x,av_positive_z_nth_y,av_positive_z_nth_z,'r.','MarkerSize',50)
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
+figure()
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
+hold on
+plot3(positive_z_nth_x,positive_z_nth_y,positive_z_nth_z,'ys')
+plot3(av_positive_z_nth_x,av_positive_z_nth_y,av_positive_z_nth_z,'r.','MarkerSize',50)
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
 
 %% Negative Z nth ROI
 negative_z_nth = z_min + nth_z;
@@ -140,15 +194,15 @@ av_negative_z_nth_z = mean(negative_z_nth_z);
 
 av_negative_z_nth = [av_negative_z_nth_x,av_negative_z_nth_y,av_negative_z_nth_z];
 
-% figure()
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
-% hold on
-% plot3(negative_z_nth_x,negative_z_nth_y,negative_z_nth_z,'ys')
-% plot3(av_negative_z_nth_x,av_negative_z_nth_y,av_negative_z_nth_z,'r.','MarkerSize',50)
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
+figure()
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
+hold on
+plot3(negative_z_nth_x,negative_z_nth_y,negative_z_nth_z,'ys')
+plot3(av_negative_z_nth_x,av_negative_z_nth_y,av_negative_z_nth_z,'r.','MarkerSize',50)
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
 
 %% Negative X nth ROI
 negative_x_nth = x_min + nth_x;
@@ -165,15 +219,15 @@ av_negative_x_nth_z = mean(negative_x_nth_z);
 
 av_negative_x_nth = [av_negative_x_nth_x,av_negative_x_nth_y,av_negative_x_nth_z];
 
-% figure()
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
-% hold on
-% plot3(negative_x_nth_x,negative_x_nth_y,negative_x_nth_z,'ys')
-% plot3(av_negative_x_nth_x,av_negative_x_nth_y,av_negative_x_nth_z,'r.','MarkerSize',50)
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
+figure()
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
+hold on
+plot3(negative_x_nth_x,negative_x_nth_y,negative_x_nth_z,'ys')
+plot3(av_negative_x_nth_x,av_negative_x_nth_y,av_negative_x_nth_z,'r.','MarkerSize',50)
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
 
 %% Positive X nth ROI
 positive_x_nth = x_max - nth_x;
@@ -190,15 +244,15 @@ av_positive_x_nth_z = mean(positive_x_nth_z);
 
 av_positive_x_nth = [av_positive_x_nth_x,av_positive_x_nth_y,av_positive_x_nth_z];
 
-% figure()
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
-% hold on
-% plot3(positive_x_nth_x,positive_x_nth_y,positive_x_nth_z,'ys')
-% plot3(av_positive_x_nth_x,av_positive_x_nth_y,av_positive_x_nth_z,'r.','MarkerSize',50)
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
+figure()
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
+hold on
+plot3(positive_x_nth_x,positive_x_nth_y,positive_x_nth_z,'ys')
+plot3(av_positive_x_nth_x,av_positive_x_nth_y,av_positive_x_nth_z,'r.','MarkerSize',50)
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
 
 %% Raw Axis Calculation
 if bone_indx == 3 % Navicular
@@ -217,6 +271,20 @@ else % Cuneiforms, Metatarsals, Calcaneus, Cuboid, Talus
     first_point = av_positive_y_nth;
     second_point = av_negative_y_nth;
     third_point = av_positive_z_nth;
+end
+
+if bone_indx == 13
+    MDTA = [av_negative_x_nth; av_positive_x_nth];
+    TLSA = [av_negative_y_nth_tlsa; av_positive_y_nth_tlsa];
+else
+    MDTA = [0,0,0; 0,0,0];
+    TLSA = MDTA;
+end
+
+if bone_indx == 2
+    SVA = av_negative_z_nth;
+else
+    SVA = [0,0,0];
 end
 
 origin = [0,0,0];
@@ -258,29 +326,29 @@ else % Cuneiforms, Metatarsals, Calcaneus, Cuboid, Talus
     ML_vector_points = ml*[origin; origin + 50 * tertiary_axis_unit];
 end
 
-% figure()
-% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
-% % plot3(nodes_aligned_original(:,1),nodes_aligned_original(:,2),nodes_aligned_original(:,3),'.k')
-% hold on
-% plot3(AP_vector_points(:,1),AP_vector_points(:,2),AP_vector_points(:,3),'r')
-% plot3(SI_vector_points(:,1),SI_vector_points(:,2),SI_vector_points(:,3),'g')
-% plot3(ML_vector_points(:,1),ML_vector_points(:,2),ML_vector_points(:,3),'b')
-% plot3(0,0,0,'ys')
-% plot3(first_point(:,1),first_point(:,2),first_point(:,3),'rs','MarkerSize',20)
-% plot3(second_point(:,1),second_point(:,2),second_point(:,3),'bs','MarkerSize',20)
-% plot3(third_point(:,1),third_point(:,2),third_point(:,3),'gs','MarkerSize',20)
-% legend('Nodal Points','AP Axis','SI Axis','ML Axis')
-% text(AP_vector_points(2,1),AP_vector_points(2,2),AP_vector_points(2,3),'Anterior','HorizontalAlignment','left','FontSize',10,'Color','r');
-% text(SI_vector_points(2,1),SI_vector_points(2,2),SI_vector_points(2,3),'Superior','HorizontalAlignment','left','FontSize',10,'Color','g');
-% if side_indx == 1
-%     text(ML_vector_points(2,1),ML_vector_points(2,2),ML_vector_points(2,3),'Lateral','HorizontalAlignment','left','FontSize',10,'Color','b');
-% else
-%     text(ML_vector_points(2,1),ML_vector_points(2,2),ML_vector_points(2,3),'Medial','HorizontalAlignment','left','FontSize',10,'Color','b');
-% end
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
+figure()
+plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'k.')
+% plot3(nodes_aligned_original(:,1),nodes_aligned_original(:,2),nodes_aligned_original(:,3),'.k')
+hold on
+plot3(AP_vector_points(:,1),AP_vector_points(:,2),AP_vector_points(:,3),'r')
+plot3(SI_vector_points(:,1),SI_vector_points(:,2),SI_vector_points(:,3),'g')
+plot3(ML_vector_points(:,1),ML_vector_points(:,2),ML_vector_points(:,3),'b')
+plot3(0,0,0,'ys')
+plot3(first_point(:,1),first_point(:,2),first_point(:,3),'rs','MarkerSize',20)
+plot3(second_point(:,1),second_point(:,2),second_point(:,3),'bs','MarkerSize',20)
+plot3(third_point(:,1),third_point(:,2),third_point(:,3),'gs','MarkerSize',20)
+legend('Nodal Points','AP Axis','SI Axis','ML Axis')
+text(AP_vector_points(2,1),AP_vector_points(2,2),AP_vector_points(2,3),'Anterior','HorizontalAlignment','left','FontSize',10,'Color','r');
+text(SI_vector_points(2,1),SI_vector_points(2,2),SI_vector_points(2,3),'Superior','HorizontalAlignment','left','FontSize',10,'Color','g');
+if side_indx == 1
+    text(ML_vector_points(2,1),ML_vector_points(2,2),ML_vector_points(2,3),'Lateral','HorizontalAlignment','left','FontSize',10,'Color','b');
+else
+    text(ML_vector_points(2,1),ML_vector_points(2,2),ML_vector_points(2,3),'Medial','HorizontalAlignment','left','FontSize',10,'Color','b');
+end
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal
 
 %% Output Axes and Rotation Index
 Temp_Coordinates = [AP_vector_points([1,2],:)

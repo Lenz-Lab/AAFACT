@@ -208,7 +208,7 @@ for m = 1:length(all_files)
         [aligned_nodes, RTs] = icp_template(bone_indx, nodes, bone_coord(n), better_start);
 
         %% Performs coordinate system calculation
-        [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord(n),side_indx);
+        [Temp_Coordinates, Temp_Nodes, MDTA, TLSA, SVA] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord(n),side_indx);
 
         %% Joint Origin
         if joint_indx > 1
@@ -218,10 +218,10 @@ for m = 1:length(all_files)
         end
 
         %% Temporarily Attach Coordinate System
-        Temp_Nodes_Coords = [Temp_Nodes; Temp_Coordinates];
+        Temp_Nodes_Coords = [Temp_Nodes; Temp_Coordinates; MDTA; TLSA; SVA];
 
         %% Reorient and Translate to Original Input Origin and Orientation
-        [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes_Coords, cm_nodes, side_indx, RTs);
+        [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit, MDTA_final, TLSA_final, SVA_final] = reorient(Temp_Nodes_Coords, cm_nodes, side_indx, RTs);
 
         if bone_indx == 1 && bone_coord(n) == 3 % Additional alignment for talus subtalar ACS
             [aligned_nodes_TST, RTs_TST] = icp_template(bone_indx, nodes, 1, better_start);
@@ -351,6 +351,14 @@ for m = 1:length(all_files)
         writematrix(Temp_Coordinates_Unit(2,:),xlfilename,'Sheet',name,'Range','B12');
         writematrix(Temp_Coordinates_Unit(4,:),xlfilename,'Sheet',name,'Range','B13');
         writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
+
+
+        if bone_indx == 13
+            writematrix(MDTA_final,xlfilename,'Sheet',name,'Range','B16');
+            writematrix(TLSA_final,xlfilename,'Sheet',name,'Range','B18');
+        elseif bone_indx == 2 && bone_coord == 1
+            writematrix(SVA_final,xlfilename,'Sheet',name,'Range','B16');
+        end
 
         %% Better Starting Point
         if length(all_files) == 1 && length(bone_coord) == 1
