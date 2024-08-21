@@ -6,6 +6,7 @@ function [aligned_nodes, RTs] = icp_template(bone_indx,nodes,bone_coord,better_s
 % choosing a better starting point the icp code doesn't undo the chosen
 % position.
 
+addpath('Template_Bones\')
 %% Read in Template Bone
 if bone_indx == 1 && bone_coord == 1 % TN
     TR_template = stlread('Talus_Template.stl');
