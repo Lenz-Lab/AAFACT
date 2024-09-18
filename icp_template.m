@@ -69,15 +69,23 @@ end
 nodes_template = TR_template.Points;
 con_temp = TR_template.ConnectivityList;
 
+max_nodes_x = (max(nodes(:,1)) - min(nodes(:,1)));
+max_nodes_y = (max(nodes(:,2)) - min(nodes(:,2)));
+max_nodes_z = (max(nodes(:,3)) - min(nodes(:,3)));
+max_nodes_length = max([max_nodes_x  max_nodes_y max_nodes_z]);
+
+if max_nodes_x == max_nodes_length
+    b = 1;
+elseif max_nodes_y == max_nodes_length
+    b = 2;
+elseif max_nodes_z == max_nodes_length
+    b = 3;
+end
 
 %% Adjusting the cropped/smaller models
 % Creates similar sized models for cropped tibia or fibula
 if bone_indx == 13 || bone_indx == 14
     nodes_template_length = (max(nodes_template(:,a)) - min(nodes_template(:,a)));
-    max_nodes_x = (max(nodes(:,1)) - min(nodes(:,1)));
-    max_nodes_y = (max(nodes(:,2)) - min(nodes(:,2)));
-    max_nodes_z = (max(nodes(:,3)) - min(nodes(:,3)));
-    max_nodes_length = max([max_nodes_x  max_nodes_y max_nodes_z]);
     if nodes_template_length/1.5 > max_nodes_length % Determines if the user's model is 2/3 the length of the template model
         temp = find(nodes_template(:,3) < (min(nodes_template(:,a)) + max_nodes_length));
         nodes_template = [nodes_template(temp,1) nodes_template(temp,2) nodes_template(temp,3)];
@@ -117,7 +125,6 @@ end
 % Similar process as above for cropped metatarsals
 if bone_indx >= 8 && bone_indx <= 12
     nodes_template_length = (max(nodes_template(:,a)) - min(nodes_template(:,a)));
-    max_nodes_length = max([(max(nodes(:,1)) - min(nodes(:,1))) (max(nodes(:,2)) - min(nodes(:,2))) (max(nodes(:,3)) - min(nodes(:,3)))]);
     if nodes_template_length/1.25 > max_nodes_length
         temp = find(nodes_template(:,2) < (min(nodes_template(:,a)) + max_nodes_length));
         nodes_template = [nodes_template(temp,1) nodes_template(temp,2) nodes_template(temp,3)];
@@ -139,7 +146,7 @@ if bone_indx >= 8 && bone_indx <= 12
 end
 
 % Determines maximum axis of bone model and compares it to the template
-multiplier = (max(nodes_template(:,a)) - min(nodes_template(:,a)))/(max(nodes(:,a)) - min(nodes(:,a)));
+multiplier = (max(nodes_template(:,a)) - min(nodes_template(:,a)))/(max(nodes(:,b)) - min(nodes(:,b)));
 parttib_multiplier = (max(nodes_template(:,1)) - min(nodes_template(:,1)))/(max(nodes(:,1)) - min(nodes(:,1)));
 
 % If the users model is smaller than the template, then this temporarly
@@ -155,163 +162,169 @@ end
 % Two different icp approaches are used, the first includeds the faces and
 % the second is just the points.
 
+format long g
 iterations = 200;
-[R1,T1,ER1] = icp(nodes_template',nodes', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-[R1_0,T1_0,ER1_0] = icp(nodes_template',nodes', iterations,'Matching','kDtree','WorstRejection',0.1);
+
+% Rotations
+r.r0 = eye(3);
+r.rx = rotx(90);
+r.rxx = rotx(180);
+r.rxxx = rotx(270);
+r.ry = roty(90);
+r.ryy = roty(180);
+r.ryyy = roty(270);
+r.rz = rotz(90);
+r.rzz = rotz(180);
+r.rzzz = rotz(270);
+
+r.rxy = rotx(90) * roty(90);
+r.rxyy = rotx(90) * roty(180);
+r.rxyyy = rotx(90) * roty(270);
+
+r.rxxy = rotx(180) * roty(90);
+r.rxxyy = rotx(180) * roty(180);
+r.rxxyyy = rotx(180) * roty(270);
+
+r.rxxxy = rotx(270) * roty(90);
+r.rxxxyy = rotx(270) * roty(180);
+r.rxxxyyy = rotx(270) * roty(270);
+
+r.rxz = rotx(90) * rotz(90);
+r.rxzz = rotx(90) * rotz(180);
+r.rxzzz = rotx(90) * rotz(270);
+
+r.rxxz = rotx(180) * rotz(90);
+r.rxxzz = rotx(180) * rotz(180);
+r.rxxzzz = rotx(180) * rotz(270);
+
+r.rxxxz = rotx(270) * rotz(90);
+r.rxxxzz = rotx(270) * rotz(180);
+r.rxxxzzz = rotx(270) * rotz(270);
+
+r.ryx = roty(90) * rotx(90);
+r.ryxx = roty(90) * rotx(180);
+r.ryxxx = roty(90) * rotx(270);
+
+r.ryyx = roty(180) * rotx(90);
+r.ryyxx = roty(180) * rotx(180);
+r.ryyxxx = roty(180) * rotx(270);
+
+r.ryyyx = roty(270) * rotx(90);
+r.ryyyxx = roty(270) * rotx(180);
+r.ryyyxxx = roty(270) * rotx(270);
+
+r.ryz = roty(90) * rotz(90);
+r.ryzz = roty(90) * rotz(180);
+r.ryzzz = roty(90) * rotz(270);
+
+r.ryyz = roty(180) * rotz(90);
+r.ryyzz = roty(180) * rotz(180);
+r.ryyzzz = roty(180) * rotz(270);
+
+r.ryyyz = roty(270) * rotz(90);
+r.ryyyzz = roty(270) * rotz(180);
+r.ryyyzzz = roty(270) * rotz(270);
+
+r.rzx = rotz(90) * rotx(90);
+r.rzxx = rotz(90) * rotx(180);
+r.rzxxx = rotz(90) * rotx(270);
+
+r.rzzx = rotz(180) * rotx(90);
+r.rzzxx = rotz(180) * rotx(180);
+r.rzzxxx = rotz(180) * rotx(270);
+
+r.rzzzx = rotz(270) * rotx(90);
+r.rzzzxx = rotz(270) * rotx(180);
+r.rzzzxxx = rotz(270) * rotx(270);
+
+r.rzy = rotz(90) * roty(90);
+r.rzyy = rotz(90) * roty(180);
+r.rzyyy = rotz(90) * roty(270);
+
+r.rzzy = rotz(180) * roty(90);
+r.rzzyy = rotz(180) * roty(180);
+r.rzzyyy = rotz(180) * roty(270);
+
+r.rzzzy = rotz(270) * roty(90);
+r.rzzzyy = rotz(270) * roty(180);
+r.rzzzyyy = rotz(270) * roty(270);
+
+fields = fieldnames(r);
+
+if better_start == 2
+    field_name = fields{1};
+    [R_temp,T_temp,E_temp] = icp(nodes_template',nodes', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    [Rwr_temp,Twr_temp,Ewr_temp] = icp(nodes_template',nodes', iterations,'Matching','kDtree','WorstRejection',0.1);
+    if E_temp(end) < Ewr_temp(end)
+        R.(field_name) = R_temp;
+        T.(field_name) = T_temp;
+        E.(field_name) = E_temp(end);
+    else
+        R.(field_name) = Rwr_temp;
+        T.(field_name) = Twr_temp;
+        E.(field_name) = Ewr_temp(end);
+    end
+end
 
 if better_start == 1
-    
-    % The users model is rotated about the z axis and realigned
-    nodesz90 = nodes*rotz(90);
-    nodesz180 = nodes*rotz(180);
-    nodesz270 = nodes*rotz(270);
+    iterations_temp = 3;
+    for n = 1:numel(fields)
+        rot = r.(fields{n}); % Access each rotation matrix using the field name
+        rotnodes = nodes*rot; % Multiple nodes by rotation matrix
+        [~,~,error_temp] = icp(nodes_template',rotnodes', iterations_temp,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp); % Perform small ICP
+        E_short.(fields{n}) = error_temp(end); % Save the lowest error
+    end
 
-    [Rz90,Tz90,ERz90] = icp(nodes_template',nodesz90', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rz90_wr,Tz90_wr,ERz90_wr] = icp(nodes_template',nodesz90', iterations,'Matching','kDtree','WorstRejection',0.1);
-    [Rz180,Tz180,ERz180] = icp(nodes_template',nodesz180', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rz180_wr,Tz180_wr,ERz180_wr] = icp(nodes_template',nodesz180', iterations,'Matching','kDtree','WorstRejection',0.1);
-    [Rz270,Tz270,ERz270] = icp(nodes_template',nodesz270', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rz270_wr,Tz270_wr,ERz270_wr] = icp(nodes_template',nodesz270', iterations,'Matching','kDtree','WorstRejection',0.1);
+    % Convert the structure 'E' to a cell array for easier sorting
+    E_short_fields = fieldnames(E_short);
+    E_short_values = struct2array(E_short);
 
-    % The users model is rotated about the y axis and realigned
-    nodesy90 = nodes*roty(90);
-    nodesy180 = nodes*roty(180);
-    nodesy270 = nodes*roty(270);
+    % Find the indices of the 5 smallest error values
+    [~, idx_smallest] = mink(E_short_values, 5);
 
-    [Ry90,Ty90,ERy90] = icp(nodes_template',nodesy90', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Ry90_wr,Ty90_wr,ERy90_wr] = icp(nodes_template',nodesy90', iterations,'Matching','kDtree','WorstRejection',0.1);
-    [Ry180,Ty180,ERy180] = icp(nodes_template',nodesy180', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Ry180_wr,Ty180_wr,ERy180_wr] = icp(nodes_template',nodesy180', iterations,'Matching','kDtree','WorstRejection',0.1);
-    [Ry270,Ty270,ERy270] = icp(nodes_template',nodesy270', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Ry270_wr,Ty270_wr,ERy270_wr] = icp(nodes_template',nodesy270', iterations,'Matching','kDtree','WorstRejection',0.1);
+    % Get the 5 corresponding field names (rotation matrices)
+    smallest_fields = E_short_fields(idx_smallest);
 
-    % The users model is rotated about the x axis and realigned
-    nodesx90 = nodes*rotx(90);
-    nodesx180 = nodes*rotx(180);
-    nodesx270 = nodes*rotx(270);
+    % Rerun the loop with 200 iterations on the 5 smallest error rotations
 
-    [Rx90,Tx90,ERx90] = icp(nodes_template',nodesx90', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rx90_wr,Tx90_wr,ERx90_wr] = icp(nodes_template',nodesx90', iterations,'Matching','kDtree','WorstRejection',0.1);
-    [Rx180,Tx180,ERx180] = icp(nodes_template',nodesx180', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rx180_wr,Tx180_wr,ERx180_wr] = icp(nodes_template',nodesx180', iterations,'Matching','kDtree','WorstRejection',0.1);
-    [Rx270,Tx270,ERx270] = icp(nodes_template',nodesx270', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
-    [Rx270_wr,Tx270_wr,ERx270_wr] = icp(nodes_template',nodesx270', iterations,'Matching','kDtree','WorstRejection',0.1);
-
-    % All errors are stored in this matrix
-    ER_all = [ER1(end),ER1_0(end),ERz90(end),ERz90_wr(end),ERz180(end),ERz180_wr(end),ERz270(end),ERz270_wr(end),...
-        ERy90(end),ERy90_wr(end),ERy180(end),ERy180_wr(end),ERy270(end),ERy270_wr(end),...
-        ERx90(end),ERx90_wr(end),ERx180(end),ERx180_wr(end),ERx270(end),ERx270_wr(end)];
-else
-    ER_all = [ER1(end),ER1_0(end)];
+    for i = 1:numel(smallest_fields)
+        field_name = smallest_fields{i};  % Get the field name of the current rotation
+        rot = r.(field_name);  % Access the corresponding rotation matrix
+        rotnodes = nodes * rot;  % Multiply nodes by the rotation matrix
+        [R_temp,T_temp,E_temp] = icp(nodes_template',rotnodes', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+        [Rwr_temp,Twr_temp,Ewr_temp] = icp(nodes_template',rotnodes', iterations,'Matching','kDtree','WorstRejection',0.1);
+        if E_temp(end) < Ewr_temp(end)
+            R.(field_name) = R_temp;
+            T.(field_name) = T_temp;
+            E.(field_name) = E_temp(end);
+        else
+            R.(field_name) = Rwr_temp;
+            T.(field_name) = Twr_temp;
+            E.(field_name) = Ewr_temp(end);
+        end
+    end
 end
 
-format long g
-ER_min = min(ER_all);
+% Find the smallest error value and corresponding field name
+E_values = struct2array(E);  % Convert the structure 'E' to a regular array of error values
+E_fields = fieldnames(E);    % Get the list of field names from 'E'
+[~, idx_smallest] = min(E_values);  % Find the index of the smallest error value
+smallest_field = E_fields{idx_smallest};  % Get the corresponding field name
 
-% The minimum error out of all of the alignment steps is used moving
-% forward to determine the most accurately aligned model.
-if ER1(end) == ER_min
-    aligned_nodes = (R1*(nodes') + repmat(T1,1,length(nodes')))';
-    iflip = [1 0 0; 0 1 0; 0 0 1];
-    iR = R1; 
-    iT= T1;
-elseif ER1_0(end) == ER_min
-    aligned_nodes = (R1_0*(nodes') + repmat(T1_0,1,length(nodes')))';
-    iflip = [1 0 0; 0 1 0; 0 0 1];
-    iR = R1_0;
-    iT= T1_0;
-elseif ERz90(end) == ER_min
-    aligned_nodes = (Rz90*(nodesz90') + repmat(Tz90,1,length(nodesz90')))';
-    iflip = rotz(90);
-    iR = Rz90;
-    iT= Tz90;
-elseif ERz90_wr(end) == ER_min
-    aligned_nodes = (Rz90_wr*(nodesz90') + repmat(Tz90_wr,1,length(nodesz90')))';
-    iflip = rotz(90);
-    iR = Rz90_wr;
-    iT= Tz90_wr;
-elseif ERz180(end) == ER_min
-    aligned_nodes = (Rz180*(nodesz180') + repmat(Tz180,1,length(nodesz180')))';
-    iflip = rotz(180);
-    iR = Rz180;
-    iT= Tz180;
-elseif ERz180_wr(end) == ER_min
-    aligned_nodes = (Rz180_wr*(nodesz180') + repmat(Tz180_wr,1,length(nodesz180')))';
-    iflip = rotz(180);
-    iR = Rz180_wr;
-    iT= Tz180_wr;
-elseif ERz270(end) == ER_min
-    aligned_nodes = (Rz270*(nodesz270') + repmat(Tz270,1,length(nodesz270')))';
-    iflip = rotz(270);
-    iR = Rz270;
-    iT= Tz270;
-elseif ERz270_wr(end) == ER_min
-    aligned_nodes = (Rz270_wr*(nodesz270') + repmat(Tz270_wr,1,length(nodesz270')))';
-    iflip = rotz(270);
-    iR = Rz270_wr;
-    iT= Tz270_wr;
-elseif ERy90(end) == ER_min
-    aligned_nodes = (Ry90*(nodesy90') + repmat(Ty90,1,length(nodesy90')))';
-    iflip = roty(90);
-    iR = Ry90;
-    iT= Ty90;
-elseif ERy90_wr(end) == ER_min
-    aligned_nodes = (Ry90_wr*(nodesy90') + repmat(Ty90_wr,1,length(nodesy90')))';
-    iflip = roty(90);
-    iR = Ry90_wr;
-    iT= Ty90_wr;
-elseif ERy180(end) == ER_min
-    aligned_nodes = (Ry180*(nodesy180') + repmat(Ty180,1,length(nodesy180')))';
-    iflip = roty(180);
-    iR = Ry180;
-    iT= Ty180;
-elseif ERy180_wr(end) == ER_min
-    aligned_nodes = (Ry180_wr*(nodesy180') + repmat(Ty180_wr,1,length(nodesy180')))';
-    iflip = roty(180);
-    iR = Ry180_wr;
-    iT= Ty180_wr;
-elseif ERy270(end) == ER_min
-    aligned_nodes = (Ry270*(nodesy270') + repmat(Ty270,1,length(nodesy270')))';
-    iflip = roty(270);
-    iR = Ry270;
-    iT= Ty270;
-elseif ERy270_wr(end) == ER_min
-    aligned_nodes = (Ry270_wr*(nodesy270') + repmat(Ty270_wr,1,length(nodesy270')))';
-    iflip = roty(270);
-    iR = Ry270_wr;
-    iT= Ty270_wr;
-elseif ERx90(end) == ER_min
-    aligned_nodes = (Rx90*(nodesx90') + repmat(Tx90,1,length(nodesx90')))';
-    iflip = rotx(90);
-    iR = Rx90;
-    iT= Tx90;
-elseif ERx90_wr(end) == ER_min
-    aligned_nodes = (Rx90_wr*(nodesx90') + repmat(Tx90_wr,1,length(nodesx90')))';
-    iflip = rotx(90);
-    iR = Rx90_wr;
-    iT= Tx90_wr;
-elseif ERx180(end) == ER_min
-    aligned_nodes = (Rx180*(nodesx180') + repmat(Tx180,1,length(nodesx180')))';
-    iflip = rotx(180);
-    iR = Rx180;
-    iT= Tx180;
-elseif ERx180_wr(end) == ER_min
-    aligned_nodes = (Rx180_wr*(nodesx180') + repmat(Tx180_wr,1,length(nodesx180')))';
-    iflip = rotx(180);
-    iR = Rx180_wr;
-    iT= Tx180_wr;
-elseif ERx270(end) == ER_min
-    aligned_nodes = (Rx270*(nodesx270') + repmat(Tx270,1,length(nodesx270')))';
-    iflip = rotx(270);
-    iR = Rx270;
-    iT= Tx270;
-elseif ERx270_wr(end) == ER_min
-    aligned_nodes = (Rx270_wr*(nodesx270') + repmat(Tx270_wr,1,length(nodesx270')))';
-    iflip = rotx(270);
-    iR = Rx270_wr;
-    iT= Tx270_wr;
-end
+% Retrieve the corresponding R, T, and rotation matrix
+best_R = R.(smallest_field);  % The best R matrix
+best_T = T.(smallest_field);  % The best T vector
+best_rotation_matrix = r.(smallest_field);  % The rotation matrix from the original structure
 
+% Perform the final alignment calculation
+aligned_nodes = (best_R * ((nodes*best_rotation_matrix)') + repmat(best_T, 1, length(nodes')))';  % Align the nodes
+
+% Store the results for the final transformation
+iflip = best_rotation_matrix;  % The rotation matrix used for alignment
+iR = best_R;  % The best R matrix
+iT = best_T;  % The best T vector
+
+%% Additional alignments and adjustments
 % This loop performs an alignment for the TT CS of the talus
 if bone_indx == 1 && bone_coord >= 2
     [sR_talus,~,~] = icp(nodes_template2',nodes_template',25,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
