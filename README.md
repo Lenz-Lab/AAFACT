@@ -2,6 +2,11 @@
 
 Use this toolbox to automatically assign a coordinate system to bone models.
 
+## Publications
+Please cite this paper if you use this code in your work:
+
+Peterson, A. C., Kruger, K. M., Lenz, A. L. (2023). Automatic Anatomical Foot and Ankle Coordinate Toolbox, Frontiers in Bioengineering and Biotechnology, Oct 31:11:1255464. https://doi.org/10.3389/fbioe.2023.1255464.
+
 ## Example anatomical coordinate systems
 
 ![Fig_CS_Manuscript_CoordinateSystems_v2](https://github.com/Lenz-Lab/AAFACT/assets/70289972/9beab321-2de5-40a1-9bb1-667924df24a9)
