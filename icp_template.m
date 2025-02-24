@@ -428,7 +428,6 @@ else
     cm_meta = [];
 end
 
-
 %% Combine all rotation and translation matricies
 RTs.iflip = iflip; % initial flip flip_out
 RTs.sflip = sflip; % secondary flip (for tibia) tib_flip
