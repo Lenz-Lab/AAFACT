@@ -189,6 +189,7 @@ for m = 1:length(all_files)
         end
 
         [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?'," ",cs_string(n))} {''}], 'ListString', list_joint,'SelectionMode','single');
+        % joint_indx = 1;
 
         if (bone_indx == 13 || bone_indx == 14) && length(joint_indx) > 1
             bone_coord = 1:2;
@@ -359,7 +360,9 @@ for m = 1:length(all_files)
             accurate_answer = uiconfirm(fig2,'Is the coordinate system accurately assigned to the model?',...
                 'Coordinate System','Options',{'Yes','No'},'DefaultOption',1);
             delete(fig2)
-            RTss = better_starting_point(accurate_answer,nodes,bone_indx,bone_coord(n),side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx,conlist,ext);
+            if accurate_answer == "No"
+                RTss = better_starting_point(accurate_answer,nodes,bone_indx,bone_coord(n),side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx,conlist,ext);
+            end
         end
 
         %% Clear Variables for New Loop

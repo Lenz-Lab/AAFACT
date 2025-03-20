@@ -113,7 +113,7 @@ switch accurate_answer
 
         %% Joint Origin
         if joint_indx > 1
-            [Temp_Coordinates, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx);
+            [Temp_Coordinates, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx, side_indx);
         else
             Joint = "Center";
         end
