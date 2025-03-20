@@ -7,6 +7,18 @@ Please cite this paper if you use this code in your work:
 
 Peterson, A. C., Kruger, K. M., Lenz, A. L. (2023). Automatic Anatomical Foot and Ankle Coordinate Toolbox, Frontiers in Bioengineering and Biotechnology, Oct 31:11:1255464. https://doi.org/10.3389/fbioe.2023.1255464.
 
+## Funding
+This work is supported by the following grant:
+
+[R01: Post-Surgical Form and Function of Planovalgus Foot Deformities in Patients with Cerebral Palsy](https://reporter.nih.gov/search/79X6dVPEpUSj6H6npTrTdA/project-details/10779007)
+
+R01AR083490 - A. Lenz (PI)
+National Institutes of Health (NIH) - National Institute of Arthritis and Musculoskeletal and Skin Diseases (NIAMS)
+
+05/15/2024-04/30/2029 - $3,265,005 total costs
+
+Goals: Standardization of foot and ankle local coordinate systems and investigation of adult patients with cerebral palsy that have a history of foot deformity, whether it was surgically reconstructed or not in adolescence. The long-term goal is to better understand form and function for improved foot function into adulthood.
+
 ## Example anatomical coordinate systems
 
 ![Fig_CS_Manuscript_CoordinateSystems_v2](https://github.com/Lenz-Lab/AAFACT/assets/70289972/9beab321-2de5-40a1-9bb1-667924df24a9)
