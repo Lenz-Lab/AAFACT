@@ -145,6 +145,9 @@ for m = 1:length(all_files)
     % Lists of different coordinate systems to choose from
     list_talus = {'Talonavicular CS','Tibiotalar CS','Subtalar CS'};
     list_calcaneus = {'Calcaneocuboid CS','Subtalar CS'};
+    list_metatarsal = {'Vertical Metatarsal CS','Radial Metatarsal CS'};
+    list_cuboid = {'Vertical Cuboid CS','Radial Cuboid CS'};
+    list_latcune = {'Vertical Lateral Cuneiform CS','Radial Lateral Cuneiform CS'};
 
     if bone_indx == 1
         [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','multiple');
@@ -152,6 +155,15 @@ for m = 1:length(all_files)
     elseif bone_indx == 2
         [bone_coord,~] = listdlg('PromptString', {'Select which calcaneus CS.'}, 'ListString', list_calcaneus,'SelectionMode','multiple');
         cs_string = string(list_calcaneus(bone_coord));
+    elseif bone_indx >= 8 && bone_indx <= 12
+        [bone_coord,~] = listdlg('PromptString', {'Select which metatarsal CS.'}, 'ListString', list_metatarsal,'SelectionMode','multiple');
+        cs_string = string(list_metatarsal(bone_coord));
+    elseif bone_indx == 4
+        [bone_coord,~] = listdlg('PromptString', {'Select which cuboid CS.'}, 'ListString', list_cuboid,'SelectionMode','multiple');
+        cs_string = string(list_cuboid(bone_coord));
+    elseif bone_indx == 7
+        [bone_coord,~] = listdlg('PromptString', {'Select which lateral cuneiform CS.'}, 'ListString', list_latcune,'SelectionMode','multiple');
+        cs_string = string(list_latcune(bone_coord));
     else
         bone_coord = 1;
         cs_string = "";
@@ -189,7 +201,6 @@ for m = 1:length(all_files)
         end
 
         [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?'," ",cs_string(n))} {''}], 'ListString', list_joint,'SelectionMode','single');
-        % joint_indx = 1;
 
         if (bone_indx == 13 || bone_indx == 14) && length(joint_indx) > 1
             bone_coord = 1:2;
@@ -209,7 +220,7 @@ for m = 1:length(all_files)
         [aligned_nodes, RTs] = icp_template(bone_indx, nodes, bone_coord(n), better_start);
 
         %% Performs coordinate system calculation
-        [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord(n),side_indx);
+        [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord(n), side_indx);
 
         %% Joint Origin
         if joint_indx > 1
@@ -332,6 +343,14 @@ for m = 1:length(all_files)
             name = strcat('CC_',name);
         elseif bone_indx == 2 && bone_coord(n) == 2
             name = strcat('ST_',name);
+        elseif (bone_indx >= 7 && bone_indx <= 12) && bone_coord(n) == 1
+            name = strcat('V_',name);
+        elseif (bone_indx >= 7 && bone_indx <= 12) && bone_coord(n) == 2
+            name = strcat('R_',name);
+        elseif bone_indx == 4 && bone_coord(n) == 1
+            name = strcat('V_',name);
+        elseif bone_indx == 4 && bone_coord(n) == 2
+            name = strcat('R_',name);
         end
 
         if length(name) > 31

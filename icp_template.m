@@ -25,8 +25,11 @@ elseif bone_indx == 2 && bone_coord == 2
 elseif bone_indx == 3
     TR_template = stlread('Navicular_Template.stl');
     a = 1;
-elseif bone_indx == 4
+elseif bone_indx == 4 && bone_coord == 1
     TR_template = stlread('Cuboid_Template.stl');
+    a = 2;
+elseif bone_indx == 4 && bone_coord == 2
+    TR_template = stlread('Cuboid_Template2.stl');
     a = 2;
 elseif bone_indx == 5
     TR_template = stlread('Medial_Cuneiform_Template.stl');
@@ -34,23 +37,41 @@ elseif bone_indx == 5
 elseif bone_indx == 6
     TR_template = stlread('Intermediate_Cuneiform_Template.stl');
     a = 3;
-elseif bone_indx == 7
+elseif bone_indx == 7 && bone_coord == 1
     TR_template = stlread('Lateral_Cuneiform_Template.stl');
     a = 3;
-elseif bone_indx == 8
+elseif bone_indx == 7 && bone_coord == 2
+    TR_template = stlread('Lateral_Cuneiform_Template2.stl');
+    a = 3;
+elseif bone_indx == 8 && bone_coord == 1
     TR_template = stlread('Metatarsal1_Template.stl');
     a = 2;
-elseif bone_indx == 9
+elseif bone_indx == 8 && bone_coord == 2
+    TR_template = stlread('Metatarsal1_Template2.stl');
+    a = 2;
+elseif bone_indx == 9 && bone_coord == 1
     TR_template = stlread('Metatarsal2_Template.stl');
     a = 2;
-elseif bone_indx == 10
+elseif bone_indx == 9 && bone_coord == 2
+    TR_template = stlread('Metatarsal2_Template2.stl');
+    a = 2;
+elseif bone_indx == 10 && bone_coord == 1
     TR_template = stlread('Metatarsal3_Template.stl');
     a = 2;
-elseif bone_indx == 11
+elseif bone_indx == 10 && bone_coord == 2
+    TR_template = stlread('Metatarsal3_Template2.stl');
+    a = 2;
+elseif bone_indx == 11 && bone_coord == 1
     TR_template = stlread('Metatarsal4_Template.stl');
     a = 2;
-elseif bone_indx == 12
+elseif bone_indx == 11 && bone_coord == 2
+    TR_template = stlread('Metatarsal4_Template2.stl');
+    a = 2;
+elseif bone_indx == 12 && bone_coord == 1
     TR_template = stlread('Metatarsal5_Template.stl');
+    a = 2;
+elseif bone_indx == 12 && bone_coord == 2
+    TR_template = stlread('Metatarsal5_Template2.stl');
     a = 2;
 elseif bone_indx == 13 && bone_coord == 1
     TR_template = stlread('Tibia_Template.stl');
