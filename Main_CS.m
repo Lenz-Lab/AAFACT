@@ -423,20 +423,32 @@ for m = 1:length(all_files)
             name = name(1:31);
         end
 
-        xlfilename = strcat(FolderPathName,'\CoordinateSystem_',FolderName,'.xlsx');
-        writematrix(A,xlfilename,'Sheet',name);
-        writecell(B,xlfilename,'Sheet',name,'Range','B1');
-        writematrix(C,xlfilename,'Sheet',name,'Range','A5');
-        writematrix(D,xlfilename,'Sheet',name,'Range','B5')
-        writematrix(D,xlfilename,'Sheet',name,'Range','B10')
-        writematrix(coords_final_unit(1,:),xlfilename,'Sheet',name,'Range','B6');
-        writematrix(coords_final_unit(2,:),xlfilename,'Sheet',name,'Range','B7');
-        writematrix(coords_final_unit(4,:),xlfilename,'Sheet',name,'Range','B8');
-        writematrix(coords_final_unit(6,:),xlfilename,'Sheet',name,'Range','B9');
-        writematrix(Temp_Coordinates_Unit(1,:),xlfilename,'Sheet',name,'Range','B11');
-        writematrix(Temp_Coordinates_Unit(2,:),xlfilename,'Sheet',name,'Range','B12');
-        writematrix(Temp_Coordinates_Unit(4,:),xlfilename,'Sheet',name,'Range','B13');
-        writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
+        % The following loop attempts to write the data to Excel using the try function. If
+        % for some reason MATLAB cannot write to the file, it catches the error, posts an error
+        % to the terminal, and tries again. If the write is successful, the index is updated to
+        % the final index in the FOR loop, and the FOR loop ends after a success.
+        for try_index = 1:5
+            try
+                xlfilename = strcat(FolderPathName,'\CoordinateSystem_',FolderName,'.xlsx');
+                writematrix(A,xlfilename,'Sheet',name);
+                writecell(B,xlfilename,'Sheet',name,'Range','B1');
+                writematrix(C,xlfilename,'Sheet',name,'Range','A5');
+                writematrix(D,xlfilename,'Sheet',name,'Range','B5')
+                writematrix(D,xlfilename,'Sheet',name,'Range','B10')
+                writematrix(coords_final_unit(1,:),xlfilename,'Sheet',name,'Range','B6');
+                writematrix(coords_final_unit(2,:),xlfilename,'Sheet',name,'Range','B7');
+                writematrix(coords_final_unit(4,:),xlfilename,'Sheet',name,'Range','B8');
+                writematrix(coords_final_unit(6,:),xlfilename,'Sheet',name,'Range','B9');
+                writematrix(Temp_Coordinates_Unit(1,:),xlfilename,'Sheet',name,'Range','B11');
+                writematrix(Temp_Coordinates_Unit(2,:),xlfilename,'Sheet',name,'Range','B12');
+                writematrix(Temp_Coordinates_Unit(4,:),xlfilename,'Sheet',name,'Range','B13');
+                writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
+                try_index = 5;
+            catch
+                disp("Error attempting to write to Excel file, reattempting...")
+                continue
+            end
+        end
 
         %% Better Starting Point
         if length(all_files) == 1 && length(bone_coord) == 1
