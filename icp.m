@@ -284,13 +284,9 @@ for k=1:arg.iter
     end
     t(k+1) = toc;
 
-%     if k >= 6
-%         if (round(ER(k+1),8) == round(ER(k),8)) &&  (round(ER(k),8) == round(ER(k-1),8)) &&...
-%                 (round(ER(k-1),8) == round(ER(k-2),8)) && (round(ER(k-2),8) == round(ER(k-3),8)) &&...
-%                 (round(ER(k-3),8) == round(ER(k-4),8)) && (round(ER(k-4),8) == round(ER(k-5),8))
-%             break
-%         end
-%     end
+    % if k >= 6 && std(ER(k-5:k+1)) < 1e-6
+    %     break;
+    % end
 end
 
 % ER = nonzeros(ER);

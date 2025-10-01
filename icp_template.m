@@ -188,6 +188,7 @@ iterations = 200;
 
 % Rotations
 r.r0 = eye(3);
+% r.r0 = rotz(-40) * rotx(-20) *roty(-10);
 r.rx = rotx(90);
 r.rxx = rotx(180);
 r.rxxx = rotx(270);
