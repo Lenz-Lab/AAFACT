@@ -113,7 +113,11 @@ switch accurate_answer
 
         %% Joint Origin
         if joint_indx > 1
-            [Temp_Coordinates, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx, side_indx);
+            if isempty(conlist)
+                Joint = "Center";
+            else
+                [Temp_Coordinates, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx, side_indx);
+            end
         else
             Joint = "Center";
         end
@@ -129,7 +133,11 @@ switch accurate_answer
             [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1, side_indx);
 
             if joint_indx > 1
-                [Temp_Coordinates_TST, Joint] = JointOrigin(Temp_Coordinates_TST, Temp_Nodes_TST, conlist, bone_indx, joint_indx);
+                if isempty(conlist)
+                    Joint = "Center";
+                else
+                    [Temp_Coordinates_TST, Joint] = JointOrigin(Temp_Coordinates_TST, Temp_Nodes_TST, conlist, bone_indx, joint_indx);
+                end
             else
                 Joint = "Center";
             end
@@ -159,7 +167,7 @@ switch accurate_answer
         fig_bottom = (screen_size(4) - fig_height) / 2;
 
         fig10 = figure('Position', [fig_left, fig_bottom+15, fig_width, fig_height]);
-        if ext == ".stl"
+        if ~isempty(conlist_original)
             Final_Bone = triangulation(conlist,nodes_original);
             patch('Faces',Final_Bone.ConnectivityList,'Vertices',Final_Bone.Points,...
                 'FaceColor', [0.85 0.85 0.85], ...

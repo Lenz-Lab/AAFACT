@@ -129,30 +129,42 @@ for m = 1:length(all_files)
     end
 
     %% Load in file based on file type
+    if strcmpi(ext,'.k')
+        nodes = LoadDataFile(fullfile(FolderPathName,FileName));
+        conlist = [];
+        fprintf('Note: %s is a .k file — origin location and plotting will be limited.\n', FileName);
 
-    if ext == ".k"
-        nodes = LoadDataFile(strcat(FolderPathName,'\',FileName));
-    elseif ext == ".stl"
-        TR = stlread(strcat(FolderPathName,'\',FileName));
+    elseif strcmpi(ext,'.stl')
+        TR = stlread(fullfile(FolderPathName,FileName));
         nodes = TR.Points;
         conlist = TR.ConnectivityList;
-    elseif ext == ".particles"
-        nodes = load(strcat(FolderPathName,'\',FileName));
-    elseif ext == ".vtk"
-        nodes = LoadDataFile(strcat(FolderPathName,'\',FileName));
-    elseif ext == ".ply"
-        ptCloud = pcread(strcat(FolderPathName,'\',FileName));
+
+    elseif strcmpi(ext,'.particles')
+        nodes = load(fullfile(FolderPathName,FileName));
+        conlist = [];
+        fprintf('Note: %s is a .particles file — origin location and plotting will be limited.\n', FileName);
+
+    elseif strcmpi(ext,'.vtk')
+        nodes = LoadDataFile(fullfile(FolderPathName,FileName));
+        conlist = [];
+        fprintf('Note: %s is a .vtk file — origin location and plotting will be limited.\n', FileName);
+
+    elseif strcmpi(ext,'.ply')
+        ptCloud = pcread(fullfile(FolderPathName,FileName));
         nodes = ptCloud.Location;
-    elseif ext == ".obj"
-        obj = readObj(strcat(FolderPathName,'\',FileName));
+        conlist = [];
+        fprintf('Note: %s is a .ply file — origin location and plotting will be limited.\n', FileName);
+
+    elseif strcmpi(ext,'.obj')
+        obj = readObj(fullfile(FolderPathName,FileName));
         nodes = obj.v;
         conlist = obj.f.v;
+
     else
-        disp('This is not an acceptable file type at this time, please choose either a ".k", ".stl", ".vtk", ".obj", ".ply" or ".particles" file type.')
-        return
+        error('Unsupported file type: %s', ext);
     end
 
-    nodes_original = nodes;
+    nodes_original   = nodes;
     conlist_original = conlist;
 
     % Lists of different coordinate systems to choose from
@@ -269,10 +281,15 @@ for m = 1:length(all_files)
 
         %% Joint Origin
         if joint_indx > 1
-            [Temp_Coordinates, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx, side_indx);
+            if isempty(conlist)
+                Joint = "Center";
+            else
+                [Temp_Coordinates, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx, side_indx);
+            end
         else
             Joint = "Center";
         end
+
 
         %% Temporarily Attach Coordinate System
         Temp_Nodes_Coords = [Temp_Nodes; Temp_Coordinates];
@@ -285,7 +302,11 @@ for m = 1:length(all_files)
             [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1, side_indx);
 
             if joint_indx > 1
-                [Temp_Coordinates_TST, Joint] = JointOrigin(Temp_Coordinates_TST, Temp_Nodes_TST, conlist, bone_indx, joint_indx, side_indx);
+                if isempty(conlist)
+                    Joint = "Center";
+                else
+                    [Temp_Coordinates_TST, Joint] = JointOrigin(Temp_Coordinates_TST, Temp_Nodes_TST, conlist, bone_indx, joint_indx, side_indx);
+                end
             else
                 Joint = "Center";
             end
@@ -325,7 +346,7 @@ for m = 1:length(all_files)
         fig_bottom = (screen_size(4) - fig_height) / 2;
 
         fig1 = figure('Position', [fig_left, fig_bottom+15, fig_width, fig_height]);
-        if ext == ".stl"
+        if ~isempty(conlist_original)
             Final_Bone = triangulation(conlist,nodes_original);
             patch('Faces',Final_Bone.ConnectivityList,'Vertices',Final_Bone.Points,...
                 'FaceColor', [0.85 0.85 0.85], ...
