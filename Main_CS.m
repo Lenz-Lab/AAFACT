@@ -35,6 +35,19 @@ list_files = temp(1,:);
 
 all_files = list_files(files_indx)'; % stores all files selected
 
+% === Apply-to-all (per bone type) option ===
+apply_to_all = false;
+if numel(all_files) > 1
+    choice = questdlg('Reuse the same selections per bone type for all selected files?', ...
+        'Apply to All', 'Yes', 'No', 'No');
+    apply_to_all = strcmp(choice,'Yes');
+end
+
+% Caches: key = bone_indx (int), value = selections for that bone type
+cs_cache    = containers.Map('KeyType','int32','ValueType','any');  % stores struct with fields: bone_coord, cs_string
+joint_cache = containers.Map('KeyType','int32','ValueType','any');  % stores scalar joint_indx
+
+
 % Lists for detemining bone and side
 list_bone = {'Talus', 'Calcaneus', 'Navicular', 'Cuboid', 'Medial_Cuneiform','Intermediate_Cuneiform',...
     'Lateral_Cuneiform','Metatarsal1','Metatarsal2','Metatarsal3','Metatarsal4','Metatarsal5',...
@@ -145,16 +158,45 @@ for m = 1:length(all_files)
     % Lists of different coordinate systems to choose from
     list_talus = {'Talonavicular CS','Tibiotalar CS','Subtalar CS'};
     list_calcaneus = {'Calcaneocuboid CS','Subtalar CS'};
+    list_metatarsal = {'Vertical Metatarsal CS','Radial Metatarsal CS'};
+    list_cuboid = {'Vertical Cuboid CS','Radial Cuboid CS'};
+    list_latcune = {'Vertical Lateral Cuneiform CS','Radial Lateral Cuneiform CS'};
 
-    if bone_indx == 1
-        [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','multiple');
-        cs_string = string(list_talus(bone_coord));
-    elseif bone_indx == 2
-        [bone_coord,~] = listdlg('PromptString', {'Select which calcaneus CS.'}, 'ListString', list_calcaneus,'SelectionMode','multiple');
-        cs_string = string(list_calcaneus(bone_coord));
+    % Ignore the bones that only have one coordinate system
+    need_cs_menu = ~(bone_indx == 3 || bone_indx == 5 || bone_indx == 6 || bone_indx == 13 || bone_indx == 14);
+
+    if need_cs_menu && apply_to_all && isKey(cs_cache, int32(bone_indx))
+        tmp = cs_cache(int32(bone_indx));
+        bone_coord = tmp.bone_coord;
+        cs_string = tmp.cs_string;
     else
-        bone_coord = 1;
-        cs_string = "";
+        if bone_indx == 1
+            [bone_coord,~] = listdlg('PromptString', {'Select which talar CS.'}, 'ListString', list_talus,'SelectionMode','multiple');
+            cs_string = string(list_talus(bone_coord));
+        elseif bone_indx == 2
+            [bone_coord,~] = listdlg('PromptString', {'Select which calcaneus CS.'}, 'ListString', list_calcaneus,'SelectionMode','multiple');
+            cs_string = string(list_calcaneus(bone_coord));
+        elseif bone_indx >= 8 && bone_indx <= 12
+            [bone_coord,~] = listdlg('PromptString', {'Select which metatarsal CS.'}, 'ListString', list_metatarsal,'SelectionMode','multiple');
+            cs_string = string(list_metatarsal(bone_coord));
+        elseif bone_indx == 4
+            [bone_coord,~] = listdlg('PromptString', {'Select which cuboid CS.'}, 'ListString', list_cuboid,'SelectionMode','multiple');
+            cs_string = string(list_cuboid(bone_coord));
+        elseif bone_indx == 7
+            [bone_coord,~] = listdlg('PromptString', {'Select which lateral cuneiform CS.'}, 'ListString', list_latcune,'SelectionMode','multiple');
+            cs_string = string(list_latcune(bone_coord));
+        else
+            bone_coord = 1;
+            cs_string = "";
+        end
+
+        if isempty(bone_coord) && need_cs_menu
+            error('No coordinate system selected for %s. Operation cancelled.', FileName);
+        end
+
+        if need_cs_menu && apply_to_all
+            cs_cache(int32(bone_indx)) = struct('bone_coord', bone_coord, 'cs_string', cs_string);
+        end
     end
 
     %% Loop for each desired Coordinate System
@@ -188,15 +230,29 @@ for m = 1:length(all_files)
             list_joint = {'Center','Talofibular Surface'};
         end
 
-        [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?'," ",cs_string(n))} {''}], 'ListString', list_joint,'SelectionMode','single');
-        % joint_indx = 1;
+        if apply_to_all && isKey(joint_cache, int32(bone_indx))
+            joint_indx = joint_cache(int32(bone_indx));
+        else
+            [joint_indx,~] = listdlg('PromptString', [{strcat('Where do you want the origin?')} {''}], ...
+                'ListString', list_joint, 'SelectionMode','single');
+            if isempty(joint_indx)
+                error('No joint origin selected for %s. Operation cancelled.', FileName);
+            end
+            if apply_to_all
+                joint_cache(int32(bone_indx)) = joint_indx;
+            end
+        end
 
-        if (bone_indx == 13 || bone_indx == 14) && length(joint_indx) > 1
-            bone_coord = 1:2;
-        elseif (bone_indx == 13 || bone_indx == 14) && joint_indx == 1
-            bone_coord = 1;
-        elseif (bone_indx == 13 || bone_indx == 14) && joint_indx == 2
-            bone_coord = 2;
+        % Tibia/Fibula special handling
+        if (bone_indx == 13 || bone_indx == 14)
+            if numel(joint_indx) > 1
+                bone_coord = 1:2;
+            elseif joint_indx == 1
+                bone_coord = 1;
+            elseif joint_indx == 2
+                bone_coord = 2;
+            end
+            cs_string = "";
         end
 
         %% ICP to Template
@@ -209,7 +265,7 @@ for m = 1:length(all_files)
         [aligned_nodes, RTs] = icp_template(bone_indx, nodes, bone_coord(n), better_start);
 
         %% Performs coordinate system calculation
-        [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord(n),side_indx);
+        [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord(n), side_indx);
 
         %% Joint Origin
         if joint_indx > 1
@@ -332,6 +388,14 @@ for m = 1:length(all_files)
             name = strcat('CC_',name);
         elseif bone_indx == 2 && bone_coord(n) == 2
             name = strcat('ST_',name);
+        elseif (bone_indx >= 7 && bone_indx <= 12) && bone_coord(n) == 1
+            name = strcat('V_',name);
+        elseif (bone_indx >= 7 && bone_indx <= 12) && bone_coord(n) == 2
+            name = strcat('R_',name);
+        elseif bone_indx == 4 && bone_coord(n) == 1
+            name = strcat('V_',name);
+        elseif bone_indx == 4 && bone_coord(n) == 2
+            name = strcat('R_',name);
         end
 
         if length(name) > 31
@@ -361,7 +425,8 @@ for m = 1:length(all_files)
                 'Coordinate System','Options',{'Yes','No'},'DefaultOption',1);
             delete(fig2)
             if accurate_answer == "No"
-                RTss = better_starting_point(accurate_answer,nodes,bone_indx,bone_coord(n),side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx,conlist,ext);
+                RTss = better_starting_point(accurate_answer,nodes,bone_indx,bone_coord(n),side_indx,FileName,...
+                    name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx,conlist,ext);
             end
         end
 

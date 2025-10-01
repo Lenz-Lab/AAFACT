@@ -125,7 +125,7 @@ switch accurate_answer
         [~, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes_Coords, cm_nodes, side_indx, RTs);
 
         if bone_indx == 1 && bone_coord == 3 % Additional alignment for talus subtalar ACS
-            [aligned_nodes_TST, RTs_TST] = icp_template(bone_indx, nodes, 1, better_start);
+            [aligned_nodes_TST, RTs_TST] = icp_template(bone_indx, nodes_new, 1, better_start);
             [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1, side_indx);
 
             if joint_indx > 1
