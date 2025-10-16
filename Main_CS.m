@@ -150,10 +150,8 @@ for m = 1:length(all_files)
         fprintf('Note: %s is a .vtk file — origin location and plotting will be limited.\n', FileName);
 
     elseif strcmpi(ext,'.ply')
-        ptCloud = pcread(fullfile(FolderPathName,FileName));
-        nodes = ptCloud.Location;
-        conlist = [];
-        fprintf('Note: %s is a .ply file — origin location and plotting will be limited.\n', FileName);
+        [nodes, conlist] = read_ply_loose(fullfile(FolderPathName,FileName));
+        nodes = [nodes.x, nodes.y, nodes.z];
 
     elseif strcmpi(ext,'.obj')
         obj = readObj(fullfile(FolderPathName,FileName));
@@ -452,14 +450,11 @@ for m = 1:length(all_files)
 
         %% Better Starting Point
         if length(all_files) == 1 && length(bone_coord) == 1
-            fig2_pos = [(screen_size(3) - 500) / 2, 50, 500, 175];
-            fig2 = uifigure('Position',fig2_pos);
-            accurate_answer = uiconfirm(fig2,'Is the coordinate system accurately assigned to the model?',...
-                'Coordinate System','Options',{'Yes','No'},'DefaultOption',1);
-            delete(fig2)
-            if accurate_answer == "No"
+            accurate_answer = questdlg('Would you like to troubleshoot alignment?', ...
+                'Troubleshoot', 'Yes', 'No', 'No');
+            if accurate_answer == "Yes"
                 RTss = better_starting_point(accurate_answer,nodes,bone_indx,bone_coord(n),side_indx,FileName,...
-                    name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx,conlist,ext);
+                    name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx,conlist,conlist_original);
             end
         end
 

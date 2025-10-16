@@ -179,7 +179,7 @@ elseif parttib_multiplier > 1 && tibfib_switch == 2 && bone_indx >= 13
 end
 
 %% Performing ICP alignment
-% This is the initial alignment with no rotation. 
+% This is the initial alignment with no rotation.
 % Two different icp approaches are used, the first includeds the faces and
 % the second is just the points.
 
@@ -188,88 +188,26 @@ iterations = 200;
 
 % Rotations
 r.r0 = eye(3);
-% r.r0 = rotz(-40) * rotx(-20) *roty(-10);
 r.rx = rotx(90);
 r.rxx = rotx(180);
 r.rxxx = rotx(270);
 r.ry = roty(90);
-r.ryy = roty(180);
 r.ryyy = roty(270);
 r.rz = rotz(90);
-r.rzz = rotz(180);
 r.rzzz = rotz(270);
-
-r.rxy = rotx(90) * roty(90);
-r.rxyy = rotx(90) * roty(180);
-r.rxyyy = rotx(90) * roty(270);
-
-r.rxxy = rotx(180) * roty(90);
-r.rxxyy = rotx(180) * roty(180);
-r.rxxyyy = rotx(180) * roty(270);
-
 r.rxxxy = rotx(270) * roty(90);
-r.rxxxyy = rotx(270) * roty(180);
 r.rxxxyyy = rotx(270) * roty(270);
-
-r.rxz = rotx(90) * rotz(90);
-r.rxzz = rotx(90) * rotz(180);
-r.rxzzz = rotx(90) * rotz(270);
-
-r.rxxz = rotx(180) * rotz(90);
-r.rxxzz = rotx(180) * rotz(180);
-r.rxxzzz = rotx(180) * rotz(270);
-
 r.rxxxz = rotx(270) * rotz(90);
-r.rxxxzz = rotx(270) * rotz(180);
 r.rxxxzzz = rotx(270) * rotz(270);
-
-r.ryx = roty(90) * rotx(90);
-r.ryxx = roty(90) * rotx(180);
-r.ryxxx = roty(90) * rotx(270);
-
-r.ryyx = roty(180) * rotx(90);
-r.ryyxx = roty(180) * rotx(180);
-r.ryyxxx = roty(180) * rotx(270);
-
-r.ryyyx = roty(270) * rotx(90);
-r.ryyyxx = roty(270) * rotx(180);
-r.ryyyxxx = roty(270) * rotx(270);
-
-r.ryz = roty(90) * rotz(90);
-r.ryzz = roty(90) * rotz(180);
-r.ryzzz = roty(90) * rotz(270);
-
-r.ryyz = roty(180) * rotz(90);
-r.ryyzz = roty(180) * rotz(180);
-r.ryyzzz = roty(180) * rotz(270);
-
-r.ryyyz = roty(270) * rotz(90);
-r.ryyyzz = roty(270) * rotz(180);
-r.ryyyzzz = roty(270) * rotz(270);
-
-r.rzx = rotz(90) * rotx(90);
-r.rzxx = rotz(90) * rotx(180);
-r.rzxxx = rotz(90) * rotx(270);
-
-r.rzzx = rotz(180) * rotx(90);
-r.rzzxx = rotz(180) * rotx(180);
-r.rzzxxx = rotz(180) * rotx(270);
-
-r.rzzzx = rotz(270) * rotx(90);
-r.rzzzxx = rotz(270) * rotx(180);
-r.rzzzxxx = rotz(270) * rotx(270);
-
-r.rzy = rotz(90) * roty(90);
-r.rzyy = rotz(90) * roty(180);
-r.rzyyy = rotz(90) * roty(270);
-
-r.rzzy = rotz(180) * roty(90);
-r.rzzyy = rotz(180) * roty(180);
-r.rzzyyy = rotz(180) * roty(270);
-
-r.rzzzy = rotz(270) * roty(90);
-r.rzzzyy = rotz(270) * roty(180);
-r.rzzzyyy = rotz(270) * roty(270);
+r.rxy = rotx(90) * roty(90);
+r.rxyyy = rotx(90) * roty(270);
+r.rxz = rotx(90) * rotz(90);
+r.rxxxyy = rotx(270) * roty(180);
+r.rxxy = rotx(180) * roty(90);
+r.rxxyyy = rotx(180) * roty(270);
+r.rxxz = rotx(180) * rotz(90);
+r.rxxzzz = rotx(180) * rotz(270);
+r.rxxxzzz = rotx(270) * rotz(270);
 
 fields = fieldnames(r);
 
@@ -362,9 +300,46 @@ elseif parttib_multiplier > 1 && tibfib_switch == 2 && bone_indx >= 13
     aligned_nodes = aligned_nodes/parttib_multiplier;
 end
 
+% This ensures the fibular coodinate system is at the center of the TF
+% joint
+if tibfib_switch == 1 && bone_indx == 14
+    max_nodes_x = (max(aligned_nodes(:,1)) - min(aligned_nodes(:,1)));
+    max_nodes_y = (max(aligned_nodes(:,2)) - min(aligned_nodes(:,2)));
+
+    if max_nodes_x < max_nodes_y
+        parttib_multiplier = (max(nodes_template(:,1)) - min(nodes_template(:,1)))/(max(aligned_nodes(:,1)) - min(aligned_nodes(:,1)));
+        aligned_nodes_temp = aligned_nodes*parttib_multiplier;
+    else
+        parttib_multiplier = (max(nodes_template(:,2)) - min(nodes_template(:,2)))/(max(aligned_nodes(:,2)) - min(aligned_nodes(:,2)));
+        aligned_nodes_temp = aligned_nodes*parttib_multiplier;
+    end
+
+    [sR_fibula,~,~] = icp(nodes_template',aligned_nodes_temp',25,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
+    aligned_nodes = (sR_fibula*(aligned_nodes'))';
+
+    sub = aligned_nodes(aligned_nodes(:,3) < 20,:);
+    minY = min(sub(:,2));
+    maxY = max(sub(:,2));
+    centerY = round((minY + maxY)/2);  % "middle" of the span; round to hit integers
+    bandMask = abs(sub(:,2) - centerY) <= 2;
+    cand = sub(bandMask,:);
+    [~,k] = max(cand(:,1));
+    Xp = cand(k,:);
+    aligned_nodes(:,1) = aligned_nodes(:,1) - Xp(1);
+    aligned_nodes(:,2) = aligned_nodes(:,2) - Xp(2);
+
+    sT_fibula = [-Xp(1); -Xp(2); 0];
+    sflip = eye(3);
+else
+    sR_fibula = [];
+    sT_fibula = [];
+    sflip = [];
+end
+
+
 % This ensures the tibial coordinate system is at the center of the tibial
 % plafond
-if (tibfib_switch == 1 && bone_indx == 13) || (tibfib_switch == 1 && bone_indx == 14)
+if tibfib_switch == 1 && bone_indx == 13
     temp = find(aligned_nodes(:,3) < 150);
     nodes_test = [aligned_nodes(temp,1) aligned_nodes(temp,2) aligned_nodes(temp,3)];
     x = (-20:4:20)';
@@ -399,12 +374,12 @@ if (tibfib_switch == 1 && bone_indx == 13) || (tibfib_switch == 1 && bone_indx =
 
     if Etw == Etw1(end)
         if better_start == 1
-            sflip = [1 0 0; 0 1 0; 0 0 1];
+            sflip = eye(3);
             aligned_nodes = (Rtw1*(aligned_nodes') + repmat(Ttw1,1,length(aligned_nodes')))';
             sR_tibia= Rtw1;
             sT_tibia = Ttw1;
         else
-            sflip = [1 0 0; 0 1 0; 0 0 1];
+            sflip = eye(3);
             aligned_nodes = (aligned_nodes' + repmat(Ttw1,1,length(aligned_nodes')))';
             sR_tibia= Rtw1;
             sT_tibia = Ttw1;
@@ -431,18 +406,17 @@ if (tibfib_switch == 1 && bone_indx == 13) || (tibfib_switch == 1 && bone_indx =
 else
     sR_tibia= [];
     sT_tibia= [];
-    sflip = [];
 end
 
-if bone_indx == 14
-    sR_fibula = sR_tibia;
-    sT_fibula = sT_tibia;
-    sR_tibia= [];
-    sT_tibia= [];
-else
-    sR_fibula = [];
-    sT_fibula = [];
-end
+% if bone_indx == 14
+%     sR_fibula = sR_tibia;
+%     sT_fibula = sT_tibia;
+%     sR_tibia= [];
+%     sT_tibia= [];
+% else
+%     sR_fibula = [];
+%     sT_fibula = [];
+% end
 
 if bone_indx >= 8 && bone_indx <= 12
     [aligned_nodes,cm_meta] = center(aligned_nodes,1);

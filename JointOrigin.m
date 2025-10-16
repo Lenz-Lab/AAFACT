@@ -146,7 +146,12 @@ if AOI ~= "None"
         end
     end
 
-    joint_origin = joint_origin(mt,:);
+    if exist("mt")
+        joint_origin = joint_origin(mt,:);
+    else
+        joint_origin = [0,0,0];
+        warning('There may be a joint origin error, please run the bone alone and use the manual better starting point input as you are most likely having an alignment issue.')
+    end
 
     Temp_Coordinates = joint_origin + Temp_Coordinates;
 else

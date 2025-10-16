@@ -1,10 +1,10 @@
-function RTs = better_starting_point(accurate_answer,nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx,conlist,ext)
+function RTs = better_starting_point(accurate_answer,nodes,bone_indx,bone_coord,side_indx,FileName,name,list_bone,list_side,FolderPathName,FolderName,cm_nodes,nodes_original,joint_indx,conlist,conlist_original)
 % This function allows the user to choose a better starting point for their
 % bone model if the icp alignment isn't working. This is only ran if you
 % run a single bone, single ACS and select that it wasn't appropriate.
 
 switch accurate_answer
-    case 'No'
+    case 'Yes'
         % Has the user tell the program which way the bone is facing
         screen_size = get(0, 'ScreenSize');
         fig_width = 800;
@@ -12,81 +12,58 @@ switch accurate_answer
         fig_left = (screen_size(3) - fig_width) / 2;
         fig_bottom = (screen_size(4) - fig_height) / 2;
 
-        fig3 = figure('Position', [fig_left, fig_bottom+15, fig_width, fig_height]);
-        plot3(nodes(:,1),nodes(:,2),nodes(:,3),'k.')
-        hold on
-        plot3(nodes(nodes(:,2) > 0,1),nodes(nodes(:,2) > 0,2),nodes(nodes(:,2) > 0,3),'yo')
-        xlabel('X')
-        ylabel('Y')
-        zlabel('Z')
-        axis equal
+        % ===== STEP 1: +Y hemisphere (YELLOW), one menu with 6 options =====
+        fig3 = figure('Position', [fig_left, fig_bottom+15, fig_width, fig_height], 'Color','w');
+        maskY = nodes(:,2) > 0; if ~any(maskY), maskY = nodes(:,2) >= 0; end
+        plot3(nodes(~maskY,1),nodes(~maskY,2),nodes(~maskY,3),'.','Color',[0.4 0.4 0.4]); hold on
+        plot3(nodes( maskY,1),nodes( maskY,2),nodes( maskY,3),'o','MarkerEdgeColor','none','MarkerFaceColor',[1 1 0],'MarkerSize',5)
+        xlabel('X'); ylabel('Y'); zlabel('Z'); axis equal; grid on; rotate3d on
+        title('Rotate freely. Highlighted points are +Y (YELLOW).')
 
-        uifig_pose = [(screen_size(3) - 500) / 2, 50, 500, 175];
-        fig4 = uifigure('Position',uifig_pose);
-        ant1_selection = uiconfirm(fig4,'What side is highlighted yellow?','Manual Alignment',...
-            'Options',{'Anterior/Posterior','Medial/Lateral','Superior/Inferior'},'DefaultOption',1);
-        delete(fig4)
-        switch ant1_selection
-            case 'Anterior/Posterior'
-                fig5 = uifigure('Position',uifig_pose);
-                ant2_selection = uiconfirm(fig5,'Is the anterior or posterior highlighted yellow?','Manual Alignment',...
-                    'Options',{'Anterior','Posterior'},'DefaultOption',1);
-                delete(fig3)
-                delete(fig5)
-                close all
-                switch ant2_selection
-                    case 'Posterior'
-                        R_yellow = rotz(180);
-                        nodes_ant = (R_yellow*nodes')';
-                    case 'Anterior'
-                        R_yellow = rotz(0);
-                        nodes_ant = nodes;
-                end
-            case 'Medial/Lateral'
-                fig6 = uifigure('Position',uifig_pose);
-                ant2_selection = uiconfirm(fig6,'Is the medial or lateral highlighted yellow?','Manual Alignment',...
-                    'Options',{'Medial','Lateral'},'DefaultOption',1);
-                delete(fig3)
-                delete(fig6)
-                close all
-                switch ant2_selection
-                    case 'Medial'
-                        R_yellow = rotz(-90);
-                        nodes_ant = (R_yellow*nodes')';
-                    case 'Lateral'
-                        R_yellow = rotz(90);
-                        nodes_ant = (R_yellow*nodes')';
-                end
-            case 'Superior/Inferior'
-                fig7 = uifigure('Position',uifig_pose);
-                ant2_selection = uiconfirm(fig7,'Is the superior or inferior highlighted yellow?','Manual Alignment',...
-                    'Options',{'Superior','Inferior'},'DefaultOption',1);
-                delete(fig3)
-                delete(fig7)
-                close all
-                switch ant2_selection
-                    case 'Superior'
-                        R_yellow = rotz(90);
-                        nodes_ant = (R_yellow*nodes')';
-                    case 'Inferior'
-                        R_yellow = rotz(-90);
-                        nodes_ant = (R_yellow*nodes')';
-                end
+        choices6 = {'Anterior','Posterior','Medial','Lateral','Superior','Inferior'};
+        selY = menu('Which anatomical direction does the YELLOW (+Y) hemisphere point toward?', choices6{:});
+        if selY == 0, error('Selection cancelled.'); end
+        ant_selection = choices6{selY};
+
+        delete(fig3);
+
+        % Map +Y answer to same rotations you used before
+        switch ant_selection
+            case 'Anterior'
+                R_yellow = rotz(0);
+                nodes_ant = nodes;
+            case 'Posterior'
+                R_yellow = rotz(180);
+                nodes_ant = (R_yellow*nodes')';
+            case 'Medial'
+                R_yellow = rotz(-90);
+                nodes_ant = (R_yellow*nodes')';
+            case 'Lateral'
+                R_yellow = rotz(90);
+                nodes_ant = (R_yellow*nodes')';
+            case 'Superior'
+                R_yellow = rotz(90);
+                nodes_ant = (R_yellow*nodes')';
+            case 'Inferior'
+                R_yellow = rotz(-90);
+                nodes_ant = (R_yellow*nodes')';
         end
 
-        fig8 = figure('Position', [fig_left, fig_bottom+15, fig_width, fig_height]);
-        plot3(nodes_ant(:,1),nodes_ant(:,2),nodes_ant(:,3),'k.')
-        hold on
-        plot3(nodes_ant(nodes_ant(:,1) > 0,1),nodes_ant(nodes_ant(:,1) > 0,2),nodes_ant(nodes_ant(:,1) > 0,3),'ro')
-        xlabel('X')
-        ylabel('Y')
-        zlabel('Z')
-        axis equal
-        fig9 = uifigure('Position',uifig_pose);
-        med1_selection = uiconfirm(fig9,'What side is highlighted red?','Manual Alignment',...
-            'Options',{'Medial','Lateral','Superior','Inferior'},'DefaultOption',1);
-        delete(fig9)
-        delete(fig8)
+        % ===== STEP 2: +X hemisphere (RED), one menu with 4 options =====
+        fig8 = figure('Position', [fig_left, fig_bottom+15, fig_width, fig_height], 'Color','w');
+        plot3(nodes_ant(:,1),nodes_ant(:,2),nodes_ant(:,3),'k.'); hold on
+        maskX = nodes_ant(:,1) > 0; if ~any(maskX), maskX = nodes_ant(:,1) >= 0; end
+        plot3(nodes_ant(maskX,1),nodes_ant(maskX,2),nodes_ant(maskX,3),'o','MarkerEdgeColor','none','MarkerFaceColor',[1 0 0],'MarkerSize',5)
+        xlabel('X'); ylabel('Y'); zlabel('Z'); axis equal; grid on; rotate3d on
+        title('Rotate freely. Highlighted points are +X (RED).')
+
+        choices4 = {'Medial','Lateral','Superior','Inferior'};
+        selX = menu('Which anatomical direction does the RED (+X) hemisphere point toward?', choices4{:});
+        if selX == 0, error('Selection cancelled.'); end
+        med1_selection = choices4{selX};
+
+        delete(fig8);
+
         switch med1_selection
             case 'Medial'
                 R_red = rotz(0);
@@ -101,6 +78,7 @@ switch accurate_answer
                 R_red = roty(90);
                 nodes_new = (R_red*nodes_ant')';
         end
+
 
         close all
         better_start = 2;
