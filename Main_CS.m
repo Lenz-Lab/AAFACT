@@ -154,9 +154,9 @@ for m = 1:length(all_files)
         nodes = [nodes.x, nodes.y, nodes.z];
 
     elseif strcmpi(ext,'.obj')
-        obj = readObj(fullfile(FolderPathName,FileName));
-        nodes = obj.v;
-        conlist = obj.f.v;
+        obj = readOBJ(fullfile(FolderPathName,FileName));
+        nodes = obj.V;
+        conlist = obj.F;
 
     else
         error('Unsupported file type: %s', ext);
@@ -359,9 +359,9 @@ for m = 1:length(all_files)
             view([-15 20])
         end
         hold on
-        arrow(coords_final(1,:),coords_final(2,:),'FaceColor','g','EdgeColor','g','LineWidth',5,'Length',10)
-        arrow(coords_final(3,:),coords_final(4,:),'FaceColor','b','EdgeColor','b','LineWidth',5,'Length',10)
-        arrow(coords_final(5,:),coords_final(6,:),'FaceColor','r','EdgeColor','r','LineWidth',5,'Length',10)
+        plot_arrow_quiver(coords_final(1,:),coords_final(2,:),[0 1 0],5,50)
+        plot_arrow_quiver(coords_final(3,:),coords_final(4,:),[0 0 1],5,50)
+        plot_arrow_quiver(coords_final(5,:),coords_final(6,:),[1 0 0],5,50)
         legend(' Nodal Points',' AP Axis',' SI Axis',' ML Axis')
         title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
         text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
