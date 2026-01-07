@@ -25,49 +25,63 @@ Goals: Standardization of foot and ankle local coordinate systems and investigat
 
 ## Description
 
-This code takes a bone model as an input (tibia, fibula, talus, calcaneus, navicular, cuboid, three cuneiforms, and the five metatarsals) and automatically assigns an anatomical coordinate system (ACS). The input file type currently supported is ".k", ".stl", ".particles", ".vtk", ".ply" and the output is an interactive figure displaying the ACS and a .xlsx file with the ACS in two different coordinate spaces. The first is the starting and ending points for all three axes, originating at the location where the user inputs the bone. The second is the starting and ending points for all three axes, originating at (0,0,0).
+AAFACT takes 3D bone models as input (tibia, fibula, talus, calcaneus, navicular, cuboid, three cuneiforms, and the five metatarsals) and automatically assigns an anatomical coordinate system (ACS). Current supported input file types are: ".stl", ".k", ".particles", ".vtk", ".ply", and ".obj". The input file type currently supported is ".k", ".stl", ".particles", ".vtk", ".ply" and ".obj". The output file is an .xlsx file with the ACS in two different coordinate spaces. The first is the starting and ending points for all three axes, originating at the location where the user inputs the bone. The second is the starting and ending points for all three axes, originating at (0,0,0) in a normalized space. Visualization of the ACS on the bone is also included on MATLAB only.
 
 ## Getting Started
+AAFACT can be run in 3 ways, depending on your needs.
 
-### Dependencies
+### Option 1: Run in MATLAB (interactive)
 
-If you want to run it in MATLAB:
+#### Dependencies
 * MATLAB R2020B or later
 * Robotics System Toolbox
 * Phased Array System Toolbox
 
-If you want to run it outside of MATLAB:
-* No dependencies
+#### How to run
+1. Clone or download this repository
+2. Open MATLAB and add the repository to your path
+3. Run the script: Main_CS.m
+4. Select the folder containing bone models
+5. Follow on-screen prompts to:
+     * select files
+     * specify bone type and laterality (this can be avoided if it's included in the file name)
+     * choose coordinate system options
+     * select origin location
+This mode provides full interactivity and visualization.
 
-### Executing program
+### Option 2: Run outside MATLAB (compiled standalone application)
+This option allows users without MATLAB to run AAFACT using MATLAB Runtime (free) 
 
-If you want to run it in MATLAB:
-* Pull the main repository
-* Execute the Matlab script 'MainCS.m'
-* Select the folder where the bone models are located
-* It is recommended to have the bone name and laterality in each file name, but it isn't necessary
-* If the file name does not contain the name of the bone and/or the laterally, you will need to manually select both of those for each bone
-* You will also be prompted to input which ACS you would like for the talus and calcaneus and the desired location of the ACS
+#### Dependencies
+* MATLAB Runtime for 2023a (https://www.mathworks.com/products/compiler/matlab-runtime.html)
 
-If you want to run it outside of MATLAB:
-* Navigate to "AAFACT_App" folder on GitHub repository
-* Download "AAFACT_Install.exe"
-* Follow install instructions (this will take a bit the first time, every future application update should be faster)
-* Once installed, navigate to the the install location (typically this is in your program files directory, where other applications are)
-* Within "application", run AAFACT application
-* Select the folder where the bone models are located
-* It is recommended to have the bone name and laterality in each file name, but it isn't necessary
-* If the file name does not contain the name of the bone and/or the laterally, you will need to manually select both of those for each bone
-* You will also be prompted to input which ACS you would like for the talus and calcaneus and the desired location of the ACS
+#### How to run
+1. Download the compiled AAFACT package for your operating system from the GitHub Releases page
+2. Install the MATLAB Runtime if not already installed
+3. Run AAFACT from the command line:
+      * Windows Example: AAFACT.exe "C:\path\bone_models"
+      * Linux / macOS Example: ./AAFACT "/path/bone_models"
+
+#### Behavior in standalone mode
+* All supported bone files in the input folder are processed
+* All available coordinate systems are computed for each bone
+* Origin is placed at the center of the bone
+* No interactive dialogs or plots are shown
+* Results are written directly to the output folder
+* Important: In standalone mode, bone name and laterality must be detectable from the file name.
+
+### Option 3: Python wrapper (optional)
+A lightweight Python interface can be used to call the compiled AAFACT application programmatically.
+* Python does not re-implement the algorithms
+* Python simply executes the compiled AAFACT binary and manages inputs/outputs
+* This enables batch processing, pipelines, and integration with Python-based workflows
+
+### File naming recommendations
+To enable automatic detection of bone type and laterality (especially for non-interative use), filenames should include: <subject>_<bone>_<side>.<ext>
 
 ## Authors
 
 * Andrew Peterson ([Github](https://github.com/AndrewCPeters0n), [Twitter](https://twitter.com/AndrewCPeters0n), andrew.c.peterson@utah.edu)
-
-## Version History
-
-* 0.1
-    * Initial Release
 
 ## License
 
@@ -81,3 +95,4 @@ Inspiration, code snippets, etc.
 * [dbader](https://github.com/dbader/readme-template)
 * [zenorocha](https://gist.github.com/zenorocha/4526327)
 * [fvcproductions](https://gist.github.com/fvcproductions/1bfc2d4aecb01a834b46)
+
