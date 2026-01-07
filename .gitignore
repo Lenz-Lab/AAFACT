@@ -184,3 +184,11 @@ octave-workspace
 
 # Matlab
 *.asv
+
+**/for_testing/
+**/for_redistribution*/
+**/PackagingLog/
+**/*.log
+**/*.ctf
+**/*.exe
+
