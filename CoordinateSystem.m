@@ -2,7 +2,7 @@ function [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes,bone_in
 % This function produces the coordinate system for the users bone in the
 % temporarily aligned orientation.
 
-trouble = 1;
+trouble = 0;
 nodes_aligned_original = aligned_nodes;
 aligned_nodes = aligned_nodes(all(aligned_nodes ~= 0, 2),:);
 
