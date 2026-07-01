@@ -56,13 +56,13 @@ nodes_final = nodes_coords_final(1:end-6,:);
 coords_final = nodes_coords_final(end-5:end,:);
 
 %% Plotting
-% figure()
-% plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'.k')
-% hold on
-% plot3(coords_final(1:2,1),coords_final(1:2,2),coords_final(1:2,3),'r-')
-% plot3(coords_final(3:4,1),coords_final(3:4,2),coords_final(3:4,3),'b-')
-% plot3(coords_final(5:6,1),coords_final(5:6,2),coords_final(5:6,3),'g-')
-% xlabel('X')
-% ylabel('Y')
-% zlabel('Z')
-% axis equal
+figure()
+plot3(nodes_final(:,1),nodes_final(:,2),nodes_final(:,3),'.k')
+hold on
+plot3(coords_final(1:2,1),coords_final(1:2,2),coords_final(1:2,3),'r-')
+plot3(coords_final(3:4,1),coords_final(3:4,2),coords_final(3:4,3),'b-')
+plot3(coords_final(5:6,1),coords_final(5:6,2),coords_final(5:6,3),'g-')
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+axis equal

@@ -51,10 +51,10 @@ joint_cache = containers.Map('KeyType','int32','ValueType','any');  % stores sca
 % Lists for detemining bone and side
 list_bone = {'Talus', 'Calcaneus', 'Navicular', 'Cuboid', 'Medial_Cuneiform','Intermediate_Cuneiform',...
     'Lateral_Cuneiform','Metatarsal1','Metatarsal2','Metatarsal3','Metatarsal4','Metatarsal5',...
-    'Tibia','Fibula'};
+    'Tibia','Fibula','Proximal_Phalanx1','Proximal_Phalanx2'};
 list_bone2 = {'Talus', 'Calcaneus', 'Navicular', 'Cuboid', 'Med_Cuneiform','Int_Cuneiform',...
     'Lat_Cuneiform','First_Metatarsal','Second_Metatarsal','Third_Metatarsal','Fourth_Metatarsal','Fifth_Metatarsal',...
-    'Tibia','Fibula'};
+    'Tibia','Fibula','First_Proximal_Phalanx','Second_Proximal_Phalanx'};
 list_side_folder = {'Right','_R.','_R_','Left','_L.','_L_'};
 list_side = {'Right','Left'};
 
@@ -238,6 +238,8 @@ for m = 1:length(all_files)
             list_joint = {'Center','Tibiotalar Surface'};
         elseif bone_indx == 14
             list_joint = {'Center','Talofibular Surface'};
+        elseif bone_indx == 15 || bone_indx == 16
+            list_joint = {'Center','Posterior Phalanx Surface'};
         end
 
         if apply_to_all && isKey(joint_cache, int32(bone_indx))
@@ -327,13 +329,15 @@ for m = 1:length(all_files)
         end
 
         %% Similarity
-        max_Z = similaritytest(Temp_Coordinates_Unit, bone_indx, bone_coord(n));
-        crit_Z = 1.645; % alpha = 0.05
+        if bone_indx < 15
+            max_Z = similaritytest(Temp_Coordinates_Unit, bone_indx, bone_coord(n));
+            crit_Z = 1.645; % alpha = 0.05
 
-        if max_Z <= crit_Z
-            fprintf(strcat('The Coordinate System is SIMILAR to existing data\n'))
-        else
-            fprintf(strcat('The Coordinate System may be DIFFERENT than existing data, double check figure\n'))
+            if max_Z <= crit_Z
+                fprintf(strcat('The Coordinate System is SIMILAR to existing data\n'))
+            else
+                fprintf(strcat('The Coordinate System may be DIFFERENT than existing data, double check figure\n'))
+            end
         end
 
         %% Final Plotting

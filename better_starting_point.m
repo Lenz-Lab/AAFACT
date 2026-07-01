@@ -160,9 +160,9 @@ switch accurate_answer
             view([-15 20])
         end
         hold on
-        plot_arrow_quiver(coords_final(1,:),coords_final(2,:),[0 1 0],5,10)
-        plot_arrow_quiver(coords_final(3,:),coords_final(4,:),[0 0 1],5,10)
-        plot_arrow_quiver(coords_final(5,:),coords_final(6,:),[1 0 0],5,10)
+        plot_arrow_quiver(coords_final(1,:),coords_final(2,:),[0 1 0],5,50)
+        plot_arrow_quiver(coords_final(3,:),coords_final(4,:),[0 0 1],5,50)
+        plot_arrow_quiver(coords_final(5,:),coords_final(6,:),[1 0 0],5,50)
         legend(' Nodal Points',' AP Axis',' SI Axis',' ML Axis')
         title(strcat('Coordinate System of'," ", char(FileName)),'Interpreter','none')
         text(coords_final(2,1),coords_final(2,2),coords_final(2,3),'   Anterior','HorizontalAlignment','left','FontSize',15,'Color','g');
