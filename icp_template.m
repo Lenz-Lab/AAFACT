@@ -445,15 +445,15 @@ RTs.red = [];
 RTs.yellow = [];
 
 %% Visualize proper alignment
-figure()
-if bone_indx == 1 && bone_coord >= 2
-    plot3(nodes_template2(:,1),nodes_template2(:,2),nodes_template2(:,3),'.k')
-else
-    plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
-end
-hold on
-plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.b')
-xlabel('X')
-ylabel('Y')
-zlabel('Z')
-axis equal
+% figure()
+% if bone_indx == 1 && bone_coord >= 2
+%     plot3(nodes_template2(:,1),nodes_template2(:,2),nodes_template2(:,3),'.k')
+% else
+%     plot3(nodes_template(:,1),nodes_template(:,2),nodes_template(:,3),'.k')
+% end
+% hold on
+% plot3(aligned_nodes(:,1),aligned_nodes(:,2),aligned_nodes(:,3),'.b')
+% xlabel('X')
+% ylabel('Y')
+% zlabel('Z')
+% axis equal
