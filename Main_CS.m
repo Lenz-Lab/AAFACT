@@ -313,17 +313,10 @@ for m = 1:length(all_files)
 
             [~, coords_final_TST, coords_final_unit_TST, Temp_Coordinates_Unit_TST] = reorient(Temp_Nodes_Coords_TST, cm_nodes, side_indx, RTs_TST);
 
-            coords_final = [coords_final(1,:); ((coords_final_TST(2,:) + coords_final(2,:)).'/2)'
-                coords_final(3,:); ((coords_final_TST(4,:) + coords_final(4,:)).'/2)'
-                coords_final(5,:); ((coords_final_TST(6,:) + coords_final(6,:)).'/2)'];
-
-            coords_final_unit = [coords_final_unit(1,:); ((coords_final_unit_TST(2,:) + coords_final_unit(2,:)).'/2)'
-                coords_final_unit(3,:); ((coords_final_unit_TST(4,:) + coords_final_unit(4,:)).'/2)'
-                coords_final_unit(5,:); ((coords_final_unit_TST(6,:) + coords_final_unit(6,:)).'/2)'];
-
-            Temp_Coordinates_Unit = [Temp_Coordinates_Unit(1,:); ((Temp_Coordinates_Unit_TST(2,:) + Temp_Coordinates_Unit(2,:)).'/2)'
-                Temp_Coordinates_Unit(3,:); ((Temp_Coordinates_Unit_TST(4,:) + Temp_Coordinates_Unit(4,:)).'/2)'
-                Temp_Coordinates_Unit(5,:); ((Temp_Coordinates_Unit_TST(6,:) + Temp_Coordinates_Unit(6,:)).'/2)'];
+            % Save the subtalar ACS to the final coordinate system by averaging the axes of the two coordinate systems
+            coords_final = AverageOrthogonalAxes(coords_final, coords_final_TST);
+            coords_final_unit = AverageOrthogonalAxes(coords_final_unit, coords_final_unit_TST);
+            Temp_Coordinates_Unit = AverageOrthogonalAxes(Temp_Coordinates_Unit, Temp_Coordinates_Unit_TST);
         end
 
         %% Similarity
