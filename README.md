@@ -27,6 +27,66 @@ Goals: Standardization of foot and ankle local coordinate systems and investigat
 
 AAFACT takes 3D bone models as input (tibia, fibula, talus, calcaneus, navicular, cuboid, three cuneiforms, and the five metatarsals) and automatically assigns an anatomical coordinate system (ACS). Current supported input file types are: ".stl", ".k", ".particles", ".vtk", ".ply", and ".obj". The input file type currently supported is ".k", ".stl", ".particles", ".vtk", ".ply" and ".obj". The output file is an .xlsx file with the ACS in two different coordinate spaces. The first is the starting and ending points for all three axes, originating at the location where the user inputs the bone. The second is the starting and ending points for all three axes, originating at (0,0,0) in a normalized space. Visualization of the ACS on the bone is also included on MATLAB only.
 
+## Coordinate system options
+
+### Axis conventions
+Every ACS has three orthogonal axes, reported in this order in the output:
+* **AP axis**: positive points anterior (distal, for the metatarsals)
+* **SI axis**: positive points superior (dorsal)
+* **ML axis**: positive points medial on a left bone and lateral on a right bone. In both cases it points toward the subject's right, so the system stays right-handed for both sides.
+
+Right bones are mirrored to the left side before processing and mirrored back afterward, so left and right bones get equivalent ACSs.
+
+### Available coordinate systems per bone
+Some bones have more than one ACS. Each ACS is written to its own sheet in the output .xlsx, and the sheet name gets the prefix shown below.
+
+| Bone | Coordinate system(s) | Sheet prefix |
+| --- | --- | --- |
+| Tibia | Single ACS | – |
+| Fibula | Single ACS | – |
+| Talus | Talonavicular, Tibiotalar, Subtalar | `TN_`, `TT_`, `ST_` |
+| Calcaneus | Calcaneocuboid, Subtalar | `CC_`, `ST_` |
+| Navicular | Single ACS | – |
+| Cuboid | Vertical, Radial | `V_`, `R_` |
+| Medial and intermediate cuneiforms | Single ACS | – |
+| Lateral cuneiform | Vertical, Radial | `V_`, `R_` |
+| Metatarsals 1–5 | Vertical, Radial | `V_`, `R_` |
+
+In MATLAB you can pick one or more options per bone. Standalone mode always computes all of them.
+
+### Talus
+* **Talonavicular (TN) ACS**: computed from the whole talus, head and neck included. The AP axis follows the long axis of the talus toward the talar head, so this ACS describes motion at the talonavicular joint.
+* **Tibiotalar (TT) ACS**: computed from the talar body and trochlea (dome) only; the head and neck are excluded. The ACS lines up with the talar dome, so it describes motion at the ankle (tibiotalar) joint. Because the talar neck angles medially, the TT axes sit rotated in the transverse plane relative to the TN axes (about 24° for the template talus).
+* **Subtalar (ST) ACS**: the TN and TT ACSs are computed separately and their axes averaged, then re-orthogonalized (see `AverageOrthogonalAxes.m`). This gives an orientation halfway between the talar head and the talar dome, for describing motion at the subtalar joint.
+
+### Calcaneus
+* **Calcaneocuboid (CC) ACS**: the AP axis follows the long axis of the calcaneus, from the tuberosity toward the calcaneocuboid joint.
+* **Subtalar (ST) ACS**: the axes line up with the subtalar (posterior talar) articular surface instead of the long axis of the bone, for describing motion at the subtalar joint.
+
+### Vertical vs. Radial (cuboid, lateral cuneiform, metatarsals)
+These bones sit along the transverse arch of the foot, so their dorsal surfaces face different directions. AAFACT offers two ways to orient their SI and ML axes:
+* **Vertical ACS**: the SI axis points straight up, perpendicular to the plantar (ground) plane, like the rest of the tarsal ACSs. Use it when comparing all bones in one common "foot-up" frame.
+* **Radial ACS**: the SI and ML axes are rotated about the bone's long (AP) axis so the SI axis points outward from the curve of the transverse arch, perpendicular to the bone's own dorsal surface. Use it when each bone should be described relative to its own position in the arch.
+
+The AP axis is the same in both options; only the rotation about it differs. On the template bones that rotation is small for the 1st metatarsal (~3°) and much larger toward the lateral column (~20–35° for the cuboid, lateral cuneiform, and 2nd–4th metatarsals, and ~70° for the 5th metatarsal).
+
+### Origin location
+By default the origin is placed at the center of the bone. In MATLAB you can move it to a joint surface instead:
+
+| Bone | Origin options |
+| --- | --- |
+| Tibia | Center, Tibiotalar surface |
+| Fibula | Center, Talofibular surface |
+| Talus | Center, Talonavicular, Tibiotalar, or Subtalar surface |
+| Calcaneus | Center, Calcaneocuboid or Subtalar surface |
+| Navicular | Center, Talonavicular or Navicular-cuneiform surface |
+| Cuboid | Center, Calcaneocuboid surface |
+| Medial and lateral cuneiforms | Center, Navicular-cuneiform, Cuneiform-metatarsal, or Intercuneiform surface |
+| Intermediate cuneiform | Center, Navicular-cuneiform, Cuneiform-metatarsal, Medial intercuneiform, or Lateral intercuneiform surface |
+| Metatarsals | Center, Posterior (proximal) metatarsal surface |
+
+Moving the origin only translates the ACS; the axis directions stay the same. The exception is the tibia and fibula: choosing the joint-surface origin also aligns the bone to a separate facet template (`Tibia_Template_Facet.stl` / `Fibula_Template_Facet.stl`), so the axes can differ slightly from the center-origin result.
+
 ## Getting Started
 AAFACT can be run in 3 ways, depending on your needs.
 
