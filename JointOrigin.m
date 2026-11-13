@@ -1,5 +1,32 @@
 function [Temp_Coordinates, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes, conlist, bone_indx, joint_indx, side_indx)
-%%
+% JOINTORIGIN  Move the ACS origin from the bone center to a joint surface.
+%
+%   [Temp_Coordinates, Joint] = JointOrigin(Temp_Coordinates, Temp_Nodes,
+%                                conlist, bone_indx, joint_indx, side_indx)
+%
+%   A ray is cast from the current origin along one ACS axis (the "axis of
+%   interest", AOI). Where it hits the bone surface becomes the new origin,
+%   and the whole ACS is translated there. Axis directions do not change.
+%
+%   Inputs:
+%     Temp_Coordinates  6x3 ACS from CoordinateSystem (origins at 0,0,0)
+%     Temp_Nodes        Nx3 template-aligned bone nodes
+%     conlist           Mx3 triangle connectivity for Temp_Nodes (a surface
+%                       mesh is required, so .k/.vtk/.particles inputs
+%                       skip this step in Main_CS)
+%     bone_indx         bone index (see list_bone in Main_CS)
+%     joint_indx        index into that bone's list_joint in Main_CS
+%                       (1 = Center, so this function is only called for 2+)
+%     side_indx         1 = right, 2 = left
+%
+%   Outputs:
+%     Temp_Coordinates  the ACS translated to the joint surface
+%     Joint             name of the chosen surface (used in the Excel sheet)
+
+%% Choose the axis of interest for this bone and joint
+% AOI is the direction (in the aligned frame) from the bone center toward
+% the requested joint surface. "CheckSI"/"CheckML" mean the ray is tried in
+% one direction first and, if it misses, in the opposite direction.
 if bone_indx == 1 % Talus
     if joint_indx == 2 % TN Joint
         AOI = "Anterior";
@@ -40,6 +67,7 @@ elseif bone_indx == 5 || bone_indx == 7 % Medial or Lateral Cuneiform
         AOI = "Anterior";
         Joint = "Cuneiform-Metatarsal Surface";
     elseif joint_indx == 4 % Intercuneiform Joint
+        % Both border the intermediate cuneiform, so look toward it
         if bone_indx == 5
             AOI = "Lateral";
         elseif bone_indx == 7
@@ -78,6 +106,12 @@ elseif bone_indx == 14 % Fibula
     end
 end
 
+%% Convert the AOI into a ray (start point and direction)
+% Rows 2, 4 and 6 of Temp_Coordinates are the AP, SI and ML tips. Because
+% the origin is still (0,0,0), a tip point is also a direction vector, so
+% it is used directly as the ray direction (negated for the opposite side).
+% The ML tip points medial on a left bone and lateral on a right bone (see
+% CoordinateSystem), which is why Medial/Lateral swap sign with side_indx.
 if AOI == "Anterior"
     current_origin = Temp_Coordinates(1,:);
     axis_direction = Temp_Coordinates(2,:);
@@ -106,10 +140,10 @@ elseif AOI == "Lateral"
         current_origin = Temp_Coordinates(5,:);
         axis_direction = -Temp_Coordinates(6,:);
     end
-elseif AOI == "CheckSI"
+elseif AOI == "CheckSI" % tibia: look inferior first (toward the plafond)
     current_origin = Temp_Coordinates(3,:);
     axis_direction = -Temp_Coordinates(4,:);
-elseif AOI == "CheckML"
+elseif AOI == "CheckML" % fibula: look medial first (toward the talus)
     if side_indx == 1
         current_origin = Temp_Coordinates(5,:);
         axis_direction = -Temp_Coordinates(6,:);
@@ -122,21 +156,29 @@ elseif AOI == "None"
 end
 
 
+% Corner vertices of every triangle in the mesh, one row per triangle
 vert1 = Temp_Nodes(conlist(:,1),:);
 vert2 = Temp_Nodes(conlist(:,2),:);
 vert3 = Temp_Nodes(conlist(:,3),:);
 
 %% Move the ACS to the desired joint using intersection.m
 if AOI ~= "None"
+    % Test the ray against every triangle. intersection() treats the ray
+    % as an infinite line, so it can return hits on both sides of the bone.
+    % MATLAB's eps (~2.2e-16) is passed as the parallel-ray tolerance.
     [intersect,~,~,~,joint_origin] = intersection(current_origin, axis_direction, vert1, vert2, vert3, eps);
     joint_origin = joint_origin(intersect,:);
 
+    % Tibia/fibula only: if nothing was hit, try the opposite direction
     if (AOI == "CheckSI" || AOI == "CheckML") && isempty(joint_origin)
         joint_origin = [];
         [intersect,~,~,~,joint_origin] = intersection(current_origin, -axis_direction, vert1, vert2, vert3, eps);
         joint_origin = joint_origin(intersect,:);
     end
 
+    % Of all hits, keep the one nearest the axis tip (50 mm out along the
+    % requested direction). This picks the surface on the requested side
+    % of the bone rather than the one behind the origin.
     comp = 10000;
     for nt = 1:length(joint_origin(:,1))
         tempt = norm(axis_direction - joint_origin(nt,:));
@@ -149,16 +191,19 @@ if AOI ~= "None"
     if exist("mt")
         joint_origin = joint_origin(mt,:);
     else
+        % No intersection at all: usually means the bone was poorly aligned
         joint_origin = [0,0,0];
         warning('There may be a joint origin error, please run the bone alone and use the manual better starting point input as you are most likely having an alignment issue.')
     end
 
+    % Translate all six ACS points (origins and tips) to the joint surface
     Temp_Coordinates = joint_origin + Temp_Coordinates;
 else
     joint_origin = current_origin;
 end
 
 %% Plotting
+% Uncomment to check the ray hit: green = old origin, red = joint origin
 % figure()
 % plot3(Temp_Nodes(:,1),Temp_Nodes(:,2),Temp_Nodes(:,3),'.k')
 % hold on

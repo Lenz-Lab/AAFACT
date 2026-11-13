@@ -18,6 +18,18 @@ clear, clc, close all
 % process. I recommend a file name similar to this for ease:
 % group_#_bone_laterality.stl (ex. ABC_01_Tibia_Right.stl)
 
+% Pipeline for each file (each step is its own function):
+%   1. work out the bone type and side (from the folder/file name or by
+%      asking), and load the mesh
+%   2. ask which ACS option(s) and which origin location to use
+%   3. mirror right bones to the left and center the bone   (center)
+%   4. align it to the matching template bone               (icp_template)
+%   5. compute the AP, SI and ML axes in the template frame (CoordinateSystem)
+%   6. optionally move the origin to a joint surface        (JointOrigin)
+%   7. undo the alignment so the ACS sits on the input bone (reorient)
+%   8. compare against reference data, plot, and write the
+%      results to CoordinateSystem_<folder>.xlsx            (similaritytest)
+
 % Determine the files in the folder selected
 FolderPathName = uigetdir('*.*', 'Select folder with your bones');
 files = dir(fullfile(FolderPathName, '*.*'));
@@ -49,12 +61,18 @@ joint_cache = containers.Map('KeyType','int32','ValueType','any');  % stores sca
 
 
 % Lists for detemining bone and side
+% The position in list_bone is the bone index (bone_indx) used by every
+% function: 1 Talus, 2 Calcaneus, 3 Navicular, 4 Cuboid, 5-7 Cuneiforms
+% (medial, intermediate, lateral), 8-12 Metatarsals 1-5, 13 Tibia,
+% 14 Fibula. list_bone2 holds alternate spellings to look for in names.
 list_bone = {'Talus', 'Calcaneus', 'Navicular', 'Cuboid', 'Medial_Cuneiform','Intermediate_Cuneiform',...
     'Lateral_Cuneiform','Metatarsal1','Metatarsal2','Metatarsal3','Metatarsal4','Metatarsal5',...
     'Tibia','Fibula'};
 list_bone2 = {'Talus', 'Calcaneus', 'Navicular', 'Cuboid', 'Med_Cuneiform','Int_Cuneiform',...
     'Lat_Cuneiform','First_Metatarsal','Second_Metatarsal','Third_Metatarsal','Fourth_Metatarsal','Fifth_Metatarsal',...
     'Tibia','Fibula'};
+% Side tags searched for in names: entries 1-3 mean right, 4-6 mean left.
+% side_indx is 1 for right and 2 for left throughout the toolbox.
 list_side_folder = {'Right','_R.','_R_','Left','_L.','_L_'};
 list_side = {'Right','Left'};
 
@@ -69,6 +87,9 @@ for m = 1:length(all_files)
     name_original = name;
 
     % Looks through the folder name for the bone name
+    % If a second bone name also matches, bone_indx is cleared because the
+    % name is ambiguous, and the next check (file name, then manual
+    % selection) is used instead.
     for n = 1:length(list_bone)
         if any(string(extract(lower(FolderName),lower(list_bone(n)))) == lower(string(list_bone(n)))) ||...
                 any(string(extract(lower(FolderName),lower(list_bone2(n)))) == lower(string(list_bone2(n))))
@@ -102,6 +123,7 @@ for m = 1:length(all_files)
     end
 
     % Looks through the folder name for the bone side
+    % (if several tags match, the last one in list_side_folder wins)
     for n = 1:length(list_side_folder)
         if any(string(extract(lower(FolderName),lower(list_side_folder(n)))) == lower(string(list_side_folder(n))))
                 side_folder_indx = n;
@@ -129,6 +151,9 @@ for m = 1:length(all_files)
     end
 
     %% Load in file based on file type
+    % nodes = Nx3 vertex coordinates; conlist = Mx3 triangle indices.
+    % Point-only formats (.k, .particles) leave conlist empty, so the
+    % joint-surface origin and shaded plot aren't available for them.
     if strcmpi(ext,'.k')
         nodes = LoadDataFile(fullfile(FolderPathName,FileName));
         conlist = [];
@@ -145,15 +170,17 @@ for m = 1:length(all_files)
         fprintf('Note: %s is a .particles file — origin location and plotting will be limited.\n', FileName);
 
     elseif strcmpi(ext,'.vtk')
-        nodes = LoadDataFile(fullfile(FolderPathName,FileName));
-        conlist = [];
-        fprintf('Note: %s is a .vtk file — origin location and plotting will be limited.\n', FileName);
+        TR = LoadDataFile(fullfile(FolderPathName,FileName)); % returns a triangulation
+        nodes = TR.Points;
+        conlist = TR.ConnectivityList;
 
     elseif strcmpi(ext,'.ply')
         [nodes, conlist] = read_ply_loose(fullfile(FolderPathName,FileName));
         nodes = [nodes.x, nodes.y, nodes.z];
 
     elseif strcmpi(ext,'.obj')
+        % readOBJ is not part of this repository or base MATLAB; it must be
+        % on the MATLAB path to load .obj files
         obj = readOBJ(fullfile(FolderPathName,FileName));
         nodes = obj.V;
         conlist = obj.F;
@@ -162,10 +189,13 @@ for m = 1:length(all_files)
         error('Unsupported file type: %s', ext);
     end
 
+    % Untouched copies; each ACS loop iteration starts again from these
     nodes_original   = nodes;
     conlist_original = conlist;
 
     % Lists of different coordinate systems to choose from
+    % The position in each list is the bone_coord value passed on to
+    % icp_template, CoordinateSystem and similaritytest.
     list_talus = {'Talonavicular CS','Tibiotalar CS','Subtalar CS'};
     list_calcaneus = {'Calcaneocuboid CS','Subtalar CS'};
     list_metatarsal = {'Vertical Metatarsal CS','Radial Metatarsal CS'};
@@ -175,6 +205,8 @@ for m = 1:length(all_files)
     % Ignore the bones that only have one coordinate system
     need_cs_menu = ~(bone_indx == 3 || bone_indx == 5 || bone_indx == 6 || bone_indx == 13 || bone_indx == 14);
 
+    % Reuse an earlier answer for this bone type if "Apply to All" is on;
+    % otherwise ask (more than one ACS can be picked) and cache the answer
     if need_cs_menu && apply_to_all && isKey(cs_cache, int32(bone_indx))
         tmp = cs_cache(int32(bone_indx));
         bone_coord = tmp.bone_coord;
@@ -217,9 +249,16 @@ for m = 1:length(all_files)
 
         if side_indx == 1
             nodes = nodes.*[1,1,-1]; % Flip all rights to left
-            conlist = [conlist(:,3) conlist(:,2) conlist(:,1)];
+            % Mirroring turns the mesh inside out, so reverse the vertex
+            % order of each triangle to keep the face normals pointing out
+            % (point-only inputs have no triangles to reorder)
+            if ~isempty(conlist)
+                conlist = [conlist(:,3) conlist(:,2) conlist(:,1)];
+            end
         end
 
+        % Origin options for this bone; the order must match the
+        % joint_indx cases in JointOrigin (1 is always "Center")
         if bone_indx == 1
             list_joint = {'Center','Talonavicular Surface','Tibiotalar Surface', 'Subtalar Surface'};
         elseif bone_indx == 2
@@ -254,6 +293,9 @@ for m = 1:length(all_files)
         end
 
         % Tibia/Fibula special handling
+        % These bones have one ACS, but the origin choice picks the
+        % template: bone_coord 1 = standard template (center origin),
+        % bone_coord 2 = "_Facet" template (joint-surface origin)
         if (bone_indx == 13 || bone_indx == 14)
             if numel(joint_indx) > 1
                 bone_coord = 1:2;
@@ -270,14 +312,17 @@ for m = 1:length(all_files)
         % model in a fashion that the superior region is in the positive Z
         % direction, the anterior region is in the positive Y direction, and the
         % medial region is in the positive X direction.
-        [nodes,cm_nodes] = center(nodes,1);
-        better_start = 1;
+        [nodes,cm_nodes] = center(nodes,1); % cm_nodes is added back in reorient
+        better_start = 1; % 1 = automatic search over starting orientations
         [aligned_nodes, RTs] = icp_template(bone_indx, nodes, bone_coord(n), better_start);
 
         %% Performs coordinate system calculation
+        % Temp_Coordinates is 6x3: [AP origin; AP tip; SI origin; SI tip;
+        % ML origin; ML tip] in the template-aligned frame
         [Temp_Coordinates, Temp_Nodes] = CoordinateSystem(aligned_nodes, bone_indx, bone_coord(n), side_indx);
 
         %% Joint Origin
+        % Needs a surface mesh; point-only inputs fall back to "Center"
         if joint_indx > 1
             if isempty(conlist)
                 Joint = "Center";
@@ -290,12 +335,20 @@ for m = 1:length(all_files)
 
 
         %% Temporarily Attach Coordinate System
+        % Append the 6 ACS points to the nodes so that reorient moves both
+        % with the same transforms
         Temp_Nodes_Coords = [Temp_Nodes; Temp_Coordinates];
 
         %% Reorient and Translate to Original Input Origin and Orientation
+        % coords_final:          ACS on the input bone, 50 mm axes
+        % coords_final_unit:     same, with unit-length axes
+        % Temp_Coordinates_Unit: unit-length ACS in the template frame
         [nodes_final, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes_Coords, cm_nodes, side_indx, RTs);
 
         if bone_indx == 1 && bone_coord(n) == 3 % Additional alignment for talus subtalar ACS
+            % The ACS above used the TT-style alignment (talar body only).
+            % Repeat the pipeline with the TN ACS (bone_coord 1); the two
+            % are then averaged to give the subtalar ACS.
             [aligned_nodes_TST, RTs_TST] = icp_template(bone_indx, nodes, 1, better_start);
             [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1, side_indx);
 
@@ -320,6 +373,8 @@ for m = 1:length(all_files)
         end
 
         %% Similarity
+        % Compare the axis directions to the reference data set. max_Z is
+        % the largest Z-score of the three axis angles.
         max_Z = similaritytest(Temp_Coordinates_Unit, bone_indx, bone_coord(n));
         crit_Z = 1.645; % alpha = 0.05
 
@@ -330,6 +385,7 @@ for m = 1:length(all_files)
         end
 
         %% Final Plotting
+        % 800x600 figure centered on the screen
         screen_size = get(0, 'ScreenSize');
         fig_width = 800;
         fig_height = 600;
@@ -337,6 +393,7 @@ for m = 1:length(all_files)
         fig_bottom = (screen_size(4) - fig_height) / 2;
 
         fig1 = figure('Position', [fig_left, fig_bottom+15, fig_width, fig_height]);
+        % Shaded surface if a mesh was loaded, otherwise a point cloud
         if ~isempty(conlist_original)
             Final_Bone = triangulation(conlist,nodes_original);
             patch('Faces',Final_Bone.ConnectivityList,'Vertices',Final_Bone.Points,...
@@ -352,6 +409,7 @@ for m = 1:length(all_files)
             view([-15 20])
         end
         hold on
+        % AP = green, SI = blue, ML = red, each drawn 50 mm long
         plot_arrow_quiver(coords_final(1,:),coords_final(2,:),[0 1 0],5,50)
         plot_arrow_quiver(coords_final(3,:),coords_final(4,:),[0 0 1],5,50)
         plot_arrow_quiver(coords_final(5,:),coords_final(6,:),[1 0 0],5,50)
@@ -372,6 +430,13 @@ for m = 1:length(all_files)
         axis equal
 
         %% Save both coordinate systems to spreadsheet
+        % One sheet per bone/ACS. Layout:
+        %   A1:B3    subject name, bone and side
+        %   A5:D9    ACS on the input bone: origin row, then the AP, SI and
+        %            ML tip points (origin + unit vector)
+        %   A10:D14  the same ACS in the template-aligned frame
+        % A-D below are the label blocks; the coordinates are written
+        % row by row further down.
         A = ["Subject"
             "Bone Model"
             "Side"];
@@ -390,6 +455,10 @@ for m = 1:length(all_files)
             "ML Axis"];
         D = ["X" "Y" "Z"];
 
+        % Prefix the sheet name with the ACS type so several ACSs for one
+        % bone get separate sheets (TN/TT/ST talus, CC/ST calcaneus,
+        % V = Vertical / R = Radial for the cuboid, lateral cuneiform and
+        % metatarsals)
         if bone_indx == 1 && bone_coord(n) == 1
             name = strcat('TN_',name);
         elseif bone_indx == 1 && bone_coord(n) == 2
@@ -410,14 +479,14 @@ for m = 1:length(all_files)
             name = strcat('R_',name);
         end
 
-        if length(name) > 31
+        if length(name) > 31 % Excel's limit for sheet names
             name = name(1:31);
         end
 
         % The following loop attempts to write the data to Excel using the try function. If
         % for some reason MATLAB cannot write to the file, it catches the error, posts an error
-        % to the terminal, and tries again. If the write is successful, the index is updated to
-        % the final index in the FOR loop, and the FOR loop ends after a success.
+        % to the terminal, and tries again (up to 5 attempts). After a successful write, break
+        % ends the FOR loop.
         for try_index = 1:5
             try
                 xlfilename = strcat(FolderPathName,'\CoordinateSystem_',FolderName,'.xlsx');
@@ -434,7 +503,7 @@ for m = 1:length(all_files)
                 writematrix(Temp_Coordinates_Unit(2,:),xlfilename,'Sheet',name,'Range','B12');
                 writematrix(Temp_Coordinates_Unit(4,:),xlfilename,'Sheet',name,'Range','B13');
                 writematrix(Temp_Coordinates_Unit(6,:),xlfilename,'Sheet',name,'Range','B14');
-                try_index = 5;
+                break
             catch
                 disp("Error attempting to write to Excel file, reattempting...")
                 continue
@@ -442,6 +511,8 @@ for m = 1:length(all_files)
         end
 
         %% Better Starting Point
+        % Only offered for a single file with a single ACS. Lets the user
+        % orient the bone by hand if the automatic alignment looks wrong.
         if length(all_files) == 1 && length(bone_coord) == 1
             accurate_answer = questdlg('Would you like to troubleshoot alignment?', ...
                 'Troubleshoot', 'Yes', 'No', 'No');

@@ -14,9 +14,17 @@ function aafact_cli(inputFolder)
 % Notes:
 % - Requires files to include bone name + side in filename or folder:
 %   e.g. ABC_01_Tibia_Right.stl
+% - Runs the same pipeline as Main_CS (center -> icp_template ->
+%   CoordinateSystem -> reorient) but with no dialogs, so it can be
+%   compiled and called from the Python wrapper. Differences from Main_CS:
+%   no joint-surface origins, no similarity test, no plots, no manual
+%   "better starting point" step, and bone detection takes the first
+%   matching name instead of rejecting ambiguous names.
+% - Results are written next to the input files as
+%   CoordinateSystem_<folder>.xlsx, one sheet per bone/ACS.
 
 inputFolder  = string(inputFolder);
-outputFolder = string(inputFolder);
+outputFolder = string(inputFolder); % output goes in the input folder
 
 if ~isfolder(inputFolder)
     error("Input folder not found: %s", inputFolder);
@@ -126,6 +134,8 @@ for m = 1:numel(d)
         [~, coords_final, coords_final_unit, Temp_Coordinates_Unit] = reorient(Temp_Nodes_Coords, cm_nodes, side_indx, RTs);
 
         % Special: Talus subtalar ACS adjustment (kept from your script)
+        % The ST ACS combines the ACS above with a TN ACS (bone_coord 1),
+        % the same way as Main_CS.
         if bone_indx == 1 && bone_coord(n) == 3
             [aligned_nodes_TST, RTs_TST] = icp_template(bone_indx, nodes, 1, better_start);
             [Temp_Coordinates_TST, Temp_Nodes_TST] = CoordinateSystem(aligned_nodes_TST, bone_indx, 1, side_indx);
@@ -133,17 +143,11 @@ for m = 1:numel(d)
             Temp_Nodes_Coords_TST = [Temp_Nodes_TST; Temp_Coordinates_TST];
             [~, coords_final_TST, coords_final_unit_TST, Temp_Coordinates_Unit_TST] = reorient(Temp_Nodes_Coords_TST, cm_nodes, side_indx, RTs_TST);
 
-            coords_final = [coords_final(1,:); ((coords_final_TST(2,:) + coords_final(2,:)).'/2)'
-                coords_final(3,:); ((coords_final_TST(4,:) + coords_final(4,:)).'/2)'
-                coords_final(5,:); ((coords_final_TST(6,:) + coords_final(6,:)).'/2)'];
-
-            coords_final_unit = [coords_final_unit(1,:); ((coords_final_unit_TST(2,:) + coords_final_unit(2,:)).'/2)'
-                coords_final_unit(3,:); ((coords_final_unit_TST(4,:) + coords_final_unit(4,:)).'/2)'
-                coords_final_unit(5,:); ((coords_final_unit_TST(6,:) + coords_final_unit(6,:)).'/2)'];
-
-            Temp_Coordinates_Unit = [Temp_Coordinates_Unit(1,:); ((Temp_Coordinates_Unit_TST(2,:) + Temp_Coordinates_Unit(2,:)).'/2)'
-                Temp_Coordinates_Unit(3,:); ((Temp_Coordinates_Unit_TST(4,:) + Temp_Coordinates_Unit(4,:)).'/2)'
-                Temp_Coordinates_Unit(5,:); ((Temp_Coordinates_Unit_TST(6,:) + Temp_Coordinates_Unit(6,:)).'/2)'];
+            % Average the axis directions of the two ACSs and
+            % re-orthogonalize them (origins come from the first ACS)
+            coords_final = AverageOrthogonalAxes(coords_final, coords_final_TST);
+            coords_final_unit = AverageOrthogonalAxes(coords_final_unit, coords_final_unit_TST);
+            Temp_Coordinates_Unit = AverageOrthogonalAxes(Temp_Coordinates_Unit, Temp_Coordinates_Unit_TST);
         end
 
         % Similarity test (kept)
@@ -177,6 +181,8 @@ for m = 1:numel(d)
         end
 
         % Try writing a few times (same strategy)
+        % Excel writes can fail briefly if the file is locked; retry up to
+        % 5 times and stop at the first success
         for try_index = 1:5
             try
                 writematrix(A, xlfilename, 'Sheet', sheet);
@@ -209,6 +215,8 @@ end
 % ===================== Helper functions =====================
 
 function bone_indx = detectBoneIndex(FileName, FolderName, list_bone, list_bone2)
+% Returns the index of the first bone name found in the folder name, or
+% failing that in the file name (case-insensitive). Empty if none match.
 bone_indx = [];
 for n = 1:numel(list_bone)
     if contains(lower(FolderName), lower(list_bone{n})) || contains(lower(FolderName), lower(list_bone2{n}))
@@ -223,6 +231,9 @@ end
 end
 
 function side_indx = detectSideIndex(FileName, FolderName, list_side_folder)
+% Returns 1 (right) or 2 (left) from the first side tag found in the
+% folder name, or failing that in the file name. Tags 1-3 in
+% list_side_folder are right, 4-6 are left. Empty if none match.
 side_indx = [];
 side_folder_indx = [];
 for n = 1:numel(list_side_folder)
@@ -245,6 +256,8 @@ end
 end
 
 function [nodes, conlist] = loadMeshByExtension(fullpath, ext)
+% Same loaders as Main_CS. nodes is Nx3; conlist is Mx3 triangle indices,
+% or empty for point-only formats.
 conlist = [];
 if strcmpi(ext,'.k')
     nodes = LoadDataFile(fullpath);
@@ -257,8 +270,9 @@ elseif strcmpi(ext,'.particles')
     nodes = load(fullpath);
     fprintf("  Note: .particles file — origin location and plotting limited.\n");
 elseif strcmpi(ext,'.vtk')
-    nodes = LoadDataFile(fullpath);
-    fprintf("  Note: .vtk file — origin location and plotting limited.\n");
+    TR = LoadDataFile(fullpath); % returns a triangulation
+    nodes = TR.Points;
+    conlist = TR.ConnectivityList;
 elseif strcmpi(ext,'.ply')
     [nodes, conlist] = read_ply_loose(fullpath);
     nodes = [nodes.x, nodes.y, nodes.z];
@@ -289,6 +303,10 @@ end
 end
 
 function sheet = prefixSheetName(name, bone_indx, bone_coord_n)
+% Adds the ACS type to the front of the sheet name (same rules as
+% Main_CS): TN/TT/ST for the talus, CC/ST for the calcaneus, and
+% V (Vertical) / R (Radial) for the cuboid, lateral cuneiform and
+% metatarsals
 sheet = name;
 if bone_indx == 1 && bone_coord_n == 1
     sheet = "TN_" + sheet;

@@ -5,17 +5,48 @@ function [aligned_nodes, RTs] = icp_template(bone_indx,nodes,bone_coord,better_s
 % by the user (bone_coord), and a logical value for the user manually
 % choosing a better starting point the icp code doesn't undo the chosen
 % position.
+%
+% Inputs:
+%   bone_indx     bone index (see list_bone in Main_CS)
+%   nodes         Nx3 centered bone nodes (rights already mirrored to left)
+%   bone_coord    ACS option; picks between template variants
+%   better_start  1 = automatic search over many starting orientations
+%                 2 = the user already oriented the bone by hand in
+%                     better_starting_point, so only that start is used
+%
+% Outputs:
+%   aligned_nodes  Nx3 nodes in the template frame (+X medial, +Y
+%                  anterior, +Z superior), at the bone's original scale
+%   RTs            struct of every rotation/translation applied, so that
+%                  reorient can undo them in reverse order
+%
+% Outline:
+%   1. load the template (and crop it if the user's bone is a partial
+%      tibia, fibula or metatarsal)
+%   2. temporarily scale the user's bone up if it is smaller than the
+%      template
+%   3. run ICP from many starting orientations and keep the best fit
+%   4. apply bone-specific refinements (talus TT/ST, fibula, tibia,
+%      metatarsals)
 
 addpath('Template_Bones\')
 %% Read in Template Bone
+% "a" is the template axis used to measure the template's length when
+% matching size below (1 = X/ML, 2 = Y/AP, 3 = Z/SI), i.e. roughly the
+% template's long axis.
 if bone_indx == 1 && bone_coord == 1 % TN
     TR_template = stlread('Talus_Template.stl');
     a = 2;
 elseif bone_indx == 1 && bone_coord >= 2 % TT & ST
+    % Align to the standard talus first, then rotate onto Talus_Template2
+    % (see "Additional alignments" below)
     TR_template2 = stlread('Talus_Template2.stl');
     TR_template = stlread('Talus_Template.stl');
     nodes_template2 = TR_template2.Points;
     a = 2;
+% Files ending in "2" are the alternate ACS (Calcaneus ST, Radial cuboid,
+% lateral cuneiform and metatarsals). "_Facet" templates are used for the
+% tibia/fibula when the origin is placed on the joint surface.
 elseif bone_indx == 2 && bone_coord == 1
     TR_template = stlread('Calcaneus_Template.stl');
     a = 2;
@@ -90,6 +121,8 @@ end
 nodes_template = TR_template.Points;
 con_temp = TR_template.ConnectivityList;
 
+% Find the longest dimension of the user's bone ("b") so it can be
+% compared with the template's length along axis "a"
 max_nodes_x = (max(nodes(:,1)) - min(nodes(:,1)));
 max_nodes_y = (max(nodes(:,2)) - min(nodes(:,2)));
 max_nodes_z = (max(nodes(:,3)) - min(nodes(:,3)));
@@ -105,9 +138,16 @@ end
 
 %% Adjusting the cropped/smaller models
 % Creates similar sized models for cropped tibia or fibula
+% Partial scans of long bones don't match a full template well, so the
+% template is cropped to the same length and capped with a flat plane of
+% points that stands in for the cut end of the user's scan.
+% tibfib_switch: 1 = enough bone for the normal pipeline,
+%                2 = very short (< 1/5 of the template); the tibia/fibula
+%                    refinements further down are skipped
 if bone_indx == 13 || bone_indx == 14
     nodes_template_length = (max(nodes_template(:,a)) - min(nodes_template(:,a)));
     if nodes_template_length/1.5 > max_nodes_length % Determines if the user's model is 2/3 the length of the template model
+        % Keep only the distal part of the template, as long as the user's bone
         temp = find(nodes_template(:,3) < (min(nodes_template(:,a)) + max_nodes_length));
         nodes_template = [nodes_template(temp,1) nodes_template(temp,2) nodes_template(temp,3)];
         x = (-20:4:10)';
@@ -126,6 +166,8 @@ if bone_indx == 13 || bone_indx == 14
         nodes_template = [nodes_template(:,1) nodes_template(:,2) nodes_template(:,3);
             plane(:,1) plane(:,2) plane(:,3)];
 
+        % Center origin: re-center the cropped template. Facet templates
+        % (bone_coord 2) keep their joint-based origin.
         if bone_coord == 1
             nodes_template = center(nodes_template,1);
         end
@@ -144,6 +186,9 @@ else
 end
 
 % Similar process as above for cropped metatarsals
+% Triggered when the user's metatarsal is shorter than 80% of the template.
+% The template is kept from its posterior (proximal) end and capped with
+% a plane perpendicular to Y.
 if bone_indx >= 8 && bone_indx <= 12
     nodes_template_length = (max(nodes_template(:,a)) - min(nodes_template(:,a)));
     if nodes_template_length/1.25 > max_nodes_length
@@ -167,6 +212,9 @@ if bone_indx >= 8 && bone_indx <= 12
 end
 
 % Determines maximum axis of bone model and compares it to the template
+% multiplier: template length / user length along each one's long axis.
+% parttib_multiplier: same ratio using X width; only used for very short
+% tibia/fibula scans where the length is not meaningful.
 multiplier = (max(nodes_template(:,a)) - min(nodes_template(:,a)))/(max(nodes(:,b)) - min(nodes(:,b)));
 parttib_multiplier = (max(nodes_template(:,1)) - min(nodes_template(:,1)))/(max(nodes(:,1)) - min(nodes(:,1)));
 
@@ -184,9 +232,13 @@ end
 % the second is just the points.
 
 format long g
-iterations = 200;
+iterations = 200; % ICP iterations for each full alignment
 
 % Rotations
+% ICP only finds the nearest local fit, so it is started from a set of
+% coarse orientations (90-degree combinations about X, Y and Z) and the
+% best result is kept. (rxxxzzz is listed twice; the second line simply
+% overwrites the first.)
 r.r0 = eye(3);
 r.rx = rotx(90);
 r.rxx = rotx(180);
@@ -211,7 +263,13 @@ r.rxxxzzz = rotx(270) * rotz(270);
 
 fields = fieldnames(r);
 
+% Each alignment runs two ICP variants and keeps the one with lower RMS:
+%   - EdgeRejection: ignores matches to edge vertices of the template mesh
+%   - WorstRejection 0.1: ignores the worst 10% of point matches
+% The results are stored in R, T and E under the starting rotation's name.
+
 if better_start == 2
+    % User already oriented the bone by hand: only use the identity start
     field_name = fields{1};
     [R_temp,T_temp,E_temp] = icp(nodes_template',nodes', iterations,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
     [Rwr_temp,Twr_temp,Ewr_temp] = icp(nodes_template',nodes', iterations,'Matching','kDtree','WorstRejection',0.1);
@@ -227,6 +285,8 @@ if better_start == 2
 end
 
 if better_start == 1
+    % Pass 1: a quick 3-iteration ICP from every starting rotation to
+    % screen out poor starts
     iterations_temp = 3;
     for n = 1:numel(fields)
         rot = r.(fields{n}); % Access each rotation matrix using the field name
@@ -277,6 +337,8 @@ best_T = T.(smallest_field);  % The best T vector
 best_rotation_matrix = r.(smallest_field);  % The rotation matrix from the original structure
 
 % Perform the final alignment calculation
+% Order: starting rotation (row-vector form, nodes*rot), then the ICP
+% rotation and translation (column-vector form, R*p + T)
 aligned_nodes = (best_R * ((nodes*best_rotation_matrix)') + repmat(best_T, 1, length(nodes')))';  % Align the nodes
 
 % Store the results for the final transformation
@@ -286,6 +348,9 @@ iT = best_T;  % The best T vector
 
 %% Additional alignments and adjustments
 % This loop performs an alignment for the TT CS of the talus
+% The bone is now aligned to Talus_Template. ICP between the two talus
+% templates gives the fixed rotation from Talus_Template to
+% Talus_Template2, which is then applied to the user's bone.
 if bone_indx == 1 && bone_coord >= 2
     [sR_talus,~,~] = icp(nodes_template2',nodes_template',25,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
     aligned_nodes = (sR_talus*(aligned_nodes'))';
@@ -303,6 +368,9 @@ end
 % This ensures the fibular coodinate system is at the center of the TF
 % joint
 if tibfib_switch == 1 && bone_indx == 14
+    % Scale a temporary copy so its smaller cross-section dimension (X or
+    % Y) matches the template, then refine the rotation with ICP. The
+    % scaled copy is only used to find sR_fibula.
     max_nodes_x = (max(aligned_nodes(:,1)) - min(aligned_nodes(:,1)));
     max_nodes_y = (max(aligned_nodes(:,2)) - min(aligned_nodes(:,2)));
 
@@ -317,6 +385,10 @@ if tibfib_switch == 1 && bone_indx == 14
     [sR_fibula,~,~] = icp(nodes_template',aligned_nodes_temp',25,'Matching','kDtree','EdgeRejection',logical(1),'Triangulation',con_temp);
     aligned_nodes = (sR_fibula*(aligned_nodes'))';
 
+    % Find the talofibular facet: within the distal 20 mm (z < 20), take
+    % a +/- 2 mm band at the AP middle of the bone and pick its most
+    % medial (+X) point. The bone is then shifted in X and Y so that
+    % point sits on the Z axis.
     sub = aligned_nodes(aligned_nodes(:,3) < 20,:);
     minY = min(sub(:,2));
     maxY = max(sub(:,2));
@@ -328,8 +400,8 @@ if tibfib_switch == 1 && bone_indx == 14
     aligned_nodes(:,1) = aligned_nodes(:,1) - Xp(1);
     aligned_nodes(:,2) = aligned_nodes(:,2) - Xp(2);
 
-    sT_fibula = [-Xp(1); -Xp(2); 0];
-    sflip = eye(3);
+    sT_fibula = [-Xp(1); -Xp(2); 0]; % stored so reorient can undo the shift
+    sflip = eye(3); % no extra flip for the fibula
 else
     sR_fibula = [];
     sT_fibula = [];
@@ -340,6 +412,11 @@ end
 % This ensures the tibial coordinate system is at the center of the tibial
 % plafond
 if tibfib_switch == 1 && bone_indx == 13
+    % Re-run ICP on just the distal tibia (nodes below z = 150 mm), capped
+    % with a flat plane at the top of that section (like the cropped
+    % templates above).
+    % In automatic mode, four starts rotated 0/90/180/270 deg about Z are
+    % tried and the lowest-error one is kept.
     temp = find(aligned_nodes(:,3) < 150);
     nodes_test = [aligned_nodes(temp,1) aligned_nodes(temp,2) aligned_nodes(temp,3)];
     x = (-20:4:20)';
@@ -372,6 +449,8 @@ if tibfib_switch == 1 && bone_indx == 13
         Etw = min([Etw1(end)]);
     end
 
+    % Apply the winning rotation/translation to the full tibia and record
+    % it (sflip = the Z rotation used as the start)
     if Etw == Etw1(end)
         if better_start == 1
             sflip = eye(3);
@@ -379,9 +458,12 @@ if tibfib_switch == 1 && bone_indx == 13
             sR_tibia= Rtw1;
             sT_tibia = Ttw1;
         else
+            % Manual start: apply the translation only, so the user's
+            % chosen orientation is kept. No rotation was applied, so
+            % identity is stored for reorient to undo.
             sflip = eye(3);
             aligned_nodes = (aligned_nodes' + repmat(Ttw1,1,length(aligned_nodes')))';
-            sR_tibia= Rtw1;
+            sR_tibia= eye(3);
             sT_tibia = Ttw1;
         end
     elseif Etw == Etw2(end)
@@ -418,6 +500,7 @@ end
 %     sT_fibula = [];
 % end
 
+% Metatarsals: put the centroid at the origin (undone in reorient)
 if bone_indx >= 8 && bone_indx <= 12
     [aligned_nodes,cm_meta] = center(aligned_nodes,1);
 else
@@ -425,6 +508,9 @@ else
 end
 
 %% Combine all rotation and translation matricies
+% Bone-specific fields are left empty ([]) when they don't apply; reorient
+% checks which ones are set. red/yellow are filled in later by
+% better_starting_point when the user orients the bone by hand.
 RTs.iflip = iflip; % initial flip flip_out
 RTs.sflip = sflip; % secondary flip (for tibia) tib_flip
 RTs.iR = iR; % initial rotation Rot
@@ -439,6 +525,7 @@ RTs.red = [];
 RTs.yellow = [];
 
 %% Visualize proper alignment
+% Uncomment to overlay the aligned bone (blue) on the template (black)
 % figure()
 % if bone_indx == 1 && bone_coord >= 2
 %     plot3(nodes_template2(:,1),nodes_template2(:,2),nodes_template2(:,3),'.k')

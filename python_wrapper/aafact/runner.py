@@ -41,7 +41,8 @@ def run_aafact(input_dir: str | Path, exe_path: str | Path) -> Path:
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Run AAFACT: AAFACT.exe "<input>" "<output>"
+    # Run AAFACT: AAFACT.exe "<input>"
+    # The CLI writes its Excel output into the input folder.
     cmd = [str(exe_path), str(input_dir)]
 
     try:
